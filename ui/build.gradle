@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.kapt'
     id 'maven-publish'
 }
 
@@ -41,6 +42,9 @@ dependencies {
 
     implementation project(':core')
     api project(':material-color-utilities')
+
+    implementation "com.google.dagger:dagger:${daggerVersion}"
+    kapt "com.google.dagger:dagger-compiler:${daggerVersion}"
 }
 
 afterEvaluate {

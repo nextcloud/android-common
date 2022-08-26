@@ -21,18 +21,13 @@ package com.nextcloud.android.common.ui.theme
 
 import scheme.Scheme
 
-interface MaterialSchemes {
-    /**
-     * Schema for light theme
-     */
-    val lightScheme: Scheme
+internal class MaterialSchemesImpl(serverTheme: ServerTheme) :
+    MaterialSchemes {
+    override val lightScheme: Scheme
+    override val darkScheme: Scheme
 
-    /**
-     * Schema for light theme
-     */
-    val darkScheme: Scheme
-
-    companion object {
-        fun fromServerTheme(theme: ServerTheme): MaterialSchemes = MaterialSchemesImpl(theme)
+    init {
+        lightScheme = Scheme.light(serverTheme.primaryColor)
+        darkScheme = Scheme.dark(serverTheme.primaryColor)
     }
 }
