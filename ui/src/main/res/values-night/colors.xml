@@ -18,11 +18,10 @@
   -->
 
 <resources>
-    <color name="refresh_spinner_background">#ffffff</color>
-    <color name="high_emphasis_text">#de000000</color>
-    <color name="disabled_text">#ff888888</color>
-    <color name="grey_900">#212121</color>
-    <color name="bg_default">#FFFFFF</color>
-    <color name="switch_thumb_color_unchecked">#ececec</color>
-    <color name="switch_track_color_unchecked">#b2b2b2</color>
+    <color name="refresh_spinner_background">#222222</color>
+    <color name="high_emphasis_text">#deffffff</color>
+    <color name="disabled_text">#ff6F6F6F</color>
+    <color name="bg_default">#121212</color>
+    <color name="switch_thumb_color_unchecked">#cbcbcb</color>
+    <color name="switch_track_color_unchecked">#5a5a5a</color>
 </resources>

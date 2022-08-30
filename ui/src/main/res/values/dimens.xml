@@ -18,11 +18,5 @@
   -->
 
 <resources>
-    <color name="refresh_spinner_background">#ffffff</color>
-    <color name="high_emphasis_text">#de000000</color>
-    <color name="disabled_text">#ff888888</color>
-    <color name="grey_900">#212121</color>
-    <color name="bg_default">#FFFFFF</color>
-    <color name="switch_thumb_color_unchecked">#ececec</color>
-    <color name="switch_track_color_unchecked">#b2b2b2</color>
+    <dimen name="dialogBorderRadius">28dp</dimen>
 </resources>

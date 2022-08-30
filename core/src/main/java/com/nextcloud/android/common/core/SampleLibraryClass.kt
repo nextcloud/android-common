@@ -19,5 +19,5 @@
 
 package com.nextcloud.android.common.core
 
-class SampleLibraryClass {
-}
+// TODO remove when the core lib actually contains useful stuff
+class SampleLibraryClass
