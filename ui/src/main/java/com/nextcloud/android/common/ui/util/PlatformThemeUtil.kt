@@ -1,6 +1,8 @@
 /*
  * Nextcloud Android Common Library
  *
+ * @author Álvaro Brey
+ * Copyright (C) 2022 Álvaro Brey <alvaro@alvarobrey.com>
  * Copyright (C) 2022 Nextcloud GmbH
  *
  * This program is free software: you can redistribute it and/or modify
