@@ -46,13 +46,11 @@ class AndroidXViewThemeUtils @Inject constructor(schemes: MaterialSchemes) :
 
             val thumbUncheckedColor = ResourcesCompat.getColor(
                 context.resources,
-                // TODO extract to common
                 R.color.switch_thumb_color_unchecked,
                 context.theme
             )
             val trackUncheckedColor = ResourcesCompat.getColor(
                 context.resources,
-                // TODO extract to common
                 R.color.switch_track_color_unchecked,
                 context.theme
             )
