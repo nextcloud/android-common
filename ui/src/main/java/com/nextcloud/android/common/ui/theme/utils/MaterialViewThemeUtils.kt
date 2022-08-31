@@ -23,6 +23,7 @@
 
 package com.nextcloud.android.common.ui.theme.utils
 
+import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.PorterDuff
@@ -31,6 +32,7 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipDrawable
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.tabs.TabLayout
@@ -283,6 +285,13 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
         withScheme(chip) { scheme ->
             chip.chipBackgroundColor = ColorStateList.valueOf(scheme.primary)
             chip.setTextColor(scheme.onPrimary)
+        }
+    }
+
+    fun colorChipDrawable(context: Context, chipDrawable: ChipDrawable) {
+        withScheme(context) { scheme ->
+            chipDrawable.chipBackgroundColor = ColorStateList.valueOf(scheme.primary)
+            chipDrawable.setTextColor(scheme.onPrimary)
         }
     }
 
