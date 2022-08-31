@@ -32,17 +32,25 @@ abstract class ViewThemeUtilsBase(val schemes: MaterialSchemes) {
     /**
      * Scheme for painting elements
      */
-    fun getScheme(context: Context): Scheme = when {
+    @Suppress("DeprecatedCallableAddReplaceWith")
+    @Deprecated(
+        "Implement view-specific theming functions in a `ViewThemeUtilsBase` subclass" +
+            " instead of getting the scheme directly"
+    )
+    fun getScheme(context: Context): Scheme = getSchemeInternal(context)
+
+    @Suppress("MemberVisibilityCanBePrivate")
+    protected fun getSchemeInternal(context: Context): Scheme = when {
         PlatformThemeUtil.isDarkMode(context) -> schemes.darkScheme
         else -> schemes.lightScheme
     }
 
     protected fun withScheme(view: View, block: (Scheme) -> Unit) {
-        block(getScheme(view.context))
+        block(getSchemeInternal(view.context))
     }
 
     protected fun withScheme(context: Context, block: (Scheme) -> Unit) {
-        block(getScheme(context))
+        block(getSchemeInternal(context))
     }
 
     protected fun withSchemeDark(block: (Scheme) -> Unit) {
