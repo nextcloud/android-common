@@ -11,6 +11,23 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
+task installGitHooks(type: Copy, group: "development") {
+    def sourceFolder = "${rootProject.projectDir}/scripts/hooks"
+    def destFolder = "${rootProject.projectDir}/.git/hooks"
+
+    description = "Install git hooks"
+
+    from(sourceFolder) {
+        include '*'
+    }
+    into destFolder
+
+    eachFile { file ->
+        println "${sourceFolder}/${file.relativeSourcePath} -> ${destFolder}/${file.path}"
+    }
+}
+
+
 allprojects {
     group = 'com.nextcloud.android-common'
 }
