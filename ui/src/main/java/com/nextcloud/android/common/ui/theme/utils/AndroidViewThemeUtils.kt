@@ -197,6 +197,13 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
     }
 
     /**
+     * In most cases you'll want to use [themeImageButton] instead.
+     */
+    fun colorImageButton(imageButton: ImageButton?, @ColorInt color: Int) {
+        imageButton?.setColorFilter(color, PorterDuff.Mode.SRC_ATOP)
+    }
+
+    /**
      * Tints the image with element color
      */
     fun colorImageView(imageView: ImageView) {
@@ -207,6 +214,15 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
 
     fun colorTextButtons(vararg buttons: Button) {
         withScheme(buttons[0]) { scheme ->
+            colorTextButtons(scheme.primary, *buttons)
+        }
+    }
+
+    /**
+     * In most cases you'll want to use [colorTextButtons] instead.
+     */
+    fun colorTextButtons(@ColorInt color: Int, vararg buttons: Button) {
+        withScheme(buttons[0]) { scheme ->
             for (button in buttons) {
                 button.setTextColor(
                     ColorStateList(
@@ -215,7 +231,7 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
                             intArrayOf(-android.R.attr.state_enabled)
                         ),
                         intArrayOf(
-                            scheme.primary,
+                            color,
                             colorUtil.adjustOpacity(scheme.onSurface, ON_SURFACE_OPACITY_BUTTON_DISABLED)
                         )
                     )
