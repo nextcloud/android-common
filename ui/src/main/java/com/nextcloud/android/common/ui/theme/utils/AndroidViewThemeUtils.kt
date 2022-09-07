@@ -35,15 +35,7 @@ import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.view.MenuItem
 import android.view.View
-import android.widget.Button
-import android.widget.CheckBox
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.RadioButton
-import android.widget.SeekBar
-import android.widget.TextView
+import android.widget.*
 import androidx.annotation.ColorInt
 import androidx.core.content.res.ResourcesCompat
 import com.nextcloud.android.common.ui.R
@@ -258,15 +250,19 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
         }
     }
 
-    fun themeCheckbox(checkbox: CheckBox) {
-        withScheme(checkbox) { scheme ->
-            checkbox.buttonTintList = ColorStateList(
+    fun themeCheckbox(vararg checkboxes: CheckBox) {
+        withScheme(checkboxes[0]) { scheme ->
+            val colorStateList = ColorStateList(
                 arrayOf(
                     intArrayOf(-android.R.attr.state_checked),
+                    intArrayOf(-android.R.attr.state_enabled),
                     intArrayOf(android.R.attr.state_checked)
                 ),
-                intArrayOf(Color.GRAY, scheme.primary)
+                intArrayOf(Color.GRAY, Color.GRAY, scheme.primary)
             )
+            checkboxes.forEach {
+                it.buttonTintList = colorStateList
+            }
         }
     }
 
