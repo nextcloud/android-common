@@ -1,0 +1,31 @@
+name: Check
+
+on:
+    pull_request:
+        branches: [ main, stable-* ]
+    push:
+        branches: [ main, stable-* ]
+
+jobs:
+    check:
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                task: [ detekt, spotlessKotlinCheck, lint ]
+        steps:
+            -   uses: actions/checkout@v3
+            -   name: Set up JDK 11
+                uses: actions/setup-java@v3
+                with:
+                    distribution: "temurin"
+                    java-version: 11
+            -   name: Check ${{ matrix.task }}
+                uses: gradle/gradle-build-action@v2
+                with:
+                    arguments: ${{ matrix.task }}
+            -   uses: actions/upload-artifact@v3
+                if: ${{ always() }}
+                with:
+                    name: ${{ matrix.task }}-report
+                    path: library/build/reports
