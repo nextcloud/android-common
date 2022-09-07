@@ -4,6 +4,7 @@ plugins {
     id 'org.jetbrains.kotlin.android' version '1.7.10' apply false
     id "org.jetbrains.kotlin.kapt" version "1.7.10" apply false
     id "com.diffplug.spotless" version "6.9.1" apply false
+    id 'io.gitlab.arturbosch.detekt' version '1.21.0' apply false
 }
 
 task clean(type: Delete) {
@@ -20,10 +21,14 @@ ext {
 
 subprojects {
     apply plugin: 'com.diffplug.spotless'
+    apply plugin: 'io.gitlab.arturbosch.detekt'
     spotless {
         kotlin {
             target '**/*.kt'
             ktlint()
         }
+    }
+    detekt {
+        buildUponDefaultConfig = true
     }
 }
