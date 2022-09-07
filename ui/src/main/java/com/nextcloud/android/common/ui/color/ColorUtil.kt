@@ -73,7 +73,11 @@ class ColorUtil @Inject constructor(private val context: Context) {
 
     @ColorInt
     private fun String?.parseColorOrFallback(fallback: () -> Int): Int {
-        return this?.let { Color.parseColor(this) } ?: fallback()
+        return if (this?.isNotBlank() == true) {
+            Color.parseColor(this)
+        } else {
+            fallback()
+        }
     }
 
     @ColorInt
