@@ -136,6 +136,12 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
         }
     }
 
+    fun themeHorizontalProgressBar(progressBar: ProgressBar) {
+        withScheme(progressBar) { scheme ->
+            themeHorizontalProgressBar(progressBar, scheme.primary)
+        }
+    }
+
     fun themeHorizontalProgressBar(progressBar: ProgressBar?, @ColorInt color: Int) {
         if (progressBar != null) {
             progressBar.indeterminateDrawable.setColorFilter(color, PorterDuff.Mode.SRC_IN)
