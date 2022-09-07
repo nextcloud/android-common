@@ -3,6 +3,7 @@ plugins {
     id 'com.android.library' version '7.2.2' apply false
     id 'org.jetbrains.kotlin.android' version '1.7.10' apply false
     id "org.jetbrains.kotlin.kapt" version "1.7.10" apply false
+    id "com.diffplug.spotless" version "6.9.1" apply false
 }
 
 task clean(type: Delete) {
@@ -15,4 +16,14 @@ allprojects {
 
 ext {
     daggerVersion = "2.43.2"
+}
+
+subprojects {
+    apply plugin: 'com.diffplug.spotless'
+    spotless {
+        kotlin {
+            target '**/*.kt'
+            ktlint()
+        }
+    }
 }
