@@ -35,6 +35,7 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipDrawable
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.progressindicator.LinearProgressIndicator
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.textview.MaterialTextView
@@ -301,6 +302,12 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
             chip.chipStrokeWidth = strokeWidth
             chip.chipStrokeColor = ColorStateList.valueOf(scheme.primary)
             chip.setTextColor(scheme.primary)
+        }
+    }
+
+    fun themeSnackbarActionText(snackbar: Snackbar) {
+        withScheme(snackbar.context) { scheme ->
+            snackbar.setActionTextColor(scheme.primary)
         }
     }
 

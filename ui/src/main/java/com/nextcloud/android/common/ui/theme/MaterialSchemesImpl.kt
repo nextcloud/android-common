@@ -21,15 +21,18 @@
 
 package com.nextcloud.android.common.ui.theme
 
+import androidx.annotation.ColorInt
 import scheme.Scheme
 
-internal class MaterialSchemesImpl(serverTheme: ServerTheme) :
+internal class MaterialSchemesImpl :
     MaterialSchemes {
     override val lightScheme: Scheme
     override val darkScheme: Scheme
 
-    init {
-        lightScheme = Scheme.light(serverTheme.primaryColor)
-        darkScheme = Scheme.dark(serverTheme.primaryColor)
+    constructor(@ColorInt primaryColor: Int) {
+        lightScheme = Scheme.light(primaryColor)
+        darkScheme = Scheme.dark(primaryColor)
     }
+
+    constructor(serverTheme: ServerTheme) : this(serverTheme.primaryColor)
 }

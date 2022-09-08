@@ -21,6 +21,7 @@
 
 package com.nextcloud.android.common.ui.theme
 
+import androidx.annotation.ColorInt
 import scheme.Scheme
 
 interface MaterialSchemes {
@@ -36,5 +37,6 @@ interface MaterialSchemes {
 
     companion object {
         fun fromServerTheme(theme: ServerTheme): MaterialSchemes = MaterialSchemesImpl(theme)
+        fun fromColor(@ColorInt color: Int): MaterialSchemes = MaterialSchemesImpl(color)
     }
 }
