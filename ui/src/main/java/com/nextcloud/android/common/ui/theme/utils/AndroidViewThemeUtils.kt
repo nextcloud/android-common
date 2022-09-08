@@ -31,6 +31,7 @@ import android.graphics.PorterDuff
 import android.graphics.Typeface
 import android.os.Build
 import android.text.Spannable
+import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.view.MenuItem
@@ -46,11 +47,13 @@ import android.widget.SeekBar
 import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.color.ColorUtil
 import com.nextcloud.android.common.ui.theme.MaterialSchemes
 import com.nextcloud.android.common.ui.theme.ViewThemeUtilsBase
 import com.nextcloud.android.common.ui.util.PlatformThemeUtil
+import scheme.Scheme
 import javax.inject.Inject
 
 /**
@@ -68,8 +71,44 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
 
     fun colorToolbarMenuIcon(context: Context, item: MenuItem) {
         withScheme(context) { scheme ->
-            item.icon.setColorFilter(scheme.onSurface, PorterDuff.Mode.SRC_ATOP)
+            colorMenuItemIcon(scheme.onSurface, item)
         }
+    }
+
+    fun colorMenuItemText(context: Context, item: MenuItem) {
+        withScheme(context) { scheme: Scheme ->
+            colorMenuItemText(scheme.onSurface, item)
+        }
+    }
+
+    fun colorMenuItemIconActive(context: Context, item: MenuItem) {
+        withScheme(context) { scheme ->
+            colorMenuItemIcon(scheme.primary, item)
+        }
+    }
+
+    fun colorMenuItemTextActive(context: Context, item: MenuItem) {
+        withScheme(context) { scheme: Scheme ->
+            colorMenuItemText(scheme.primary, item)
+        }
+    }
+
+    private fun colorMenuItemIcon(@ColorInt color: Int, item: MenuItem) {
+        val normalDrawable = item.icon
+        val wrapDrawable = DrawableCompat.wrap(normalDrawable)
+        DrawableCompat.setTint(wrapDrawable, color)
+        item.icon = wrapDrawable
+    }
+
+    private fun colorMenuItemText(@ColorInt color: Int, item: MenuItem) {
+        val newItemTitle = SpannableString(item.title)
+        newItemTitle.setSpan(
+            ForegroundColorSpan(color),
+            0,
+            newItemTitle.length,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        item.title = newItemTitle
     }
 
     fun themeStatusBar(activity: Activity, view: View) {
