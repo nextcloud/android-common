@@ -250,6 +250,8 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
             textInputLayout.setErrorTextColor(errorColorStateList)
             textInputLayout.boxStrokeErrorColor = errorColorStateList
             textInputLayout.defaultHintTextColor = coloredColorStateList
+
+            textInputLayout.editText?.highlightColor = scheme.primary
         }
     }
 
