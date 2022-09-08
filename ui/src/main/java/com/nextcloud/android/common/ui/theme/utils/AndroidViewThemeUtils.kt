@@ -35,7 +35,15 @@ import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.view.MenuItem
 import android.view.View
-import android.widget.*
+import android.widget.Button
+import android.widget.CheckBox
+import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.ProgressBar
+import android.widget.RadioButton
+import android.widget.SeekBar
+import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.core.content.res.ResourcesCompat
 import com.nextcloud.android.common.ui.R
