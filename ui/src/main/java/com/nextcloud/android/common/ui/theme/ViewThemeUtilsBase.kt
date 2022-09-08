@@ -28,7 +28,7 @@ import android.view.View
 import com.nextcloud.android.common.ui.util.PlatformThemeUtil
 import scheme.Scheme
 
-abstract class ViewThemeUtilsBase(val schemes: MaterialSchemes) {
+open class ViewThemeUtilsBase(val schemes: MaterialSchemes) {
     /**
      * Scheme for painting elements
      */

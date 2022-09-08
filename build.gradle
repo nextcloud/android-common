@@ -3,11 +3,30 @@ plugins {
     id 'com.android.library' version '7.2.2' apply false
     id 'org.jetbrains.kotlin.android' version '1.7.10' apply false
     id "org.jetbrains.kotlin.kapt" version "1.7.10" apply false
+    id "com.diffplug.spotless" version "6.9.1" apply false
+    id 'io.gitlab.arturbosch.detekt' version '1.21.0' apply false
 }
 
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+task installGitHooks(type: Copy, group: "development") {
+    def sourceFolder = "${rootProject.projectDir}/scripts/hooks"
+    def destFolder = "${rootProject.projectDir}/.git/hooks"
+
+    description = "Install git hooks"
+
+    from(sourceFolder) {
+        include '*'
+    }
+    into destFolder
+
+    eachFile { file ->
+        println "${sourceFolder}/${file.relativeSourcePath} -> ${destFolder}/${file.path}"
+    }
+}
+
 
 allprojects {
     group = 'com.nextcloud.android-common'
@@ -15,4 +34,18 @@ allprojects {
 
 ext {
     daggerVersion = "2.43.2"
+}
+
+subprojects {
+    apply plugin: 'com.diffplug.spotless'
+    apply plugin: 'io.gitlab.arturbosch.detekt'
+    spotless {
+        kotlin {
+            target '**/*.kt'
+            ktlint()
+        }
+    }
+    detekt {
+        buildUponDefaultConfig = true
+    }
 }
