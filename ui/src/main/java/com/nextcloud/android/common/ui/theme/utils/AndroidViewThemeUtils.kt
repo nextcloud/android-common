@@ -206,8 +206,20 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
 
     /**
      * Colors the background as element color and the foreground as text color.
+     *
      */
+    @Deprecated(
+        replaceWith = ReplaceWith("colorImageViewBackgroundAndIcon"),
+        message = "Use colorImageViewBackgroundAndIcon, which has a better name, instead"
+    )
     fun colorImageViewButton(imageView: ImageView) {
+        colorImageViewBackgroundAndIcon(imageView)
+    }
+
+    /**
+     * Colors the background as element color and the foreground as text color.
+     */
+    fun colorImageViewBackgroundAndIcon(imageView: ImageView) {
         withScheme(imageView) { scheme ->
             imageView.imageTintList = ColorStateList.valueOf(scheme.onPrimaryContainer)
             imageView.backgroundTintList = ColorStateList.valueOf(scheme.primaryContainer)
