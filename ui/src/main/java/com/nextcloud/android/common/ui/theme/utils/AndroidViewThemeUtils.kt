@@ -29,6 +29,7 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.Typeface
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.text.Spannable
 import android.text.SpannableString
@@ -36,16 +37,9 @@ import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.view.MenuItem
 import android.view.View
-import android.widget.Button
-import android.widget.CheckBox
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.RadioButton
-import android.widget.SeekBar
-import android.widget.TextView
+import android.widget.*
 import androidx.annotation.ColorInt
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import com.google.android.material.navigation.NavigationView
@@ -126,6 +120,24 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
         )
         item.title = newItemTitle
+    }
+
+    private fun colorDrawable(@ColorInt color: Int, drawable: Drawable) {
+        val wrapDrawable = DrawableCompat.wrap(drawable)
+        DrawableCompat.setTint(wrapDrawable, color)
+    }
+
+    fun tintToolbarArrowDrawable(
+            context: Context,
+            drawerToggle: ActionBarDrawerToggle,
+            drawable: Drawable
+    ) {
+        withScheme(context) { scheme: Scheme ->
+            val wrap = DrawableCompat.wrap(drawable)
+            wrap.setColorFilter(scheme.onSurface, PorterDuff.Mode.SRC_ATOP)
+            drawerToggle.setHomeAsUpIndicator(wrap)
+            drawerToggle.drawerArrowDrawable.color = scheme.onSurface
+        }
     }
 
     fun themeStatusBar(activity: Activity, view: View) {
