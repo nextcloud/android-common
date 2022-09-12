@@ -48,6 +48,7 @@ import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import com.google.android.material.navigation.NavigationView
 import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.color.ColorUtil
 import com.nextcloud.android.common.ui.theme.MaterialSchemes
@@ -69,6 +70,40 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
         }
     }
 
+    fun colorNavigationView(navigationView: NavigationView) {
+        withScheme(navigationView) { scheme ->
+            if (navigationView.itemBackground != null) {
+                navigationView.itemBackground!!.setTintList(
+                        ColorStateList(
+                                arrayOf(
+                                        intArrayOf(android.R.attr.state_checked),
+                                        intArrayOf(-android.R.attr.state_checked)
+                                ),
+                                intArrayOf(
+                                        scheme.secondaryContainer,
+                                        Color.TRANSPARENT
+                                )
+                        )
+                )
+            }
+            navigationView.setBackgroundColor(scheme.surface)
+
+            val colorStateList = ColorStateList(
+                    arrayOf(
+                            intArrayOf(android.R.attr.state_checked),
+                            intArrayOf(-android.R.attr.state_checked)
+                    ),
+                    intArrayOf(
+                            scheme.onSecondaryContainer,
+                            scheme.onSurfaceVariant
+                    )
+            )
+
+            navigationView.itemTextColor = colorStateList
+            navigationView.itemIconTintList = colorStateList
+        }
+    }
+
     fun colorToolbarMenuIcon(context: Context, item: MenuItem) {
         withScheme(context) { scheme ->
             colorMenuItemIcon(scheme.onSurface, item)
@@ -83,13 +118,13 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
 
     fun colorMenuItemIconActive(context: Context, item: MenuItem) {
         withScheme(context) { scheme ->
-            colorMenuItemIcon(scheme.primary, item)
+            colorMenuItemIcon(scheme.onSecondaryContainer, item)
         }
     }
 
     fun colorMenuItemTextActive(context: Context, item: MenuItem) {
         withScheme(context) { scheme: Scheme ->
-            colorMenuItemText(scheme.primary, item)
+            colorMenuItemText(scheme.onSecondaryContainer, item)
         }
     }
 
