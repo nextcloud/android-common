@@ -37,7 +37,15 @@ import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.view.MenuItem
 import android.view.View
-import android.widget.*
+import android.widget.Button
+import android.widget.CheckBox
+import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.ProgressBar
+import android.widget.RadioButton
+import android.widget.SeekBar
+import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.content.res.ResourcesCompat
@@ -68,29 +76,29 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
         withScheme(navigationView) { scheme ->
             if (navigationView.itemBackground != null) {
                 navigationView.itemBackground!!.setTintList(
-                        ColorStateList(
-                                arrayOf(
-                                        intArrayOf(android.R.attr.state_checked),
-                                        intArrayOf(-android.R.attr.state_checked)
-                                ),
-                                intArrayOf(
-                                        scheme.secondaryContainer,
-                                        Color.TRANSPARENT
-                                )
+                    ColorStateList(
+                        arrayOf(
+                            intArrayOf(android.R.attr.state_checked),
+                            intArrayOf(-android.R.attr.state_checked)
+                        ),
+                        intArrayOf(
+                            scheme.secondaryContainer,
+                            Color.TRANSPARENT
                         )
+                    )
                 )
             }
             navigationView.setBackgroundColor(scheme.surface)
 
             val colorStateList = ColorStateList(
-                    arrayOf(
-                            intArrayOf(android.R.attr.state_checked),
-                            intArrayOf(-android.R.attr.state_checked)
-                    ),
-                    intArrayOf(
-                            scheme.onSecondaryContainer,
-                            scheme.onSurfaceVariant
-                    )
+                arrayOf(
+                    intArrayOf(android.R.attr.state_checked),
+                    intArrayOf(-android.R.attr.state_checked)
+                ),
+                intArrayOf(
+                    scheme.onSecondaryContainer,
+                    scheme.onSurfaceVariant
+                )
             )
 
             navigationView.itemTextColor = colorStateList
@@ -128,15 +136,10 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
         item.title = newItemTitle
     }
 
-    private fun colorDrawable(@ColorInt color: Int, drawable: Drawable) {
-        val wrapDrawable = DrawableCompat.wrap(drawable)
-        DrawableCompat.setTint(wrapDrawable, color)
-    }
-
     fun tintToolbarArrowDrawable(
-            context: Context,
-            drawerToggle: ActionBarDrawerToggle,
-            drawable: Drawable
+        context: Context,
+        drawerToggle: ActionBarDrawerToggle,
+        drawable: Drawable
     ) {
         withScheme(context) { scheme: Scheme ->
             val wrap = DrawableCompat.wrap(drawable)

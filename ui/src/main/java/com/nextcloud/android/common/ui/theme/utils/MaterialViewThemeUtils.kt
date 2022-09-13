@@ -210,7 +210,7 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
 
     fun themeActionBar(context: Context, actionBar: ActionBar, title: String, backArrow: Drawable) {
         withScheme(context) { scheme ->
-            setColoredTitle(actionBar, title, context, scheme.onSurface)
+            setColoredTitle(actionBar, title, scheme.onSurface)
             actionBar.setBackgroundDrawable(ColorDrawable(scheme.surface))
 
             val wrap = DrawableCompat.wrap(backArrow)
@@ -218,18 +218,19 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
             actionBar.setHomeAsUpIndicator(wrap)
         }
     }
-    
+
     private fun setColoredTitle(
-            actionBar: ActionBar,
-            title: String,
-            context: Context,
-            @ColorInt color: Int
+        actionBar: ActionBar,
+        title: String,
+        @ColorInt color: Int
     ) {
         val text: Spannable = SpannableString(title)
-        text.setSpan(ForegroundColorSpan(color),
-                0,
-                text.length,
-                Spannable.SPAN_INCLUSIVE_INCLUSIVE)
+        text.setSpan(
+            ForegroundColorSpan(color),
+            0,
+            text.length,
+            Spannable.SPAN_INCLUSIVE_INCLUSIVE
+        )
         actionBar.title = text
     }
 
