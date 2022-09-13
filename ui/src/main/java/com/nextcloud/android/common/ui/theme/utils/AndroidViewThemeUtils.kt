@@ -37,16 +37,9 @@ import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.view.MenuItem
 import android.view.View
-import android.widget.Button
-import android.widget.CheckBox
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.RadioButton
-import android.widget.SeekBar
-import android.widget.TextView
+import android.widget.*
 import androidx.annotation.ColorInt
+import androidx.annotation.DrawableRes
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.DrawableCompat
@@ -134,6 +127,17 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
         )
         item.title = newItemTitle
+    }
+
+    fun tintPrimaryDrawable(context: Context, @DrawableRes id: Int): Drawable? {
+        return tintPrimaryDrawable(context, ResourcesCompat.getDrawable(context.resources, id, null))
+    }
+
+    fun tintPrimaryDrawable(context: Context, drawable: Drawable?): Drawable? {
+        withScheme(context) { scheme: Scheme ->
+            drawable?.setColorFilter(scheme.primary, PorterDuff.Mode.SRC_ATOP)
+        }
+        return drawable
     }
 
     fun tintToolbarArrowDrawable(
