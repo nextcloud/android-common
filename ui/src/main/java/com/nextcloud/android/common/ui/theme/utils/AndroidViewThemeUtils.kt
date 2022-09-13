@@ -37,7 +37,15 @@ import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.view.MenuItem
 import android.view.View
-import android.widget.*
+import android.widget.Button
+import android.widget.CheckBox
+import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.ProgressBar
+import android.widget.RadioButton
+import android.widget.SeekBar
+import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -153,8 +161,14 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
         }
     }
 
+    @Deprecated(message = "Use themeStatusBar(activity) instead", replaceWith = ReplaceWith("themeStatusBar(activity)"))
+    @Suppress("Detekt.UnusedPrivateMember") // deprecated, to be removed
     fun themeStatusBar(activity: Activity, view: View) {
-        withScheme(view) { scheme ->
+        themeStatusBar(activity)
+    }
+
+    fun themeStatusBar(activity: Activity) {
+        withScheme(activity) { scheme ->
             applyColorToStatusBar(activity, scheme.surface)
         }
     }
