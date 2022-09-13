@@ -23,10 +23,20 @@
 
 package com.nextcloud.android.common.ui.theme.utils
 
+import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.graphics.PorterDuff
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
+import androidx.annotation.ColorInt
+import androidx.appcompat.app.ActionBar
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.theme.MaterialSchemes
@@ -79,6 +89,32 @@ class AndroidXViewThemeUtils @Inject constructor(schemes: MaterialSchemes) :
             swipeRefreshLayout.setColorSchemeColors(scheme.primary)
             swipeRefreshLayout.setProgressBackgroundColorSchemeResource(R.color.refresh_spinner_background)
         }
+    }
+
+    fun themeActionBar(context: Context, actionBar: ActionBar, title: String, backArrow: Drawable) {
+        withScheme(context) { scheme ->
+            setColoredTitle(actionBar, title, scheme.onSurface)
+            actionBar.setBackgroundDrawable(ColorDrawable(scheme.surface))
+
+            val wrap = DrawableCompat.wrap(backArrow)
+            wrap.setColorFilter(scheme.onSurface, PorterDuff.Mode.SRC_ATOP)
+            actionBar.setHomeAsUpIndicator(wrap)
+        }
+    }
+
+    private fun setColoredTitle(
+        actionBar: ActionBar,
+        title: String,
+        @ColorInt color: Int
+    ) {
+        val text: Spannable = SpannableString(title)
+        text.setSpan(
+            ForegroundColorSpan(color),
+            0,
+            text.length,
+            Spannable.SPAN_INCLUSIVE_INCLUSIVE
+        )
+        actionBar.title = text
     }
 
     companion object {
