@@ -91,6 +91,7 @@ class AndroidXViewThemeUtils @Inject constructor(schemes: MaterialSchemes) :
         }
     }
 
+    // TODO host the back arrow in this lib instead of passing it everywhere
     fun themeActionBar(context: Context, actionBar: ActionBar, title: String, backArrow: Drawable) {
         withScheme(context) { scheme ->
             setColoredTitle(actionBar, title, scheme.onSurface)
