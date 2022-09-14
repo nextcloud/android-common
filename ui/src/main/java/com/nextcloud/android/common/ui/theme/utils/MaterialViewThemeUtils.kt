@@ -255,6 +255,12 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
         }
     }
 
+    fun themeTabLayout(tabLayout: TabLayout) {
+        withScheme(tabLayout) { scheme ->
+            colorTabLayout(tabLayout, scheme)
+        }
+    }
+
     fun themeTabLayoutOnSurface(tabLayout: TabLayout) {
         withScheme(tabLayout) { scheme ->
             tabLayout.setBackgroundColor(scheme.surface)
@@ -264,7 +270,7 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
 
     fun colorTabLayout(tabLayout: TabLayout, scheme: Scheme) {
         tabLayout.setSelectedTabIndicatorColor(scheme.primary)
-        tabLayout.tabTextColors = ColorStateList(
+        val tabContentColors = ColorStateList(
             arrayOf(
                 intArrayOf(android.R.attr.state_selected),
                 intArrayOf(-android.R.attr.state_selected)
@@ -274,6 +280,8 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
                 ContextCompat.getColor(tabLayout.context, R.color.high_emphasis_text)
             )
         )
+        tabLayout.tabTextColors = tabContentColors
+        tabLayout.tabIconTint = tabContentColors
         tabLayout.tabRippleColor = ColorStateList(
             arrayOf(
                 intArrayOf(android.R.attr.state_pressed)
