@@ -45,15 +45,9 @@ open class ViewThemeUtilsBase(private val schemes: MaterialSchemes) {
         else -> schemes.lightScheme
     }
 
-    protected fun withScheme(view: View, block: (Scheme) -> Unit) {
-        block(getSchemeInternal(view.context))
-    }
+    protected fun <R> withScheme(view: View, block: (Scheme) -> R): R = block(getSchemeInternal(view.context))
 
-    protected fun withScheme(context: Context, block: (Scheme) -> Unit) {
-        block(getSchemeInternal(context))
-    }
+    protected fun <R> withScheme(context: Context, block: (Scheme) -> R): R = block(getSchemeInternal(context))
 
-    protected fun withSchemeDark(block: (Scheme) -> Unit) {
-        block(schemes.darkScheme)
-    }
+    protected fun <R> withSchemeDark(block: (Scheme) -> R): R = block(schemes.darkScheme)
 }
