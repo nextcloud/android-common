@@ -315,9 +315,11 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
         }
     }
 
-    fun themeSnackbarActionText(snackbar: Snackbar) {
+    fun themeSnackbar(snackbar: Snackbar) {
         withScheme(snackbar.context) { scheme ->
-            snackbar.setActionTextColor(scheme.primary)
+            snackbar.setBackgroundTint(scheme.inverseSurface)
+            snackbar.setActionTextColor(scheme.inversePrimary)
+            snackbar.setTextColor(scheme.inverseOnSurface)
         }
     }
 
