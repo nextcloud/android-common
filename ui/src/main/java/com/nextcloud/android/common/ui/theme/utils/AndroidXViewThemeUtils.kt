@@ -34,9 +34,11 @@ import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.ActionBar
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.widget.TextViewCompat
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.theme.MaterialSchemes
@@ -88,6 +90,13 @@ class AndroidXViewThemeUtils @Inject constructor(schemes: MaterialSchemes) :
         withScheme(swipeRefreshLayout) { scheme ->
             swipeRefreshLayout.setColorSchemeColors(scheme.primary)
             swipeRefreshLayout.setProgressBackgroundColorSchemeResource(R.color.refresh_spinner_background)
+        }
+    }
+
+    fun colorPrimaryTextViewElement(textView: AppCompatTextView) {
+        withScheme(textView) { scheme ->
+            textView.setTextColor(scheme.primary)
+            TextViewCompat.setCompoundDrawableTintList(textView, ColorStateList.valueOf(scheme.primary))
         }
     }
 
