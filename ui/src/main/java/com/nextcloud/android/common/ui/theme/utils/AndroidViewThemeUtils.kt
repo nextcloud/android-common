@@ -50,6 +50,8 @@ import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.BlendModeColorFilterCompat
+import androidx.core.graphics.BlendModeCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import com.google.android.material.navigation.NavigationView
 import com.nextcloud.android.common.ui.R
@@ -142,10 +144,28 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
     }
 
     fun tintPrimaryDrawable(context: Context, drawable: Drawable?): Drawable? {
-        withScheme(context) { scheme: Scheme ->
-            drawable?.setColorFilter(scheme.primary, PorterDuff.Mode.SRC_ATOP)
+        return drawable?.let {
+            withScheme(context) { scheme: Scheme ->
+                tintDrawable(it, scheme.primary)
+            }
         }
-        return drawable
+    }
+
+    fun tintTextDrawable(context: Context, drawable: Drawable?): Drawable? {
+        return drawable?.let {
+            withScheme(context) { scheme: Scheme ->
+                tintDrawable(it, scheme.onSurface)
+            }
+        }
+    }
+
+    internal fun tintDrawable(drawable: Drawable, @ColorInt color: Int): Drawable {
+        val wrap = DrawableCompat.wrap(drawable)
+        wrap.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
+            color,
+            BlendModeCompat.SRC_ATOP
+        )
+        return wrap
     }
 
     fun tintToolbarArrowDrawable(

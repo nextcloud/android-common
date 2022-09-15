@@ -26,7 +26,6 @@ package com.nextcloud.android.common.ui.theme.utils
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.graphics.PorterDuff
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.text.Spannable
@@ -37,7 +36,6 @@ import androidx.appcompat.app.ActionBar
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.widget.TextViewCompat
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.nextcloud.android.common.ui.R
@@ -48,7 +46,11 @@ import javax.inject.Inject
 /**
  * View theme utils for Android extension views (androidx.*)
  */
-class AndroidXViewThemeUtils @Inject constructor(schemes: MaterialSchemes) :
+// TODO breaking change: androidViewThemeUtils parameter
+class AndroidXViewThemeUtils @Inject constructor(
+    schemes: MaterialSchemes,
+    private val androidViewThemeUtils: AndroidViewThemeUtils
+) :
     ViewThemeUtilsBase(schemes) {
 
     fun colorSwitchCompat(switchCompat: SwitchCompat) {
@@ -104,11 +106,15 @@ class AndroidXViewThemeUtils @Inject constructor(schemes: MaterialSchemes) :
     fun themeActionBar(context: Context, actionBar: ActionBar, title: String, backArrow: Drawable) {
         withScheme(context) { scheme ->
             setColoredTitle(actionBar, title, scheme.onSurface)
-            actionBar.setBackgroundDrawable(ColorDrawable(scheme.surface))
+            themeActionBar(context, actionBar, backArrow)
+        }
+    }
 
-            val wrap = DrawableCompat.wrap(backArrow)
-            wrap.setColorFilter(scheme.onSurface, PorterDuff.Mode.SRC_ATOP)
-            actionBar.setHomeAsUpIndicator(wrap)
+    fun themeActionBar(context: Context, actionBar: ActionBar, backArrow: Drawable) {
+        withScheme(context) { scheme ->
+            actionBar.setBackgroundDrawable(ColorDrawable(scheme.surface))
+            val indicator = androidViewThemeUtils.tintDrawable(backArrow, scheme.onSurface)
+            actionBar.setHomeAsUpIndicator(indicator)
         }
     }
 

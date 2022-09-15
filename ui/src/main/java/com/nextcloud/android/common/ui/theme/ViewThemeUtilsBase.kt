@@ -40,6 +40,7 @@ open class ViewThemeUtilsBase(private val schemes: MaterialSchemes) {
     fun getScheme(context: Context): Scheme = getSchemeInternal(context)
 
     @Suppress("MemberVisibilityCanBePrivate")
+    // TODO cache by context hashcode
     protected fun getSchemeInternal(context: Context): Scheme = when {
         PlatformThemeUtil.isDarkMode(context) -> schemes.darkScheme
         else -> schemes.lightScheme
