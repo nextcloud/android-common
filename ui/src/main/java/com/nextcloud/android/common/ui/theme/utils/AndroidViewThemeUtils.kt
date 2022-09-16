@@ -29,6 +29,7 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.Typeface
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.text.Spannable
@@ -106,6 +107,12 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
 
             navigationView.itemTextColor = colorStateList
             navigationView.itemIconTintList = colorStateList
+        }
+    }
+
+    fun getPrimaryColorDrawable(context: Context): Drawable {
+        return withScheme(context) { scheme ->
+            ColorDrawable(scheme.primary)
         }
     }
 
