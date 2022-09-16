@@ -31,9 +31,12 @@ import android.graphics.drawable.Drawable
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
+import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.TextViewCompat
@@ -115,6 +118,23 @@ class AndroidXViewThemeUtils @Inject constructor(
             actionBar.setBackgroundDrawable(ColorDrawable(scheme.surface))
             val indicator = androidViewThemeUtils.tintDrawable(backArrow, scheme.onSurface)
             actionBar.setHomeAsUpIndicator(indicator)
+        }
+    }
+
+    fun themeToolbarSearchView(searchView: SearchView) {
+        withScheme(searchView) { scheme ->
+            // hacky as no default way is provided
+            val editText =
+                searchView.findViewById<SearchView.SearchAutoComplete>(androidx.appcompat.R.id.search_src_text)
+            val searchPlate = searchView.findViewById<LinearLayout>(androidx.appcompat.R.id.search_plate)
+            val closeButton = searchView.findViewById<ImageView>(androidx.appcompat.R.id.search_close_btn)
+            val searchButton = searchView.findViewById<ImageView>(androidx.appcompat.R.id.search_button)
+            editText.setHintTextColor(scheme.onSurfaceVariant)
+            editText.highlightColor = scheme.inverseOnSurface
+            editText.setTextColor(scheme.onSurface)
+            closeButton.setColorFilter(scheme.onSurface)
+            searchButton.setColorFilter(scheme.onSurface)
+            searchPlate.setBackgroundColor(scheme.surface)
         }
     }
 
