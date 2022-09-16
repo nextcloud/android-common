@@ -208,11 +208,11 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
         }
     }
 
-    fun colorCardViewBackground(card: MaterialCardView) {
-        withScheme(card) { scheme ->
-            card.setCardBackgroundColor(scheme.surfaceVariant)
-        }
-    }
+    @Deprecated(
+        "Duplicated, use themeCardView instead",
+        replaceWith = ReplaceWith("themeCardView(card)")
+    )
+    fun colorCardViewBackground(card: MaterialCardView) = themeCardView(card)
 
     fun colorProgressBar(progressIndicator: LinearProgressIndicator) {
         withScheme(progressIndicator) { scheme ->
