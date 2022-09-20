@@ -477,6 +477,12 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
         } while (index != -1)
     }
 
+    fun primaryColor(activity: Activity): Int {
+        return withScheme(activity) { scheme ->
+            scheme.primary
+        }
+    }
+
     companion object {
         private const val ON_SURFACE_OPACITY_BUTTON_DISABLED: Float = 0.38f
     }
