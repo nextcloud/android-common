@@ -147,7 +147,6 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
 
     fun colorMaterialButtonPrimaryOutlined(button: MaterialButton) {
         withScheme(button) { scheme ->
-            button.strokeColor = ColorStateList.valueOf(scheme.outline)
             button.setTextColor(
                 ColorStateList(
                     arrayOf(
@@ -168,6 +167,31 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
                 intArrayOf(
                     scheme.primary,
                     colorUtil.adjustOpacity(scheme.onSurface, ON_SURFACE_OPACITY_BUTTON_DISABLED)
+                )
+            )
+            button.strokeColor = ColorStateList(
+                arrayOf(
+                    intArrayOf(android.R.attr.state_enabled),
+                    intArrayOf(-android.R.attr.state_enabled),
+                    intArrayOf(-android.R.attr.state_hovered),
+                    intArrayOf(-android.R.attr.state_focused),
+                    intArrayOf(-android.R.attr.state_pressed),
+                ),
+                intArrayOf(
+                    scheme.outline,
+                    colorUtil.adjustOpacity(scheme.onSurface, ON_SURFACE_OPACITY_BUTTON_OUTLINE_DISABLED),
+                    scheme.outline,
+                    scheme.primary,
+                    scheme.outline
+                )
+            )
+            button.strokeWidth = button.resources.getDimension(R.dimen.outlinedButtonStrokeWidth).toInt()
+            button.rippleColor = ColorStateList(
+                arrayOf(
+                    intArrayOf(android.R.attr.state_pressed)
+                ),
+                intArrayOf(
+                    colorUtil.adjustOpacity(scheme.primary, SURFACE_OPACITY_BUTTON_DISABLED)
                 )
             )
         }
@@ -325,6 +349,7 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
 
     companion object {
         private const val SURFACE_OPACITY_BUTTON_DISABLED: Float = 0.12f
+        private const val ON_SURFACE_OPACITY_BUTTON_OUTLINE_DISABLED: Float = 0.12f
         private const val ON_SURFACE_OPACITY_BUTTON_DISABLED: Float = 0.38f
     }
 }
