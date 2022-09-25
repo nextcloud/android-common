@@ -40,6 +40,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.CheckBox
+import android.widget.CheckedTextView
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -387,6 +388,22 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
     fun colorCircularProgressBarOnSurfaceVariant(progressBar: ProgressBar) {
         withScheme(progressBar) { scheme ->
             progressBar.indeterminateDrawable.setColorFilter(scheme.onSurfaceVariant, PorterDuff.Mode.SRC_ATOP)
+        }
+    }
+
+    fun themeCheckedTextView(vararg checkedTextViews: CheckedTextView) {
+        withScheme(checkedTextViews[0]) { scheme ->
+            val colorStateList = ColorStateList(
+                arrayOf(
+                    intArrayOf(-android.R.attr.state_checked),
+                    intArrayOf(-android.R.attr.state_enabled),
+                    intArrayOf(android.R.attr.state_checked)
+                ),
+                intArrayOf(Color.GRAY, Color.GRAY, scheme.primary)
+            )
+            checkedTextViews.forEach {
+                it.checkMarkTintList = colorStateList
+            }
         }
     }
 

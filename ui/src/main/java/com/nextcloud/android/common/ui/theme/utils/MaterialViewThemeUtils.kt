@@ -175,7 +175,7 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
                     intArrayOf(-android.R.attr.state_enabled),
                     intArrayOf(-android.R.attr.state_hovered),
                     intArrayOf(-android.R.attr.state_focused),
-                    intArrayOf(-android.R.attr.state_pressed),
+                    intArrayOf(-android.R.attr.state_pressed)
                 ),
                 intArrayOf(
                     scheme.outline,
