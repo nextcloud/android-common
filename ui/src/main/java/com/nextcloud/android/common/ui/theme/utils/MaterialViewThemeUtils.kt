@@ -27,6 +27,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.PorterDuff
+import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
@@ -240,8 +241,12 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
 
     fun colorProgressBar(progressIndicator: LinearProgressIndicator) {
         withScheme(progressIndicator) { scheme ->
-            progressIndicator.setIndicatorColor(scheme.primary)
+            colorProgressBar(progressIndicator, scheme.primary)
         }
+    }
+
+    fun colorProgressBar(progressIndicator: LinearProgressIndicator, @ColorInt color: Int) {
+        progressIndicator.setIndicatorColor(color)
     }
 
     fun colorTextInputLayout(textInputLayout: TextInputLayout) {
