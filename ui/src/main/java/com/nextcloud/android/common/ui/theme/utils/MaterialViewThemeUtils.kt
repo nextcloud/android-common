@@ -75,6 +75,18 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
     fun themeCardView(cardView: MaterialCardView) {
         withScheme(cardView) { scheme ->
             cardView.backgroundTintList = ColorStateList.valueOf(scheme.surface)
+            cardView.setStrokeColor(
+                ColorStateList(
+                    arrayOf(
+                        intArrayOf(android.R.attr.state_checked),
+                        intArrayOf(-android.R.attr.state_checked)
+                    ),
+                    intArrayOf(
+                        scheme.primary,
+                        scheme.outline
+                    )
+                )
+            )
         }
     }
 
@@ -141,6 +153,64 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
                 intArrayOf(
                     scheme.onPrimary,
                     colorUtil.adjustOpacity(scheme.onSurface, ON_SURFACE_OPACITY_BUTTON_DISABLED)
+                )
+            )
+        }
+    }
+
+    fun colorMaterialButtonPrimaryTonal(button: MaterialButton) {
+        withScheme(button) { scheme ->
+            button.backgroundTintList =
+                ColorStateList(
+                    arrayOf(
+                        intArrayOf(android.R.attr.state_enabled),
+                        intArrayOf(-android.R.attr.state_enabled),
+                        intArrayOf(-android.R.attr.state_hovered),
+                        intArrayOf(-android.R.attr.state_focused),
+                        intArrayOf(-android.R.attr.state_pressed)
+                    ),
+                    intArrayOf(
+                        scheme.secondaryContainer,
+                        colorUtil.adjustOpacity(scheme.onSurface, SURFACE_OPACITY_BUTTON_DISABLED),
+                        scheme.onSecondaryContainer,
+                        scheme.onSecondaryContainer,
+                        scheme.onSecondaryContainer
+                    )
+                )
+
+            button.setTextColor(
+                ColorStateList(
+                    arrayOf(
+                        intArrayOf(android.R.attr.state_enabled),
+                        intArrayOf(-android.R.attr.state_enabled),
+                        intArrayOf(-android.R.attr.state_hovered),
+                        intArrayOf(-android.R.attr.state_focused),
+                        intArrayOf(-android.R.attr.state_pressed)
+                    ),
+                    intArrayOf(
+                        scheme.onSecondaryContainer,
+                        colorUtil.adjustOpacity(scheme.onSurface, ON_SURFACE_OPACITY_BUTTON_DISABLED),
+                        scheme.onSecondaryContainer,
+                        scheme.onSecondaryContainer,
+                        scheme.onSecondaryContainer
+                    )
+                )
+            )
+
+            button.iconTint = ColorStateList(
+                arrayOf(
+                    intArrayOf(android.R.attr.state_enabled),
+                    intArrayOf(-android.R.attr.state_enabled),
+                    intArrayOf(-android.R.attr.state_hovered),
+                    intArrayOf(-android.R.attr.state_focused),
+                    intArrayOf(-android.R.attr.state_pressed)
+                ),
+                intArrayOf(
+                    scheme.onSecondaryContainer,
+                    colorUtil.adjustOpacity(scheme.onSurface, ON_SURFACE_OPACITY_BUTTON_DISABLED),
+                    scheme.onSecondaryContainer,
+                    scheme.onSecondaryContainer,
+                    scheme.onSecondaryContainer
                 )
             )
         }

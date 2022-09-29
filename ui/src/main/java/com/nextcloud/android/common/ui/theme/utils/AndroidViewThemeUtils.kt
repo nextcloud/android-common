@@ -276,6 +276,12 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
         }
     }
 
+    fun colorOnSecondaryContainerTextViewElement(textView: TextView) {
+        withScheme(textView) { scheme ->
+            textView.setTextColor(scheme.onSecondaryContainer)
+        }
+    }
+
     fun colorPrimaryTextViewElementDarkMode(textView: TextView) {
         withSchemeDark { scheme ->
             textView.setTextColor(scheme.primary)
