@@ -38,6 +38,7 @@ import androidx.appcompat.app.ActionBar
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.SwitchCompat
+import androidx.core.app.NotificationCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.TextViewCompat
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -135,6 +136,12 @@ class AndroidXViewThemeUtils @Inject constructor(
             closeButton.setColorFilter(scheme.onSurface)
             searchButton.setColorFilter(scheme.onSurface)
             searchPlate.setBackgroundColor(scheme.surface)
+        }
+    }
+
+    fun themeNotificationCompatBuilder(context: Context, builder: NotificationCompat.Builder) {
+        withScheme(context) { scheme ->
+            builder.setColor(scheme.primary)
         }
     }
 
