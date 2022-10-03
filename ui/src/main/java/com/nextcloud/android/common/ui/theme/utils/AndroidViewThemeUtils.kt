@@ -71,9 +71,10 @@ import javax.inject.Inject
 class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, private val colorUtil: ColorUtil) :
     ViewThemeUtilsBase(schemes) {
 
-    fun colorViewBackground(view: View) {
+    @JvmOverloads
+    fun colorViewBackground(view: View, colorRole: ColorRole = ColorRole.SURFACE) {
         withScheme(view) { scheme ->
-            view.setBackgroundColor(scheme.surface)
+            view.setBackgroundColor(colorRole.select(scheme))
         }
     }
 
@@ -147,24 +148,52 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
         item.title = newItemTitle
     }
 
+    @JvmOverloads
+    fun tintDrawable(context: Context, @DrawableRes id: Int, colorRole: ColorRole = ColorRole.PRIMARY): Drawable? {
+        val drawable = ResourcesCompat.getDrawable(context.resources, id, null)
+        return drawable?.let {
+            tintDrawable(context, it, colorRole)
+        }
+    }
+
+    @Deprecated(
+        replaceWith = ReplaceWith(
+            "tintDrawable(context, id, ColorRole.PRIMARY)",
+            imports = ["com.nextcloud.android.common.ui.theme.utils.ColorRole"]
+        ),
+        message = "Use tintDrawable(context, id, ColorRole.PRIMARY) instead"
+    )
     fun tintPrimaryDrawable(context: Context, @DrawableRes id: Int): Drawable? {
-        return tintPrimaryDrawable(context, ResourcesCompat.getDrawable(context.resources, id, null))
+        return tintDrawable(context, id, ColorRole.PRIMARY)
     }
 
+    @JvmOverloads
+    fun tintDrawable(context: Context, drawable: Drawable, colorRole: ColorRole = ColorRole.PRIMARY): Drawable {
+        return withScheme(context) { scheme: Scheme ->
+            tintDrawable(drawable, colorRole.select(scheme))
+        }
+    }
+
+    @Deprecated(
+        replaceWith = ReplaceWith(
+            "tintDrawable(context, drawable, ColorRole.PRIMARY)",
+            imports = ["com.nextcloud.android.common.ui.theme.utils.ColorRole"]
+        ),
+        message = "Use tintDrawable(context, drawable, ColorRole.PRIMARY) instead"
+    )
     fun tintPrimaryDrawable(context: Context, drawable: Drawable?): Drawable? {
-        return drawable?.let {
-            withScheme(context) { scheme: Scheme ->
-                tintDrawable(it, scheme.primary)
-            }
-        }
+        return drawable?.let { tintDrawable(context, it, ColorRole.PRIMARY) }
     }
 
+    @Deprecated(
+        replaceWith = ReplaceWith(
+            "tintDrawable(context, drawable, ColorRole.ON_SURFACE)",
+            imports = ["com.nextcloud.android.common.ui.theme.utils.ColorRole"]
+        ),
+        message = "Use tintDrawable(context, drawable, ColorRole.ON_SURFACE) instead"
+    )
     fun tintTextDrawable(context: Context, drawable: Drawable?): Drawable? {
-        return drawable?.let {
-            withScheme(context) { scheme: Scheme ->
-                tintDrawable(it, scheme.onSurface)
-            }
-        }
+        return drawable?.let { tintDrawable(context, it, ColorRole.ON_SURFACE) }
     }
 
     internal fun tintDrawable(drawable: Drawable, @ColorInt color: Int): Drawable {
@@ -270,16 +299,30 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
         progressBar?.progressDrawable?.setColorFilter(color, PorterDuff.Mode.SRC_IN)
     }
 
-    fun colorPrimaryTextViewElement(textView: TextView) {
+    @JvmOverloads
+    fun colorTextView(textView: TextView, colorRole: ColorRole = ColorRole.PRIMARY) {
         withScheme(textView) { scheme ->
-            textView.setTextColor(scheme.primary)
+            textView.setTextColor(colorRole.select(scheme))
         }
     }
 
+    @Deprecated(
+        replaceWith = ReplaceWith("colorTextView(textView)"),
+        message = "Use colorTextView(textView) instead"
+    )
+    fun colorPrimaryTextViewElement(textView: TextView) {
+        colorTextView(textView, ColorRole.PRIMARY)
+    }
+
+    @Deprecated(
+        replaceWith = ReplaceWith(
+            "colorTextView(textView, ColorRole.ON_SECONDARY_CONTAINER)",
+            imports = ["com.nextcloud.android.common.ui.theme.utils.ColorRole"]
+        ),
+        message = "Use colorTextView(textView, ColorRole.ON_SECONDARY_CONTAINER) instead"
+    )
     fun colorOnSecondaryContainerTextViewElement(textView: TextView) {
-        withScheme(textView) { scheme ->
-            textView.setTextColor(scheme.onSecondaryContainer)
-        }
+        colorTextView(textView, ColorRole.ON_SECONDARY_CONTAINER)
     }
 
     fun colorPrimaryTextViewElementDarkMode(textView: TextView) {
@@ -288,6 +331,10 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
         }
     }
 
+    @Deprecated(
+        replaceWith = ReplaceWith("colorViewBackground(view)"),
+        message = "Use colorViewBackground(view) instead"
+    )
     fun colorPrimaryView(view: View) {
         withScheme(view) { scheme ->
             view.setBackgroundColor(scheme.primary)

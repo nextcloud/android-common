@@ -132,20 +132,7 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
                     )
                 )
 
-            button.setTextColor(
-                ColorStateList(
-                    arrayOf(
-                        intArrayOf(android.R.attr.state_enabled),
-                        intArrayOf(-android.R.attr.state_enabled)
-                    ),
-                    intArrayOf(
-                        scheme.onPrimary,
-                        colorUtil.adjustOpacity(scheme.onSurface, ON_SURFACE_OPACITY_BUTTON_DISABLED)
-                    )
-                )
-            )
-
-            button.iconTint = ColorStateList(
+            val contentColorList = ColorStateList(
                 arrayOf(
                     intArrayOf(android.R.attr.state_enabled),
                     intArrayOf(-android.R.attr.state_enabled)
@@ -155,6 +142,9 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
                     colorUtil.adjustOpacity(scheme.onSurface, ON_SURFACE_OPACITY_BUTTON_DISABLED)
                 )
             )
+
+            button.setTextColor(contentColorList)
+            button.iconTint = contentColorList
         }
     }
 
@@ -178,26 +168,7 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
                     )
                 )
 
-            button.setTextColor(
-                ColorStateList(
-                    arrayOf(
-                        intArrayOf(android.R.attr.state_enabled),
-                        intArrayOf(-android.R.attr.state_enabled),
-                        intArrayOf(-android.R.attr.state_hovered),
-                        intArrayOf(-android.R.attr.state_focused),
-                        intArrayOf(-android.R.attr.state_pressed)
-                    ),
-                    intArrayOf(
-                        scheme.onSecondaryContainer,
-                        colorUtil.adjustOpacity(scheme.onSurface, ON_SURFACE_OPACITY_BUTTON_DISABLED),
-                        scheme.onSecondaryContainer,
-                        scheme.onSecondaryContainer,
-                        scheme.onSecondaryContainer
-                    )
-                )
-            )
-
-            button.iconTint = ColorStateList(
+            val contentColorList = ColorStateList(
                 arrayOf(
                     intArrayOf(android.R.attr.state_enabled),
                     intArrayOf(-android.R.attr.state_enabled),
@@ -213,24 +184,14 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
                     scheme.onSecondaryContainer
                 )
             )
+            button.setTextColor(contentColorList)
+            button.iconTint = contentColorList
         }
     }
 
     fun colorMaterialButtonPrimaryOutlined(button: MaterialButton) {
         withScheme(button) { scheme ->
-            button.setTextColor(
-                ColorStateList(
-                    arrayOf(
-                        intArrayOf(android.R.attr.state_enabled),
-                        intArrayOf(-android.R.attr.state_enabled)
-                    ),
-                    intArrayOf(
-                        scheme.primary,
-                        colorUtil.adjustOpacity(scheme.onSurface, ON_SURFACE_OPACITY_BUTTON_DISABLED)
-                    )
-                )
-            )
-            button.iconTint = ColorStateList(
+            val contentColorList = ColorStateList(
                 arrayOf(
                     intArrayOf(android.R.attr.state_enabled),
                     intArrayOf(-android.R.attr.state_enabled)
@@ -240,6 +201,8 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
                     colorUtil.adjustOpacity(scheme.onSurface, ON_SURFACE_OPACITY_BUTTON_DISABLED)
                 )
             )
+            button.setTextColor(contentColorList)
+            button.iconTint = contentColorList
             button.strokeColor = ColorStateList(
                 arrayOf(
                     intArrayOf(android.R.attr.state_enabled),
@@ -270,19 +233,7 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
 
     fun colorMaterialButtonPrimaryBorderless(button: MaterialButton) {
         withScheme(button) { scheme ->
-            button.setTextColor(
-                ColorStateList(
-                    arrayOf(
-                        intArrayOf(android.R.attr.state_enabled),
-                        intArrayOf(-android.R.attr.state_enabled)
-                    ),
-                    intArrayOf(
-                        scheme.primary,
-                        colorUtil.adjustOpacity(scheme.onSurface, ON_SURFACE_OPACITY_BUTTON_DISABLED)
-                    )
-                )
-            )
-            button.iconTint = ColorStateList(
+            val contentColorList = ColorStateList(
                 arrayOf(
                     intArrayOf(android.R.attr.state_enabled),
                     intArrayOf(-android.R.attr.state_enabled)
@@ -290,6 +241,84 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
                 intArrayOf(
                     scheme.primary,
                     colorUtil.adjustOpacity(scheme.onSurface, ON_SURFACE_OPACITY_BUTTON_DISABLED)
+                )
+            )
+            button.setTextColor(contentColorList)
+            button.iconTint = contentColorList
+        }
+    }
+
+    /**
+     * text is primary, background is on_primary
+     */
+    fun colorMaterialButtonFilledOnPrimary(button: MaterialButton) {
+        withScheme(button) { scheme ->
+            button.backgroundTintList =
+                ColorStateList(
+                    arrayOf(
+                        intArrayOf(android.R.attr.state_enabled),
+                        intArrayOf(-android.R.attr.state_enabled),
+                        intArrayOf(-android.R.attr.state_hovered),
+                        intArrayOf(-android.R.attr.state_focused),
+                        intArrayOf(-android.R.attr.state_pressed)
+                    ),
+                    intArrayOf(
+                        scheme.onPrimary,
+                        colorUtil.adjustOpacity(scheme.surface, SURFACE_OPACITY_BUTTON_DISABLED),
+                        scheme.onPrimary,
+                        scheme.onPrimary,
+                        scheme.onPrimary
+                    )
+                )
+
+            val contentColorList = ColorStateList(
+                arrayOf(
+                    intArrayOf(android.R.attr.state_enabled),
+                    intArrayOf(-android.R.attr.state_enabled),
+                    intArrayOf(-android.R.attr.state_hovered),
+                    intArrayOf(-android.R.attr.state_focused),
+                    intArrayOf(-android.R.attr.state_pressed)
+                ),
+                intArrayOf(
+                    scheme.primary,
+                    colorUtil.adjustOpacity(scheme.primary, ON_SURFACE_OPACITY_BUTTON_DISABLED),
+                    scheme.primary,
+                    scheme.primary,
+                    scheme.primary
+                )
+            )
+
+            button.setTextColor(
+                contentColorList
+            )
+
+            button.iconTint = contentColorList
+        }
+    }
+
+    fun colorMaterialButtonOutlinedOnPrimary(button: MaterialButton) {
+        withScheme(button) { scheme ->
+            button.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
+            val contentColorList = ColorStateList(
+                arrayOf(
+                    intArrayOf(android.R.attr.state_enabled),
+                    intArrayOf(-android.R.attr.state_enabled)
+                ),
+                intArrayOf(
+                    scheme.onPrimary,
+                    colorUtil.adjustOpacity(scheme.onPrimary, ON_SURFACE_OPACITY_BUTTON_DISABLED)
+                )
+            )
+            button.setTextColor(contentColorList)
+            button.iconTint = contentColorList
+            button.strokeColor = contentColorList
+            button.strokeWidth = button.resources.getDimension(R.dimen.outlinedButtonStrokeWidth).toInt()
+            button.rippleColor = ColorStateList(
+                arrayOf(
+                    intArrayOf(android.R.attr.state_pressed)
+                ),
+                intArrayOf(
+                    colorUtil.adjustOpacity(scheme.primary, SURFACE_OPACITY_BUTTON_DISABLED)
                 )
             )
         }
