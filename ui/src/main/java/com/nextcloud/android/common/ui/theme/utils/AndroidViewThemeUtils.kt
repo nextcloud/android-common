@@ -23,6 +23,7 @@
 
 package com.nextcloud.android.common.ui.theme.utils
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.res.ColorStateList
@@ -47,6 +48,7 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.RadioButton
 import android.widget.SeekBar
+import android.widget.Switch
 import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
@@ -547,6 +549,17 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
         } while (index != -1)
     }
 
+    // here for backwards compatibility
+    @SuppressLint("UseSwitchCompatOrMaterialCode")
+    fun colorSwitch(switch: Switch) {
+        withScheme(switch) { scheme ->
+            val colors = SwitchColorUtils.calculateSwitchColors(switch.context, scheme)
+            DrawableCompat.setTintList(switch.thumbDrawable, colors.thumbColor)
+            DrawableCompat.setTintList(switch.trackDrawable, colors.trackColor)
+        }
+    }
+
+    @Deprecated("Don't do this, implement custom viewthemeutils instead")
     fun primaryColor(activity: Activity): Int {
         return withScheme(activity) { scheme ->
             scheme.primary

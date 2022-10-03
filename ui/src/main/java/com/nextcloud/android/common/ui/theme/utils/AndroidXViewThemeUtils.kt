@@ -25,7 +25,6 @@ package com.nextcloud.android.common.ui.theme.utils
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.text.Spannable
@@ -39,7 +38,6 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.app.NotificationCompat
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.TextViewCompat
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.nextcloud.android.common.ui.R
@@ -59,36 +57,9 @@ class AndroidXViewThemeUtils @Inject constructor(
 
     fun colorSwitchCompat(switchCompat: SwitchCompat) {
         withScheme(switchCompat) { scheme ->
-
-            val context = switchCompat.context
-
-            val thumbUncheckedColor = ResourcesCompat.getColor(
-                context.resources,
-                R.color.switch_thumb_color_unchecked,
-                context.theme
-            )
-            val trackUncheckedColor = ResourcesCompat.getColor(
-                context.resources,
-                R.color.switch_track_color_unchecked,
-                context.theme
-            )
-
-            val trackColor = Color.argb(
-                SWITCH_COMPAT_TRACK_ALPHA,
-                Color.red(scheme.primary),
-                Color.green(scheme.primary),
-                Color.blue(scheme.primary)
-            )
-
-            switchCompat.thumbTintList = ColorStateList(
-                arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
-                intArrayOf(scheme.primary, thumbUncheckedColor)
-            )
-
-            switchCompat.trackTintList = ColorStateList(
-                arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
-                intArrayOf(trackColor, trackUncheckedColor)
-            )
+            val colors = SwitchColorUtils.calculateSwitchColors(switchCompat.context, scheme)
+            switchCompat.thumbTintList = colors.thumbColor
+            switchCompat.trackTintList = colors.trackColor
         }
     }
 
@@ -158,9 +129,5 @@ class AndroidXViewThemeUtils @Inject constructor(
             Spannable.SPAN_INCLUSIVE_INCLUSIVE
         )
         actionBar.title = text
-    }
-
-    companion object {
-        private const val SWITCH_COMPAT_TRACK_ALPHA: Int = 77
     }
 }
