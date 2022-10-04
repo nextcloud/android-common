@@ -32,7 +32,6 @@ import android.graphics.PorterDuff
 import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
-import android.os.Build
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
@@ -57,12 +56,12 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.google.android.material.navigation.NavigationView
 import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.color.ColorUtil
 import com.nextcloud.android.common.ui.theme.MaterialSchemes
 import com.nextcloud.android.common.ui.theme.ViewThemeUtilsBase
-import com.nextcloud.android.common.ui.util.PlatformThemeUtil
 import scheme.Scheme
 import javax.inject.Inject
 
@@ -228,34 +227,23 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
 
     fun themeStatusBar(activity: Activity) {
         withScheme(activity) { scheme ->
-            applyColorToStatusBar(activity, scheme.surface)
+            colorStatusBar(activity, scheme.surface)
         }
     }
 
-    private fun applyColorToStatusBar(activity: Activity, @ColorInt color: Int) {
+    /**
+     * Public for special cases, e.g. action mode. You probably want [themeStatusBar] for most cases instead.
+     */
+    fun colorStatusBar(activity: Activity, @ColorInt color: Int) {
         val window = activity.window ?: return
-        val isLightTheme = !PlatformThemeUtil.isDarkMode(activity)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val decor = window.decorView
-            if (isLightTheme) {
-                val systemUiFlagLightStatusBar = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or
-                        View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-                } else {
-                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-                }
-                decor.systemUiVisibility = systemUiFlagLightStatusBar
-            } else {
-                decor.systemUiVisibility = 0
-            }
-            window.statusBarColor = color
-        } else if (isLightTheme) {
-            window.statusBarColor = Color.BLACK
-        }
+        val isLightBackground = !colorUtil.isDarkBackground(color)
+        val decor = window.decorView
+        window.statusBarColor = color
+        WindowInsetsControllerCompat(window, decor).isAppearanceLightStatusBars = isLightBackground
     }
 
     fun resetStatusBar(activity: Activity) {
-        applyColorToStatusBar(
+        colorStatusBar(
             activity,
             ResourcesCompat.getColor(
                 activity.resources,
