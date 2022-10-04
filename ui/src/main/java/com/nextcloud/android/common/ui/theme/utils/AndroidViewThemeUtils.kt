@@ -242,7 +242,9 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
         val isLightBackground = !colorUtil.isDarkBackground(color)
         val decor = window.decorView
         window.statusBarColor = color
+        window.navigationBarColor = color
         WindowInsetsControllerCompat(window, decor).isAppearanceLightStatusBars = isLightBackground
+        WindowInsetsControllerCompat(window, decor).isAppearanceLightNavigationBars = isLightBackground
     }
 
     fun resetStatusBar(activity: Activity) {
