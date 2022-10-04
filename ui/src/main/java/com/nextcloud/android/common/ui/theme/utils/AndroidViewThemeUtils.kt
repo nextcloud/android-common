@@ -171,7 +171,7 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
     @JvmOverloads
     fun tintDrawable(context: Context, drawable: Drawable, colorRole: ColorRole = ColorRole.PRIMARY): Drawable {
         return withScheme(context) { scheme: Scheme ->
-            tintDrawable(drawable, colorRole.select(scheme))
+            colorDrawable(drawable, colorRole.select(scheme))
         }
     }
 
@@ -197,7 +197,10 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
         return drawable?.let { tintDrawable(context, it, ColorRole.ON_SURFACE) }
     }
 
-    internal fun tintDrawable(drawable: Drawable, @ColorInt color: Int): Drawable {
+    /**
+     * Public for edge cases. For most cases use [tintDrawable] instead
+     */
+    fun colorDrawable(drawable: Drawable, @ColorInt color: Int): Drawable {
         val wrap = DrawableCompat.wrap(drawable)
         wrap.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
             color,
