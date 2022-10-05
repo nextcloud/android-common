@@ -32,7 +32,7 @@ import scheme.Scheme
 /**
  * To be used to calculate color lists for both Switch and SwitchCompat
  */
-object SwitchColorUtils {
+internal object SwitchColorUtils {
 
     private const val SWITCH_COMPAT_TRACK_ALPHA: Int = 77
 
