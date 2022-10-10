@@ -75,6 +75,10 @@ class ColorUtil @Inject constructor(private val context: Context) {
         return ColorUtils.HSLToColor(hsl)
     }
 
+    fun colorToHexString(@ColorInt color: Int): String {
+        return String.format(null, "#%06X", HEX_WHITE and color)
+    }
+
     @ColorInt
     private fun String?.parseColorOrFallback(fallback: () -> Int): Int {
         return if (this?.isNotBlank() == true) {
@@ -98,5 +102,6 @@ class ColorUtil @Inject constructor(private val context: Context) {
         private const val HSL_SIZE: Int = 3
         private const val INDEX_LIGHTNESS: Int = 2
         private const val LIGHTNESS_DARK_THRESHOLD: Float = 0.6f
+        private const val HEX_WHITE = 0xFFFFFF
     }
 }
