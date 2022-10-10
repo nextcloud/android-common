@@ -62,6 +62,7 @@ import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.color.ColorUtil
 import com.nextcloud.android.common.ui.theme.MaterialSchemes
 import com.nextcloud.android.common.ui.theme.ViewThemeUtilsBase
+import com.nextcloud.android.common.ui.util.buildColorStateList
 import scheme.Scheme
 import javax.inject.Inject
 
@@ -83,29 +84,17 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
         withScheme(navigationView) { scheme ->
             if (navigationView.itemBackground != null) {
                 navigationView.itemBackground!!.setTintList(
-                    ColorStateList(
-                        arrayOf(
-                            intArrayOf(android.R.attr.state_checked),
-                            intArrayOf(-android.R.attr.state_checked)
-                        ),
-                        intArrayOf(
-                            scheme.secondaryContainer,
-                            Color.TRANSPARENT
-                        )
+                    buildColorStateList(
+                        android.R.attr.state_checked to scheme.secondaryContainer,
+                        -android.R.attr.state_checked to Color.TRANSPARENT
                     )
                 )
             }
             navigationView.setBackgroundColor(scheme.surface)
 
-            val colorStateList = ColorStateList(
-                arrayOf(
-                    intArrayOf(android.R.attr.state_checked),
-                    intArrayOf(-android.R.attr.state_checked)
-                ),
-                intArrayOf(
-                    scheme.onSecondaryContainer,
-                    scheme.onSurfaceVariant
-                )
+            val colorStateList = buildColorStateList(
+                android.R.attr.state_checked to scheme.onSecondaryContainer,
+                -android.R.attr.state_checked to scheme.onSurfaceVariant
             )
 
             navigationView.itemTextColor = colorStateList
@@ -360,18 +349,13 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
 
     fun themeImageButton(imageButton: ImageButton) {
         withScheme(imageButton) { scheme ->
-            imageButton.imageTintList = ColorStateList(
-                arrayOf(
-                    intArrayOf(android.R.attr.state_selected),
-                    intArrayOf(-android.R.attr.state_selected),
-                    intArrayOf(android.R.attr.state_enabled),
-                    intArrayOf(-android.R.attr.state_enabled)
-                ),
-                intArrayOf(
-                    scheme.primary,
-                    scheme.onSurfaceVariant,
-                    scheme.onSurfaceVariant,
-                    colorUtil.adjustOpacity(scheme.onSurface, ON_SURFACE_OPACITY_BUTTON_DISABLED)
+            imageButton.imageTintList = buildColorStateList(
+                android.R.attr.state_selected to scheme.primary,
+                -android.R.attr.state_selected to scheme.onSurfaceVariant,
+                android.R.attr.state_enabled to scheme.onSurfaceVariant,
+                -android.R.attr.state_enabled to colorUtil.adjustOpacity(
+                    scheme.onSurface,
+                    ON_SURFACE_OPACITY_BUTTON_DISABLED
                 )
             )
         }
@@ -406,14 +390,11 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
         withScheme(buttons[0]) { scheme ->
             for (button in buttons) {
                 button.setTextColor(
-                    ColorStateList(
-                        arrayOf(
-                            intArrayOf(android.R.attr.state_enabled),
-                            intArrayOf(-android.R.attr.state_enabled)
-                        ),
-                        intArrayOf(
-                            color,
-                            colorUtil.adjustOpacity(scheme.onSurface, ON_SURFACE_OPACITY_BUTTON_DISABLED)
+                    buildColorStateList(
+                        android.R.attr.state_enabled to color,
+                        -android.R.attr.state_enabled to colorUtil.adjustOpacity(
+                            scheme.onSurface,
+                            ON_SURFACE_OPACITY_BUTTON_DISABLED
                         )
                     )
                 )
@@ -441,14 +422,12 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
 
     fun themeCheckedTextView(vararg checkedTextViews: CheckedTextView) {
         withScheme(checkedTextViews[0]) { scheme ->
-            val colorStateList = ColorStateList(
-                arrayOf(
-                    intArrayOf(-android.R.attr.state_checked),
-                    intArrayOf(-android.R.attr.state_enabled),
-                    intArrayOf(android.R.attr.state_checked)
-                ),
-                intArrayOf(Color.GRAY, Color.GRAY, scheme.primary)
+            val colorStateList = buildColorStateList(
+                -android.R.attr.state_checked to Color.GRAY,
+                -android.R.attr.state_enabled to Color.GRAY,
+                android.R.attr.state_checked to scheme.primary
             )
+
             checkedTextViews.forEach {
                 it.checkMarkTintList = colorStateList
             }
@@ -457,13 +436,10 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
 
     fun themeCheckbox(vararg checkboxes: CheckBox) {
         withScheme(checkboxes[0]) { scheme ->
-            val colorStateList = ColorStateList(
-                arrayOf(
-                    intArrayOf(-android.R.attr.state_checked),
-                    intArrayOf(-android.R.attr.state_enabled),
-                    intArrayOf(android.R.attr.state_checked)
-                ),
-                intArrayOf(Color.GRAY, Color.GRAY, scheme.primary)
+            val colorStateList = buildColorStateList(
+                -android.R.attr.state_checked to Color.GRAY,
+                -android.R.attr.state_enabled to Color.GRAY,
+                android.R.attr.state_checked to scheme.primary
             )
             checkboxes.forEach {
                 it.buttonTintList = colorStateList
@@ -473,12 +449,9 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
 
     fun themeRadioButton(radioButton: RadioButton) {
         withScheme(radioButton) { scheme ->
-            radioButton.buttonTintList = ColorStateList(
-                arrayOf(
-                    intArrayOf(-android.R.attr.state_checked),
-                    intArrayOf(android.R.attr.state_checked)
-                ),
-                intArrayOf(Color.GRAY, scheme.primary)
+            radioButton.buttonTintList = buildColorStateList(
+                -android.R.attr.state_checked to Color.GRAY,
+                android.R.attr.state_checked to scheme.primary
             )
         }
     }
@@ -487,16 +460,11 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
         withScheme(editText) { scheme ->
             // TODO check API-level compatibility
             // editText.background.setColorFilter(color, PorterDuff.Mode.SRC_ATOP)
-            editText.backgroundTintList = ColorStateList(
-                arrayOf(
-                    intArrayOf(-android.R.attr.state_focused),
-                    intArrayOf(android.R.attr.state_focused)
-                ),
-                intArrayOf(
-                    scheme.outline,
-                    scheme.primary
-                )
+            editText.backgroundTintList = buildColorStateList(
+                -android.R.attr.state_focused to scheme.outline,
+                android.R.attr.state_focused to scheme.primary
             )
+
             editText.setHintTextColor(scheme.onSurfaceVariant)
             editText.setTextColor(scheme.onSurface)
         }
@@ -552,7 +520,7 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
         }
     }
 
-    @Deprecated("Don't do this, implement custom viewthemeutils instead")
+    @Deprecated("Don't do this, implement custom viewThemeUtils instead")
     fun primaryColor(activity: Activity): Int {
         return withScheme(activity) { scheme ->
             scheme.primary
