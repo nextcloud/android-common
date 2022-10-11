@@ -87,12 +87,7 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
 
     fun colorMaterialTextButton(button: MaterialButton) {
         withScheme(button) { scheme ->
-            button.rippleColor = buildColorStateList(
-                android.R.attr.state_pressed to colorUtil.adjustOpacity(
-                    scheme.primary,
-                    SURFACE_OPACITY_BUTTON_DISABLED
-                )
-            )
+            button.rippleColor = rippleColor(scheme)
         }
     }
 
@@ -184,12 +179,7 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
 
             button.strokeWidth =
                 button.resources.getDimension(R.dimen.outlinedButtonStrokeWidth).toInt()
-            button.rippleColor = buildColorStateList(
-                android.R.attr.state_pressed to colorUtil.adjustOpacity(
-                    scheme.primary,
-                    SURFACE_OPACITY_BUTTON_DISABLED
-                )
-            )
+            button.rippleColor = rippleColor(scheme)
         }
     }
 
@@ -259,12 +249,7 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
             button.strokeColor = contentColorList
             button.strokeWidth =
                 button.resources.getDimension(R.dimen.outlinedButtonStrokeWidth).toInt()
-            button.rippleColor = buildColorStateList(
-                android.R.attr.state_pressed to colorUtil.adjustOpacity(
-                    scheme.primary,
-                    SURFACE_OPACITY_BUTTON_DISABLED
-                )
-            )
+            button.rippleColor = rippleColor(scheme)
         }
     }
 
@@ -341,12 +326,7 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
 
         tabLayout.tabTextColors = tabContentColors
         tabLayout.tabIconTint = tabContentColors
-        tabLayout.tabRippleColor = buildColorStateList(
-            android.R.attr.state_pressed to colorUtil.adjustOpacity(
-                scheme.primary,
-                SURFACE_OPACITY_BUTTON_DISABLED
-            )
-        )
+        tabLayout.tabRippleColor = rippleColor(scheme)
     }
 
     fun colorChipBackground(chip: Chip) {
@@ -379,6 +359,13 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
             snackbar.setTextColor(scheme.inverseOnSurface)
         }
     }
+
+    private fun rippleColor(scheme: Scheme) = buildColorStateList(
+        android.R.attr.state_pressed to colorUtil.adjustOpacity(
+            scheme.primary,
+            SURFACE_OPACITY_BUTTON_DISABLED
+        )
+    )
 
     companion object {
         private const val SURFACE_OPACITY_BUTTON_DISABLED: Float = 0.12f
