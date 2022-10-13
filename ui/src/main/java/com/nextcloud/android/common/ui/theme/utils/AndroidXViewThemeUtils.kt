@@ -47,7 +47,6 @@ import javax.inject.Inject
 /**
  * View theme utils for Android extension views (androidx.*)
  */
-// TODO breaking change: androidViewThemeUtils parameter
 class AndroidXViewThemeUtils @Inject constructor(
     schemes: MaterialSchemes,
     private val androidViewThemeUtils: AndroidViewThemeUtils
