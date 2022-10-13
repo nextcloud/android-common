@@ -68,8 +68,27 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
 
     fun themeFAB(fab: FloatingActionButton) {
         withScheme(fab) { scheme ->
-            fab.backgroundTintList = ColorStateList.valueOf(scheme.primaryContainer)
-            fab.imageTintList = ColorStateList.valueOf(scheme.onPrimaryContainer)
+            fab.backgroundTintList = ColorStateList(
+                arrayOf(
+                    intArrayOf(android.R.attr.state_enabled),
+                    intArrayOf(-android.R.attr.state_enabled)
+                ),
+                intArrayOf(
+                    scheme.primaryContainer,
+                    Color.GRAY
+                )
+            )
+
+            fab.imageTintList = ColorStateList(
+                arrayOf(
+                    intArrayOf(android.R.attr.state_enabled),
+                    intArrayOf(-android.R.attr.state_enabled)
+                ),
+                intArrayOf(
+                    scheme.onPrimaryContainer,
+                    Color.WHITE
+                )
+            )
         }
     }
 
