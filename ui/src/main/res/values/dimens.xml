@@ -19,4 +19,5 @@
 
 <resources>
     <dimen name="dialogBorderRadius">28dp</dimen>
+    <dimen name="outlinedButtonStrokeWidth">1dp</dimen>
 </resources>

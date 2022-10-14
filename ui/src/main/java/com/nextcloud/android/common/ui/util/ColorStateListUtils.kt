@@ -1,8 +1,6 @@
 /*
  * Nextcloud Android Common Library
  *
- * @author Álvaro Brey
- * Copyright (C) 2022 Álvaro Brey <alvaro@alvarobrey.com>
  * Copyright (C) 2022 Nextcloud GmbH
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,14 +19,13 @@
 
 package com.nextcloud.android.common.ui.util
 
-import android.content.Context
-import android.content.res.Configuration
+import android.content.res.ColorStateList
 
-object PlatformThemeUtil {
-    @JvmStatic
-    fun isDarkMode(context: Context): Boolean =
-        when (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
-            Configuration.UI_MODE_NIGHT_YES -> true
-            else -> false
-        }
+/**
+ * First element of each pair is @AttRes (can be negated) and second one is @ColorInt
+ */
+fun buildColorStateList(vararg pairs: Pair<Int, Int>): ColorStateList {
+    val stateArray = pairs.map { intArrayOf(it.first) }.toTypedArray()
+    val colorArray = pairs.map { it.second }.toIntArray()
+    return ColorStateList(stateArray, colorArray)
 }

@@ -51,14 +51,18 @@ class ColorUtil @Inject constructor(private val context: Context) {
 
     @ColorInt
     fun getForegroundColorForBackgroundColor(@ColorInt color: Int): Int {
-        val hsl = FloatArray(HSL_SIZE)
-        ColorUtils.RGBToHSL(Color.red(color), Color.green(color), Color.blue(color), hsl)
-
-        return if (hsl[INDEX_LIGHTNESS] < LIGHTNESS_DARK_THRESHOLD) {
+        return if (isDarkBackground(color)) {
             Color.WHITE
         } else {
             ContextCompat.getColor(context, R.color.grey_900)
         }
+    }
+
+    fun isDarkBackground(@ColorInt color: Int): Boolean {
+        val hsl = FloatArray(HSL_SIZE)
+        ColorUtils.RGBToHSL(Color.red(color), Color.green(color), Color.blue(color), hsl)
+
+        return hsl[INDEX_LIGHTNESS] < LIGHTNESS_DARK_THRESHOLD
     }
 
     fun setLightness(@ColorInt color: Int, lightness: Float): Int {
@@ -71,9 +75,17 @@ class ColorUtil @Inject constructor(private val context: Context) {
         return ColorUtils.HSLToColor(hsl)
     }
 
+    fun colorToHexString(@ColorInt color: Int): String {
+        return String.format(null, "#%06X", HEX_WHITE and color)
+    }
+
     @ColorInt
     private fun String?.parseColorOrFallback(fallback: () -> Int): Int {
-        return this?.let { Color.parseColor(this) } ?: fallback()
+        return if (this?.isNotBlank() == true) {
+            Color.parseColor(this)
+        } else {
+            fallback()
+        }
     }
 
     @ColorInt
@@ -90,5 +102,6 @@ class ColorUtil @Inject constructor(private val context: Context) {
         private const val HSL_SIZE: Int = 3
         private const val INDEX_LIGHTNESS: Int = 2
         private const val LIGHTNESS_DARK_THRESHOLD: Float = 0.6f
+        private const val HEX_WHITE = 0xFFFFFF
     }
 }

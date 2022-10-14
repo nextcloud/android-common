@@ -28,7 +28,7 @@ import android.view.View
 import com.nextcloud.android.common.ui.util.PlatformThemeUtil
 import scheme.Scheme
 
-open class ViewThemeUtilsBase(val schemes: MaterialSchemes) {
+open class ViewThemeUtilsBase(private val schemes: MaterialSchemes) {
     /**
      * Scheme for painting elements
      */
@@ -40,20 +40,15 @@ open class ViewThemeUtilsBase(val schemes: MaterialSchemes) {
     fun getScheme(context: Context): Scheme = getSchemeInternal(context)
 
     @Suppress("MemberVisibilityCanBePrivate")
+    // TODO cache by context hashcode
     protected fun getSchemeInternal(context: Context): Scheme = when {
         PlatformThemeUtil.isDarkMode(context) -> schemes.darkScheme
         else -> schemes.lightScheme
     }
 
-    protected fun withScheme(view: View, block: (Scheme) -> Unit) {
-        block(getSchemeInternal(view.context))
-    }
+    protected fun <R> withScheme(view: View, block: (Scheme) -> R): R = block(getSchemeInternal(view.context))
 
-    protected fun withScheme(context: Context, block: (Scheme) -> Unit) {
-        block(getSchemeInternal(context))
-    }
+    protected fun <R> withScheme(context: Context, block: (Scheme) -> R): R = block(getSchemeInternal(context))
 
-    protected fun withSchemeDark(block: (Scheme) -> Unit) {
-        block(schemes.darkScheme)
-    }
+    protected fun <R> withSchemeDark(block: (Scheme) -> R): R = block(schemes.darkScheme)
 }
