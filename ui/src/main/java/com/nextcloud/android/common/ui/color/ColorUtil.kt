@@ -24,6 +24,7 @@ package com.nextcloud.android.common.ui.color
 
 import android.content.Context
 import android.graphics.Color
+import android.util.Log
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat
@@ -82,7 +83,12 @@ class ColorUtil @Inject constructor(private val context: Context) {
     @ColorInt
     private fun String?.parseColorOrFallback(fallback: () -> Int): Int {
         return if (this?.isNotBlank() == true) {
-            Color.parseColor(this)
+            try {
+                Color.parseColor(this)
+            } catch (e: IllegalArgumentException) {
+                Log.w(TAG, "Invalid color: $this", e)
+                fallback()
+            }
         } else {
             fallback()
         }
@@ -103,5 +109,6 @@ class ColorUtil @Inject constructor(private val context: Context) {
         private const val INDEX_LIGHTNESS: Int = 2
         private const val LIGHTNESS_DARK_THRESHOLD: Float = 0.6f
         private const val HEX_WHITE = 0xFFFFFF
+        private val TAG = ColorUtil::class.simpleName
     }
 }
