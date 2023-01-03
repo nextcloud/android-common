@@ -35,7 +35,7 @@ open class ViewThemeUtilsBase(private val schemes: MaterialSchemes) {
     @Suppress("DeprecatedCallableAddReplaceWith")
     @Deprecated(
         "Implement view-specific theming functions in a `ViewThemeUtilsBase` subclass" +
-            " instead of getting the scheme directly"
+            " instead of getting the scheme directly",
     )
     fun getScheme(context: Context): Scheme = getSchemeInternal(context)
 

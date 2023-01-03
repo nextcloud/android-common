@@ -51,7 +51,7 @@ class DialogViewThemeUtils @Inject constructor(schemes: MaterialSchemes) :
                 context,
                 null,
                 com.google.android.material.R.attr.alertDialogStyle,
-                com.google.android.material.R.style.MaterialAlertDialog_MaterialComponents
+                com.google.android.material.R.style.MaterialAlertDialog_MaterialComponents,
             )
             materialShapeDrawable.initializeElevationOverlay(context)
             materialShapeDrawable.fillColor = ColorStateList.valueOf(scheme.surface)

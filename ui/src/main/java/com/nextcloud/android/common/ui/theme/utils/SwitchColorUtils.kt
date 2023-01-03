@@ -38,37 +38,37 @@ internal object SwitchColorUtils {
 
     data class SwitchColors(
         val thumbColor: ColorStateList,
-        val trackColor: ColorStateList
+        val trackColor: ColorStateList,
     )
 
     fun calculateSwitchColors(context: Context, scheme: Scheme): SwitchColors {
         val thumbUncheckedColor = ResourcesCompat.getColor(
             context.resources,
             R.color.switch_thumb_color_unchecked,
-            context.theme
+            context.theme,
         )
         val trackUncheckedColor = ResourcesCompat.getColor(
             context.resources,
             R.color.switch_track_color_unchecked,
-            context.theme
+            context.theme,
         )
 
         val trackColor = Color.argb(
             SWITCH_COMPAT_TRACK_ALPHA,
             Color.red(scheme.primary),
             Color.green(scheme.primary),
-            Color.blue(scheme.primary)
+            Color.blue(scheme.primary),
         )
 
         return SwitchColors(
             thumbColor = ColorStateList(
                 arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
-                intArrayOf(scheme.primary, thumbUncheckedColor)
+                intArrayOf(scheme.primary, thumbUncheckedColor),
             ),
             trackColor = ColorStateList(
                 arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
-                intArrayOf(trackColor, trackUncheckedColor)
-            )
+                intArrayOf(trackColor, trackUncheckedColor),
+            ),
         )
     }
 }

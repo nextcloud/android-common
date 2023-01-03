@@ -86,15 +86,15 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
                 navigationView.itemBackground!!.setTintList(
                     buildColorStateList(
                         android.R.attr.state_checked to scheme.secondaryContainer,
-                        -android.R.attr.state_checked to Color.TRANSPARENT
-                    )
+                        -android.R.attr.state_checked to Color.TRANSPARENT,
+                    ),
                 )
             }
             navigationView.setBackgroundColor(scheme.surface)
 
             val colorStateList = buildColorStateList(
                 android.R.attr.state_checked to scheme.onSecondaryContainer,
-                -android.R.attr.state_checked to scheme.onSurfaceVariant
+                -android.R.attr.state_checked to scheme.onSurfaceVariant,
             )
 
             navigationView.itemTextColor = colorStateList
@@ -133,7 +133,7 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
             ForegroundColorSpan(color),
             0,
             newItemTitle.length,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
         )
         item.title = newItemTitle
     }
@@ -149,9 +149,9 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
     @Deprecated(
         replaceWith = ReplaceWith(
             "tintDrawable(context, id, ColorRole.PRIMARY)",
-            imports = ["com.nextcloud.android.common.ui.theme.utils.ColorRole"]
+            imports = ["com.nextcloud.android.common.ui.theme.utils.ColorRole"],
         ),
-        message = "Use tintDrawable(context, id, ColorRole.PRIMARY) instead"
+        message = "Use tintDrawable(context, id, ColorRole.PRIMARY) instead",
     )
     fun tintPrimaryDrawable(context: Context, @DrawableRes id: Int): Drawable? {
         return tintDrawable(context, id, ColorRole.PRIMARY)
@@ -167,9 +167,9 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
     @Deprecated(
         replaceWith = ReplaceWith(
             "tintDrawable(context, drawable, ColorRole.PRIMARY)",
-            imports = ["com.nextcloud.android.common.ui.theme.utils.ColorRole"]
+            imports = ["com.nextcloud.android.common.ui.theme.utils.ColorRole"],
         ),
-        message = "Use tintDrawable(context, drawable, ColorRole.PRIMARY) instead"
+        message = "Use tintDrawable(context, drawable, ColorRole.PRIMARY) instead",
     )
     fun tintPrimaryDrawable(context: Context, drawable: Drawable?): Drawable? {
         return drawable?.let { tintDrawable(context, it, ColorRole.PRIMARY) }
@@ -178,9 +178,9 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
     @Deprecated(
         replaceWith = ReplaceWith(
             "tintDrawable(context, drawable, ColorRole.ON_SURFACE)",
-            imports = ["com.nextcloud.android.common.ui.theme.utils.ColorRole"]
+            imports = ["com.nextcloud.android.common.ui.theme.utils.ColorRole"],
         ),
-        message = "Use tintDrawable(context, drawable, ColorRole.ON_SURFACE) instead"
+        message = "Use tintDrawable(context, drawable, ColorRole.ON_SURFACE) instead",
     )
     fun tintTextDrawable(context: Context, drawable: Drawable?): Drawable? {
         return drawable?.let { tintDrawable(context, it, ColorRole.ON_SURFACE) }
@@ -193,7 +193,7 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
         val wrap = DrawableCompat.wrap(drawable)
         wrap.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
             color,
-            BlendModeCompat.SRC_ATOP
+            BlendModeCompat.SRC_ATOP,
         )
         return wrap
     }
@@ -201,7 +201,7 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
     fun tintToolbarArrowDrawable(
         context: Context,
         drawerToggle: ActionBarDrawerToggle,
-        drawable: Drawable
+        drawable: Drawable,
     ) {
         withScheme(context) { scheme: Scheme ->
             val wrap = DrawableCompat.wrap(drawable)
@@ -242,8 +242,8 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
             ResourcesCompat.getColor(
                 activity.resources,
                 R.color.bg_default,
-                activity.theme
-            )
+                activity.theme,
+            ),
         )
     }
 
@@ -292,7 +292,7 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
 
     @Deprecated(
         replaceWith = ReplaceWith("colorTextView(textView)"),
-        message = "Use colorTextView(textView) instead"
+        message = "Use colorTextView(textView) instead",
     )
     fun colorPrimaryTextViewElement(textView: TextView) {
         colorTextView(textView, ColorRole.PRIMARY)
@@ -301,9 +301,9 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
     @Deprecated(
         replaceWith = ReplaceWith(
             "colorTextView(textView, ColorRole.ON_SECONDARY_CONTAINER)",
-            imports = ["com.nextcloud.android.common.ui.theme.utils.ColorRole"]
+            imports = ["com.nextcloud.android.common.ui.theme.utils.ColorRole"],
         ),
-        message = "Use colorTextView(textView, ColorRole.ON_SECONDARY_CONTAINER) instead"
+        message = "Use colorTextView(textView, ColorRole.ON_SECONDARY_CONTAINER) instead",
     )
     fun colorOnSecondaryContainerTextViewElement(textView: TextView) {
         colorTextView(textView, ColorRole.ON_SECONDARY_CONTAINER)
@@ -317,7 +317,7 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
 
     @Deprecated(
         replaceWith = ReplaceWith("colorViewBackground(view)"),
-        message = "Use colorViewBackground(view) instead"
+        message = "Use colorViewBackground(view) instead",
     )
     fun colorPrimaryView(view: View) {
         withScheme(view) { scheme ->
@@ -331,7 +331,7 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
      */
     @Deprecated(
         replaceWith = ReplaceWith("colorImageViewBackgroundAndIcon"),
-        message = "Use colorImageViewBackgroundAndIcon, which has a better name, instead"
+        message = "Use colorImageViewBackgroundAndIcon, which has a better name, instead",
     )
     fun colorImageViewButton(imageView: ImageView) {
         colorImageViewBackgroundAndIcon(imageView)
@@ -355,8 +355,8 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
                 android.R.attr.state_enabled to scheme.onSurfaceVariant,
                 -android.R.attr.state_enabled to colorUtil.adjustOpacity(
                     scheme.onSurface,
-                    ON_SURFACE_OPACITY_BUTTON_DISABLED
-                )
+                    ON_SURFACE_OPACITY_BUTTON_DISABLED,
+                ),
             )
         }
     }
@@ -394,9 +394,9 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
                         android.R.attr.state_enabled to color,
                         -android.R.attr.state_enabled to colorUtil.adjustOpacity(
                             scheme.onSurface,
-                            ON_SURFACE_OPACITY_BUTTON_DISABLED
-                        )
-                    )
+                            ON_SURFACE_OPACITY_BUTTON_DISABLED,
+                        ),
+                    ),
                 )
             }
         }
@@ -425,7 +425,7 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
             val colorStateList = buildColorStateList(
                 -android.R.attr.state_checked to Color.GRAY,
                 -android.R.attr.state_enabled to Color.GRAY,
-                android.R.attr.state_checked to scheme.primary
+                android.R.attr.state_checked to scheme.primary,
             )
 
             checkedTextViews.forEach {
@@ -439,7 +439,7 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
             val colorStateList = buildColorStateList(
                 -android.R.attr.state_checked to Color.GRAY,
                 -android.R.attr.state_enabled to Color.GRAY,
-                android.R.attr.state_checked to scheme.primary
+                android.R.attr.state_checked to scheme.primary,
             )
             checkboxes.forEach {
                 it.buttonTintList = colorStateList
@@ -451,7 +451,7 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
         withScheme(radioButton) { scheme ->
             radioButton.buttonTintList = buildColorStateList(
                 -android.R.attr.state_checked to Color.GRAY,
-                android.R.attr.state_checked to scheme.primary
+                android.R.attr.state_checked to scheme.primary,
             )
         }
     }
@@ -462,7 +462,7 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
             // editText.background.setColorFilter(color, PorterDuff.Mode.SRC_ATOP)
             editText.backgroundTintList = buildColorStateList(
                 -android.R.attr.state_focused to scheme.outline,
-                android.R.attr.state_focused to scheme.primary
+                android.R.attr.state_focused to scheme.primary,
             )
 
             editText.setHintTextColor(scheme.onSurfaceVariant)
@@ -480,7 +480,7 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
         textView: TextView,
         originalText: String,
         constraint: String,
-        @ColorInt color: Int
+        @ColorInt color: Int,
     ) {
         val constraintLower = constraint.lowercase()
         val start: Int = originalText.lowercase().indexOf(constraintLower)
@@ -498,7 +498,7 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
         constraint: String,
         @ColorInt color: Int,
         start: Int,
-        spanText: Spannable
+        spanText: Spannable,
     ) {
         var index = start
         do {

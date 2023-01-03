@@ -100,7 +100,7 @@ class ColorUtil @Inject constructor(private val context: Context) {
             (Color.alpha(color) * opacity).roundToInt(),
             Color.red(color),
             Color.green(color),
-            Color.blue(color)
+            Color.blue(color),
         )
     }
 

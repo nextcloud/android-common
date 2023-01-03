@@ -49,7 +49,7 @@ import javax.inject.Inject
  */
 class AndroidXViewThemeUtils @Inject constructor(
     schemes: MaterialSchemes,
-    private val androidViewThemeUtils: AndroidViewThemeUtils
+    private val androidViewThemeUtils: AndroidViewThemeUtils,
 ) :
     ViewThemeUtilsBase(schemes) {
 
@@ -127,7 +127,7 @@ class AndroidXViewThemeUtils @Inject constructor(
             ForegroundColorSpan(color),
             0,
             text.length,
-            Spannable.SPAN_INCLUSIVE_INCLUSIVE
+            Spannable.SPAN_INCLUSIVE_INCLUSIVE,
         )
         return text
     }
