@@ -1,3 +1,4 @@
+# synced from @nextcloud/android-config
 version: 2
 updates:
     -   package-ecosystem: "github-actions"
@@ -13,4 +14,5 @@ updates:
         rebase-strategy: "disabled"
         open-pull-requests-limit: 10
         labels:
+            - 3. to review
             - dependencies
