@@ -201,7 +201,7 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
     fun tintToolbarArrowDrawable(
         context: Context,
         drawerToggle: ActionBarDrawerToggle,
-        drawable: Drawable
+        drawable: Drawable,
     ) {
         withScheme(context) { scheme: Scheme ->
             val wrap = DrawableCompat.wrap(drawable)
@@ -480,7 +480,7 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
         textView: TextView,
         originalText: String,
         constraint: String,
-        @ColorInt color: Int
+        @ColorInt color: Int,
     ) {
         val constraintLower = constraint.lowercase()
         val start: Int = originalText.lowercase().indexOf(constraintLower)
@@ -498,7 +498,7 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
         constraint: String,
         @ColorInt color: Int,
         start: Int,
-        spanText: Spannable
+        spanText: Spannable,
     ) {
         var index = start
         do {
