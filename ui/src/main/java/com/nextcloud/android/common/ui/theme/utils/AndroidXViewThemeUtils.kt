@@ -49,7 +49,7 @@ import javax.inject.Inject
  */
 class AndroidXViewThemeUtils @Inject constructor(
     schemes: MaterialSchemes,
-    private val androidViewThemeUtils: AndroidViewThemeUtils,
+    private val androidViewThemeUtils: AndroidViewThemeUtils
 ) :
     ViewThemeUtilsBase(schemes) {
 

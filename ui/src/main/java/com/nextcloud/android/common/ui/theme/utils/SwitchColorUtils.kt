@@ -38,7 +38,7 @@ internal object SwitchColorUtils {
 
     data class SwitchColors(
         val thumbColor: ColorStateList,
-        val trackColor: ColorStateList,
+        val trackColor: ColorStateList
     )
 
     fun calculateSwitchColors(context: Context, scheme: Scheme): SwitchColors {

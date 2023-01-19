@@ -32,5 +32,5 @@ enum class ColorRole(internal val select: (Scheme) -> Int) {
     ON_SECONDARY_CONTAINER({ it.onSecondaryContainer }),
     ON_SURFACE({ it.onSurface }),
     PRIMARY({ it.primary }),
-    SURFACE({ it.surface }),
+    SURFACE({ it.surface })
 }
