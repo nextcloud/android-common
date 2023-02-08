@@ -308,6 +308,32 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
         }
     }
 
+    fun colorTextInputLayout(textInputLayout: TextInputLayout, colorRole: ColorRole) {
+        withScheme(textInputLayout) { scheme ->
+            val errorColor = scheme.error
+
+            val errorColorStateList = buildColorStateList(
+                -android.R.attr.state_focused to errorColor,
+                android.R.attr.state_focused to errorColor
+            )
+
+            val coloredColorStateList = buildColorStateList(
+                -android.R.attr.state_focused to scheme.outline,
+                android.R.attr.state_focused to colorRole.select(scheme)
+            )
+
+            textInputLayout.setBoxStrokeColorStateList(coloredColorStateList)
+            textInputLayout.setErrorIconTintList(errorColorStateList)
+            textInputLayout.setErrorTextColor(errorColorStateList)
+            textInputLayout.boxStrokeErrorColor = errorColorStateList
+            textInputLayout.defaultHintTextColor = coloredColorStateList
+
+            textInputLayout.editText?.highlightColor = colorRole.select(scheme)
+            textInputLayout.setEndIconTintList(coloredColorStateList)
+            textInputLayout.setStartIconTintList(coloredColorStateList)
+        }
+    }
+
     fun themeTabLayout(tabLayout: TabLayout) {
         withScheme(tabLayout) { scheme ->
             colorTabLayout(tabLayout, scheme)
