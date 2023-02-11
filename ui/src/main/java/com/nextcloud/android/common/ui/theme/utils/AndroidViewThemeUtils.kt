@@ -38,17 +38,7 @@ import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.view.MenuItem
 import android.view.View
-import android.widget.Button
-import android.widget.CheckBox
-import android.widget.CheckedTextView
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.RadioButton
-import android.widget.SeekBar
-import android.widget.Switch
-import android.widget.TextView
+import android.widget.*
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -80,7 +70,7 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
         }
     }
 
-    fun colorNavigationView(navigationView: NavigationView) {
+    fun colorNavigationView(navigationView: NavigationView, colorIcons: Boolean = true) {
         withScheme(navigationView) { scheme ->
             if (navigationView.itemBackground != null) {
                 navigationView.itemBackground!!.setTintList(
@@ -90,7 +80,7 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
                     )
                 )
             }
-            navigationView.setBackgroundColor(scheme.surface)
+            navigationView.background.setTintList(ColorStateList.valueOf(scheme.surface))
 
             val colorStateList = buildColorStateList(
                 android.R.attr.state_checked to scheme.onSecondaryContainer,
@@ -98,7 +88,9 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
             )
 
             navigationView.itemTextColor = colorStateList
-            navigationView.itemIconTintList = colorStateList
+            if (colorIcons) {
+                navigationView.itemIconTintList = colorStateList
+            }
         }
     }
 
