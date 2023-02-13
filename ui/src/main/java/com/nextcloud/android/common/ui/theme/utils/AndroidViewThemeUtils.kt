@@ -32,6 +32,7 @@ import android.graphics.PorterDuff
 import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
@@ -218,8 +219,12 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
     }
 
     fun themeStatusBar(activity: Activity) {
+        themeStatusBar(activity, ColorRole.SURFACE)
+    }
+
+    fun themeStatusBar(activity: Activity, colorRole: ColorRole) {
         withScheme(activity) { scheme ->
-            colorStatusBar(activity, scheme.surface)
+            colorStatusBar(activity, colorRole.select(scheme))
         }
     }
 
@@ -371,9 +376,17 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
     /**
      * Tints the image with element color
      */
+    @Deprecated(
+        replaceWith = ReplaceWith("colorImageView(imageView, ColorRole.PRIMARY)"),
+        message = "Use colorImageView(imageView, ColorRole.PRIMARY) instead"
+    )
     fun colorImageView(imageView: ImageView) {
+        colorImageView(imageView, ColorRole.PRIMARY)
+    }
+
+    fun colorImageView(imageView: ImageView, colorRole: ColorRole) {
         withScheme(imageView) { scheme ->
-            imageView.imageTintList = ColorStateList.valueOf(scheme.primary)
+            imageView.imageTintList = ColorStateList.valueOf(colorRole.select(scheme))
         }
     }
 
@@ -402,21 +415,42 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
         }
     }
 
+    @Deprecated(
+        replaceWith = ReplaceWith(
+            "colorCircularProgressBar(progressBar, ColorRole.ON_PRIMARY_CONTAINER)",
+            imports = ["com.nextcloud.android.common.ui.theme.utils.ColorRole"]
+        ),
+        message = "Use colorCircularProgressBar(progressBar, ColorRole.ON_PRIMARY_CONTAINER) instead"
+    )
     fun colorCircularProgressBarOnPrimaryContainer(progressBar: ProgressBar) {
-        withScheme(progressBar) { scheme ->
-            progressBar.indeterminateDrawable.setColorFilter(scheme.onPrimaryContainer, PorterDuff.Mode.SRC_ATOP)
-        }
+        colorCircularProgressBar(progressBar, ColorRole.ON_PRIMARY_CONTAINER)
     }
 
+    @Deprecated(
+        replaceWith = ReplaceWith(
+            "colorCircularProgressBar(progressBar, ColorRole.PRIMARY)",
+            imports = ["com.nextcloud.android.common.ui.theme.utils.ColorRole"]
+        ),
+        message = "Use colorCircularProgressBar(progressBar, ColorRole.PRIMARY) instead"
+    )
     fun colorCircularProgressBar(progressBar: ProgressBar) {
-        withScheme(progressBar) { scheme ->
-            progressBar.indeterminateDrawable.setColorFilter(scheme.primary, PorterDuff.Mode.SRC_ATOP)
-        }
+        colorCircularProgressBar(progressBar, ColorRole.PRIMARY)
     }
 
+    @Deprecated(
+        replaceWith = ReplaceWith(
+            "colorCircularProgressBar(progressBar, ColorRole.ON_SURFACE_VARIANT)",
+            imports = ["com.nextcloud.android.common.ui.theme.utils.ColorRole"]
+        ),
+        message = "Use colorCircularProgressBar(progressBar, ColorRole.ON_SURFACE_VARIANT) instead"
+    )
     fun colorCircularProgressBarOnSurfaceVariant(progressBar: ProgressBar) {
+        colorCircularProgressBar(progressBar, ColorRole.ON_SURFACE_VARIANT)
+    }
+
+    fun colorCircularProgressBar(progressBar: ProgressBar, colorRole: ColorRole) {
         withScheme(progressBar) { scheme ->
-            progressBar.indeterminateDrawable.setColorFilter(scheme.onSurfaceVariant, PorterDuff.Mode.SRC_ATOP)
+            progressBar.indeterminateDrawable.setColorFilter(colorRole.select(scheme), PorterDuff.Mode.SRC_ATOP)
         }
     }
 
@@ -467,6 +501,19 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
 
             editText.setHintTextColor(scheme.onSurfaceVariant)
             editText.setTextColor(scheme.onSurface)
+        }
+    }
+
+    fun colorEditTextOnPrimary(editText: EditText) {
+        withScheme(editText) { scheme ->
+            // TODO check API-level compatibility
+            editText.setHintTextColor(scheme.onPrimary)
+            editText.setTextColor(scheme.onPrimary)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                editText.textCursorDrawable?.let {
+                    editText.textCursorDrawable = colorDrawable(it, scheme.onPrimary)
+                }
+            }
         }
     }
 
