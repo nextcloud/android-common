@@ -88,10 +88,12 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
                 -android.R.attr.state_enabled to Color.GRAY
             )
 
-            fab.iconTint = buildColorStateList(
+            val colorStateList = buildColorStateList(
                 android.R.attr.state_enabled to scheme.onPrimaryContainer,
                 -android.R.attr.state_enabled to Color.WHITE
             )
+            fab.setTextColor(colorStateList)
+            fab.iconTint = colorStateList
         }
     }
 
