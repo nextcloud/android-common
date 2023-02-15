@@ -34,6 +34,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipDrawable
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.snackbar.Snackbar
@@ -77,6 +78,22 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
                 android.R.attr.state_enabled to scheme.onPrimaryContainer,
                 -android.R.attr.state_enabled to Color.WHITE
             )
+        }
+    }
+
+    fun themeExtendedFAB(fab: ExtendedFloatingActionButton) {
+        withScheme(fab) { scheme ->
+            fab.backgroundTintList = buildColorStateList(
+                android.R.attr.state_enabled to scheme.primaryContainer,
+                -android.R.attr.state_enabled to Color.GRAY
+            )
+
+            val colorStateList = buildColorStateList(
+                android.R.attr.state_enabled to scheme.onPrimaryContainer,
+                -android.R.attr.state_enabled to Color.WHITE
+            )
+            fab.setTextColor(colorStateList)
+            fab.iconTint = colorStateList
         }
     }
 
