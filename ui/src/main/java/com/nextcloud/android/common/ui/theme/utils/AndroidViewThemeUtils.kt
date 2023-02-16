@@ -80,6 +80,7 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
         }
     }
 
+    @JvmOverloads
     fun colorNavigationView(navigationView: NavigationView, colorIcons: Boolean = true) {
         withScheme(navigationView) { scheme ->
             if (navigationView.itemBackground != null) {
