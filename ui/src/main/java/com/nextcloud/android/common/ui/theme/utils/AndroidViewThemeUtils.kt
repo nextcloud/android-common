@@ -81,7 +81,8 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
         }
     }
 
-    fun colorNavigationView(navigationView: NavigationView) {
+    @JvmOverloads
+    fun colorNavigationView(navigationView: NavigationView, colorIcons: Boolean = true) {
         withScheme(navigationView) { scheme ->
             if (navigationView.itemBackground != null) {
                 navigationView.itemBackground!!.setTintList(
@@ -91,7 +92,7 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
                     )
                 )
             }
-            navigationView.setBackgroundColor(scheme.surface)
+            navigationView.background.setTintList(ColorStateList.valueOf(scheme.surface))
 
             val colorStateList = buildColorStateList(
                 android.R.attr.state_checked to scheme.onSecondaryContainer,
@@ -99,7 +100,9 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
             )
 
             navigationView.itemTextColor = colorStateList
-            navigationView.itemIconTintList = colorStateList
+            if (colorIcons) {
+                navigationView.itemIconTintList = colorStateList
+            }
         }
     }
 
