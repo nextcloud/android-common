@@ -28,12 +28,24 @@ import scheme.Scheme
  * Parameter for library methods so that clients can choose color roles without accessing the Scheme directly
  */
 enum class ColorRole(internal val select: (Scheme) -> Int) {
-    ON_PRIMARY({ it.onPrimary }),
-    ON_SECONDARY_CONTAINER({ it.onSecondaryContainer }),
-    ON_SURFACE({ it.onSurface }),
-    ON_SURFACE_VARIANT({ it.onSurfaceVariant }),
     PRIMARY({ it.primary }),
+    ON_PRIMARY({ it.onPrimary }),
     PRIMARY_CONTAINER({ it.primaryContainer }),
     ON_PRIMARY_CONTAINER({ it.onPrimaryContainer }),
-    SURFACE({ it.surface })
+    SECONDARY({ it.secondary }),
+    ON_SECONDARY({ it.onSecondary }),
+    SECONDARY_CONTAINER({ it.secondaryContainer }),
+    ON_SECONDARY_CONTAINER({ it.onSecondaryContainer }),
+    ERROR({ it.error }),
+    ON_ERROR({ it.onError }),
+    ERROR_CONTAINER({ it.errorContainer }),
+    ON_ERROR_CONTAINER({ it.onErrorContainer }),
+    BACKGROUND({ it.background }),
+    ON_BACKGROUND({ it.onBackground }),
+    SURFACE({ it.surface }),
+    ON_SURFACE({ it.onSurface }),
+    SURFACE_VARIANT({ it.surfaceVariant }),
+    ON_SURFACE_VARIANT({ it.onSurfaceVariant }),
+    OUTLINE({ it.outline }),
+    OUTLINE_VARIANT({ it.outlineVariant })
 }
