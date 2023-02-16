@@ -539,9 +539,15 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
         }
     }
 
-    fun highlightText(textView: TextView, originalText: String, constraint: String) {
+    @JvmOverloads
+    fun highlightText(
+        textView: TextView,
+        originalText: String,
+        constraint: String,
+        colorRole: ColorRole = ColorRole.PRIMARY
+    ) {
         withScheme(textView) { scheme ->
-            highlightText(textView, originalText, constraint, scheme.primary)
+            highlightText(textView, originalText, constraint, colorRole.select(scheme))
         }
     }
 
