@@ -58,6 +58,7 @@ import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.color.ColorUtil
@@ -73,6 +74,24 @@ import javax.inject.Inject
 @Suppress("TooManyFunctions")
 class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, private val colorUtil: ColorUtil) :
     ViewThemeUtilsBase(schemes) {
+
+    fun colorBottomNavigationView(bottomNavigationView: BottomNavigationView) {
+        withScheme(bottomNavigationView) { scheme ->
+            bottomNavigationView.setBackgroundColor(scheme.surface)
+
+            bottomNavigationView.itemIconTintList = buildColorStateList(
+                android.R.attr.state_checked to scheme.onSecondaryContainer,
+                -android.R.attr.state_checked to scheme.onSurfaceVariant
+            )
+
+            bottomNavigationView.itemTextColor = buildColorStateList(
+                android.R.attr.state_checked to scheme.onSurface,
+                -android.R.attr.state_checked to scheme.onSurfaceVariant
+            )
+
+            bottomNavigationView.itemActiveIndicatorColor = ColorStateList.valueOf(scheme.secondaryContainer)
+        }
+    }
 
     @JvmOverloads
     fun colorViewBackground(view: View, colorRole: ColorRole = ColorRole.SURFACE) {
