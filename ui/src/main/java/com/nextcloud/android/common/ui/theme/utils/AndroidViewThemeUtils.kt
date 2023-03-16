@@ -144,10 +144,7 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
     }
 
     private fun colorMenuItemIcon(@ColorInt color: Int, item: MenuItem) {
-        val normalDrawable = item.icon
-        val wrapDrawable = DrawableCompat.wrap(normalDrawable)
-        DrawableCompat.setTint(wrapDrawable, color)
-        item.icon = wrapDrawable
+        item.icon.setTint(color)
     }
 
     private fun colorMenuItemText(@ColorInt color: Int, item: MenuItem) {
