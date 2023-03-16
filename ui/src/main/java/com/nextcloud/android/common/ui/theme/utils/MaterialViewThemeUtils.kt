@@ -57,7 +57,7 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
     ViewThemeUtilsBase(schemes) {
     fun colorToolbarOverflowIcon(toolbar: MaterialToolbar) {
         withScheme(toolbar) { scheme ->
-            toolbar.overflowIcon?.setColorFilter(scheme.onSurface, PorterDuff.Mode.SRC_ATOP)
+            toolbar.overflowIcon?.setColorFilter(scheme.onSurfaceVariant, PorterDuff.Mode.SRC_ATOP)
         }
     }
 

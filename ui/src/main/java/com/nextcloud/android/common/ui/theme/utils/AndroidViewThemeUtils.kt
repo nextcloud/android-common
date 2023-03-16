@@ -133,7 +133,7 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
 
     fun colorToolbarMenuIcon(context: Context, item: MenuItem) {
         withScheme(context) { scheme ->
-            colorMenuItemIcon(scheme.onSurface, item)
+            colorMenuItemIcon(scheme.onSurfaceVariant, item)
         }
     }
 
