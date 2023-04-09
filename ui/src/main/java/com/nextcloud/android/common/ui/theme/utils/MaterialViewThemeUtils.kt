@@ -27,6 +27,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.PorterDuff
+import android.graphics.drawable.Drawable
 import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
 import com.google.android.material.appbar.MaterialToolbar
@@ -57,8 +58,12 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
     ViewThemeUtilsBase(schemes) {
     fun colorToolbarOverflowIcon(toolbar: MaterialToolbar) {
         withScheme(toolbar) { scheme ->
-            toolbar.overflowIcon?.setColorFilter(scheme.onSurfaceVariant, PorterDuff.Mode.SRC_ATOP)
+            colorTrailingIcon(scheme, toolbar.overflowIcon)
         }
+    }
+
+    private fun colorTrailingIcon(scheme: Scheme, icon: Drawable?) {
+        icon?.setColorFilter(scheme.onSurfaceVariant, PorterDuff.Mode.SRC_ATOP)
     }
 
     fun themeSearchBarText(searchText: MaterialTextView) {
@@ -282,6 +287,7 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
             toolbar.setBackgroundColor(scheme.surface)
             toolbar.setNavigationIconTint(scheme.onSurface)
             toolbar.setTitleTextColor(scheme.onSurface)
+            colorTrailingIcon(scheme, toolbar.overflowIcon)
         }
     }
 
