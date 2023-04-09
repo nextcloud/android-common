@@ -144,7 +144,7 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
     }
 
     private fun colorMenuItemIcon(@ColorInt color: Int, item: MenuItem) {
-        item.icon.setTint(color)
+        item.icon?.setTint(color)
     }
 
     private fun colorMenuItemText(@ColorInt color: Int, item: MenuItem) {
