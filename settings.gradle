@@ -16,3 +16,4 @@ rootProject.name = "android-common"
 include ':core'
 include ':ui'
 include ':material-color-utilities'
+include ':sample'
