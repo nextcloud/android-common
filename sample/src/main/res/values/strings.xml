@@ -20,4 +20,5 @@
 <resources>
     <string name="app_name">Sample</string>
     <string name="title_ui">UI</string>
+    <string name="apply_theme">Apply Theme</string>
 </resources>

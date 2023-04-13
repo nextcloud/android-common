@@ -17,13 +17,13 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.nextcloud.android.common.sample.ui
+package com.nextcloud.android.common.sample
 
 import android.graphics.Color
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class UiViewModel : ViewModel() {
+class MainViewModel : ViewModel() {
 
-    val color = MutableLiveData(Color.parseColor("#0082C9"))
+    val color = MutableLiveData<Int>()
 }
