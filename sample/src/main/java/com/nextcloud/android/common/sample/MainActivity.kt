@@ -23,12 +23,13 @@ import android.graphics.Color
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.ViewModelProvider
 import com.nextcloud.android.common.sample.databinding.ActivityMainBinding
 import com.nextcloud.android.common.ui.color.ColorUtil
 import com.nextcloud.android.common.ui.theme.MaterialSchemes
-import com.nextcloud.android.common.ui.theme.utils.*
+import com.nextcloud.android.common.ui.theme.utils.AndroidViewThemeUtils
+import com.nextcloud.android.common.ui.theme.utils.ColorRole
+import com.nextcloud.android.common.ui.theme.utils.MaterialViewThemeUtils
 
 class MainActivity : AppCompatActivity() {
 
@@ -67,8 +68,8 @@ class MainActivity : AppCompatActivity() {
         // Use them to instantiate ThemUtils you need
         val platform = AndroidViewThemeUtils(schemes, colorUtil)
         val material = MaterialViewThemeUtils(schemes, colorUtil)
-        val androidx = AndroidXViewThemeUtils(schemes, platform)
-        val dialog = DialogViewThemeUtils(schemes)
+        // val androidx = AndroidXViewThemeUtils(schemes, platform)
+        // val dialog = DialogViewThemeUtils(schemes)
 
         // Use the methods of the ThemeUtils to apply the actual theme.
         // For a consistent User Experience it is necessary to apply the theme to *every* UI element
