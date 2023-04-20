@@ -10,28 +10,16 @@
 Add the dependency to the `build.gradle` file of your app, replace `X.X.X` with the [latest available version](https://github.com/nextcloud/android-common/releases).
 
 ```
-implementation 'com.github.nextcloud:android-common:X.X.X'
+implementation 'com.github.nextcloud.android-common:ui:X.X.X'
 ```
 
 ### Theming
 
-```java
-// Define your MaterialSchemes and ColorUtil
-final var schemes = MaterialSchemes.Companion.fromColor(color); // color should be fetched from the server capabilities
-final var utils = new ColorUtil(context);
-
-// Use them to instantiate ThemUtils you need
-final var platform = new AndroidViewThemeUtils(schemes, colorUtil);
-final var material = new MaterialViewThemeUtils(schemes, colorUtil);
-final var androidx = new AndroidXViewThemeUtils(schemes, this.platform);
-final var dialog = new DialogViewThemeUtils(schemes);
-
-// Use the methods of the ThemeUtils to apply the actual theme:
-material.themeTabLayout(tabLayout);
-```
+See `Sample` app → `UiFragment` for a basic usage sample.
 
 ## Known users
 
-- [Nextcloud files](https://github.com/nextcloud/android)
-- [Nextcloud talk](https://github.com/nextcloud/talk-android/)
-- [Nextcloud notes](https://github.com/nextcloud/notes-android) ([Planned](https://github.com/nextcloud/notes-android/issues/1648#issuecomment-1403223962))
+- [Nextcloud Files](https://github.com/nextcloud/android)
+- [Nextcloud Talk](https://github.com/nextcloud/talk-android/)
+- [Nextcloud Notes](https://github.com/nextcloud/notes-android)
+- [Nextcloud Deck](https://github.com/stefan-niedermann/nextcloud-deck)
