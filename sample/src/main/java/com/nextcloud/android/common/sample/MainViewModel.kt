@@ -19,7 +19,6 @@
 
 package com.nextcloud.android.common.sample
 
-import android.graphics.Color
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 

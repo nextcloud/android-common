@@ -41,7 +41,6 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
         val mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
 
         // Color should be fetched from the server capabilities or another proper source
@@ -53,7 +52,7 @@ class MainActivity : AppCompatActivity() {
                     this,
                     "#${binding.color.text} is not a valid color.",
                     Toast.LENGTH_SHORT
-                ).show();
+                ).show()
             }
         }
 
