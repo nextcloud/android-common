@@ -66,6 +66,7 @@ import com.nextcloud.android.common.ui.theme.MaterialSchemes
 import com.nextcloud.android.common.ui.theme.ViewThemeUtilsBase
 import com.nextcloud.android.common.ui.util.buildColorStateList
 import scheme.Scheme
+import java.util.regex.Pattern
 import javax.inject.Inject
 
 /**
@@ -573,13 +574,18 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
         spanText: Spannable
     ) {
         var index = start
-        do {
-            val end = index + constraint.length
+
+        val matcher = Pattern
+            .compile(constraint, Pattern.CASE_INSENSITIVE or Pattern.LITERAL)
+            .matcher(originalText)
+
+        while (matcher.find()) {
+            val end = matcher.end()
             spanText.setSpan(ForegroundColorSpan(color), index, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             spanText.setSpan(StyleSpan(Typeface.BOLD), index, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             index =
                 originalText.lowercase().indexOf(constraint, end + 1) // +1 skips the consecutive span
-        } while (index != -1)
+        }
     }
 
     // here for backwards compatibility
