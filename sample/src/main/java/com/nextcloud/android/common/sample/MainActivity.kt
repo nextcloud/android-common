@@ -78,5 +78,8 @@ class MainActivity : AppCompatActivity() {
         platform.themeStatusBar(this)
         material.colorTextInputLayout(binding.colorTil)
         material.themeExtendedFAB(binding.btn)
+        material.themeChipAssist(binding.assistChip)
+        material.themeChipInput(binding.inputChip)
+        material.themeChipSuggestion(binding.suggestionChip)
     }
 }

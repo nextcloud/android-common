@@ -416,6 +416,84 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
         }
     }
 
+    fun themeChipSuggestion(chip: Chip) {
+        withScheme(chip.context) { scheme ->
+            chip.chipStrokeColor = chipOutlineColorList(scheme)
+            chip.setTextColor(chipSuggestionInputTextColorList(scheme))
+        }
+    }
+
+    fun themeChipAssist(chip: Chip) {
+        withScheme(chip.context) { scheme ->
+            val iconColors = buildColorStateList(
+                android.R.attr.state_enabled to scheme.primary,
+                -android.R.attr.state_enabled to colorUtil.adjustOpacity(
+                    scheme.onSurface,
+                    ON_SURFACE_OPACITY_BUTTON_DISABLED
+                ),
+                android.R.attr.state_focused to scheme.primary,
+                android.R.attr.state_hovered to scheme.primary,
+                android.R.attr.state_pressed to scheme.primary
+            )
+
+            val textColors = buildColorStateList(
+                android.R.attr.state_enabled to scheme.onSurface,
+                -android.R.attr.state_enabled to colorUtil.adjustOpacity(
+                    scheme.onSurface,
+                    ON_SURFACE_OPACITY_BUTTON_DISABLED
+                ),
+                android.R.attr.state_hovered to scheme.onSurface,
+                android.R.attr.state_focused to scheme.onSurface,
+                android.R.attr.state_pressed to scheme.onSurface
+            )
+
+            chip.chipStrokeColor = chipOutlineColorList(scheme)
+            chip.setTextColor(textColors)
+            chip.chipIconTint = iconColors
+        }
+    }
+
+    fun themeChipInput(chip: Chip) {
+        withScheme(chip.context) { scheme ->
+            val iconColors = buildColorStateList(
+                android.R.attr.state_enabled to scheme.onSurfaceVariant,
+                -android.R.attr.state_enabled to colorUtil.adjustOpacity(
+                    scheme.onSurface,
+                    ON_SURFACE_OPACITY_BUTTON_DISABLED
+                ),
+                android.R.attr.state_focused to scheme.onSurfaceVariant,
+                android.R.attr.state_hovered to scheme.onSurfaceVariant,
+                android.R.attr.state_pressed to scheme.onSurfaceVariant
+            )
+
+            chip.chipStrokeColor = chipOutlineColorList(scheme)
+            chip.setTextColor(chipSuggestionInputTextColorList(scheme))
+            chip.chipIconTint = iconColors
+        }
+    }
+
+    private fun chipOutlineColorList(scheme: Scheme) = buildColorStateList(
+        android.R.attr.state_enabled to scheme.outline,
+        -android.R.attr.state_enabled to colorUtil.adjustOpacity(
+            scheme.onSurface,
+            ON_SURFACE_OPACITY_BUTTON_OUTLINE_DISABLED
+        ),
+        android.R.attr.state_hovered to scheme.outline,
+        android.R.attr.state_focused to scheme.onSurfaceVariant,
+        android.R.attr.state_pressed to scheme.outline
+    )
+
+    private fun chipSuggestionInputTextColorList(scheme: Scheme) = buildColorStateList(
+        android.R.attr.state_enabled to scheme.onSurfaceVariant,
+        -android.R.attr.state_enabled to colorUtil.adjustOpacity(
+            scheme.onSurface,
+            ON_SURFACE_OPACITY_BUTTON_DISABLED
+        ),
+        android.R.attr.state_hovered to scheme.onSurfaceVariant,
+        android.R.attr.state_focused to scheme.onSurfaceVariant,
+        android.R.attr.state_pressed to scheme.onSurfaceVariant
+    )
+
     private fun rippleColor(scheme: Scheme) = buildColorStateList(
         android.R.attr.state_pressed to colorUtil.adjustOpacity(
             scheme.primary,
