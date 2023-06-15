@@ -427,7 +427,7 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
         withScheme(chip.context) { scheme ->
             val backgroundColors = buildColorStateList(
                 android.R.attr.state_checked to scheme.secondaryContainer,
-                -android.R.attr.state_checked to Color.TRANSPARENT,
+                -android.R.attr.state_checked to scheme.surface,
                 android.R.attr.state_focused to scheme.secondaryContainer,
                 android.R.attr.state_hovered to scheme.secondaryContainer,
                 android.R.attr.state_pressed to scheme.secondaryContainer
