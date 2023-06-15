@@ -423,6 +423,39 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
         }
     }
 
+    fun themeChipFilter(chip: Chip) {
+        withScheme(chip.context) { scheme ->
+            val backgroundColors = buildColorStateList(
+                android.R.attr.state_checked to scheme.secondaryContainer,
+                -android.R.attr.state_checked to Color.TRANSPARENT,
+                android.R.attr.state_focused to scheme.secondaryContainer,
+                android.R.attr.state_hovered to scheme.secondaryContainer,
+                android.R.attr.state_pressed to scheme.secondaryContainer
+            )
+
+            val iconColors = buildColorStateList(
+                android.R.attr.state_checked to scheme.onSecondaryContainer,
+                -android.R.attr.state_checked to scheme.onSurfaceVariant,
+                android.R.attr.state_focused to scheme.onSecondaryContainer,
+                android.R.attr.state_hovered to scheme.onSecondaryContainer,
+                android.R.attr.state_pressed to scheme.onSecondaryContainer
+            )
+
+            val textColors = buildColorStateList(
+                android.R.attr.state_checked to scheme.onSecondaryContainer,
+                -android.R.attr.state_checked to scheme.onSurfaceVariant,
+                android.R.attr.state_hovered to scheme.onSecondaryContainer,
+                android.R.attr.state_focused to scheme.onSecondaryContainer,
+                android.R.attr.state_pressed to scheme.onSecondaryContainer
+            )
+
+            chip.chipBackgroundColor = backgroundColors
+            chip.chipStrokeColor = chipOutlineFilterColorList(scheme)
+            chip.setTextColor(textColors)
+            chip.checkedIconTint = iconColors
+        }
+    }
+
     fun themeChipAssist(chip: Chip) {
         withScheme(chip.context) { scheme ->
             val iconColors = buildColorStateList(
@@ -466,7 +499,7 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
                 android.R.attr.state_pressed to scheme.onSurfaceVariant
             )
 
-            chip.chipStrokeColor = chipOutlineColorList(scheme)
+            chip.chipStrokeColor = chipOutlineFilterColorList(scheme)
             chip.setTextColor(chipSuggestionInputTextColorList(scheme))
             chip.chipIconTint = iconColors
         }
@@ -481,6 +514,11 @@ class MaterialViewThemeUtils @Inject constructor(schemes: MaterialSchemes, priva
         android.R.attr.state_hovered to scheme.outline,
         android.R.attr.state_focused to scheme.onSurfaceVariant,
         android.R.attr.state_pressed to scheme.outline
+    )
+
+    private fun chipOutlineFilterColorList(scheme: Scheme) = buildColorStateList(
+        android.R.attr.state_checked to scheme.secondaryContainer,
+        -android.R.attr.state_checked to scheme.outline
     )
 
     private fun chipSuggestionInputTextColorList(scheme: Scheme) = buildColorStateList(

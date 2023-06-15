@@ -21,4 +21,11 @@
     <string name="app_name">Sample</string>
     <string name="title_ui">UI</string>
     <string name="apply_theme">Apply Theme</string>
+    <string name="assist_chip">Assist Chip</string>
+    <string name="input_chip">Input Chip</string>
+    <string name="suggestion_chip">Suggestion Chip</string>
+    <string name="filter_chip">Filter Chip</string>
+    <string name="hint_color">Color</string>
+    <string name="headline_theming">Theming</string>
+    <string name="headline_ui_module">UI Module</string>
 </resources>

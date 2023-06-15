@@ -17,7 +17,6 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program. If not, see <https://www.gnu.org/licenses/>.
   -->
-
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -33,7 +32,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="UI Module"
+        android:text="@string/headline_ui_module"
         android:textColor="?attr/colorPrimary"
         app:layout_constraintEnd_toEndOf="@+id/headline_module_ui"
         app:layout_constraintStart_toStartOf="parent"
@@ -45,7 +44,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Theming"
+        android:text="@string/headline_theming"
         android:textColor="?attr/colorSecondary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -56,7 +55,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:hint="Color"
+        android:hint="@string/hint_color"
         app:layout_constraintEnd_toStartOf="@id/btn"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/headline_module_ui"
@@ -83,33 +82,46 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/colorTil" />
 
-    <com.google.android.material.chip.Chip
-        android:id="@+id/assistChip"
-        android:layout_width="wrap_content"
+    <com.google.android.material.chip.ChipGroup
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Assist Chip"
-        app:chipIcon="@drawable/ic_directions_car"
-        app:chipEndPadding="4dp"
+        android:layout_marginTop="@dimen/standard_half_margin"
+        android:layout_marginBottom="@dimen/standard_half_margin"
+        app:chipSpacingHorizontal="@dimen/standard_half_margin"
+        app:chipSpacingVertical="0dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/colorTil" />
+        app:layout_constraintTop_toBottomOf="@+id/colorTil">
 
-    <com.google.android.material.chip.Chip
-        android:id="@+id/inputChip"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Input Chip"
-        app:chipIcon="@drawable/ic_directions_car"
-        app:closeIcon="@drawable/ic_close"
-        app:closeIconVisible="true"
-        app:layout_constraintStart_toEndOf="@+id/assistChip"
-        app:layout_constraintTop_toBottomOf="@+id/colorTil" />
+        <com.google.android.material.chip.Chip
+            android:id="@+id/assistChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/assist_chip"
+            app:chipEndPadding="4dp"
+            app:chipIcon="@drawable/ic_directions_car" />
 
-    <com.google.android.material.chip.Chip
-        android:id="@+id/suggestionChip"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Suggestion Chip"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/assistChip" />
+        <com.google.android.material.chip.Chip
+            android:id="@+id/inputChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/input_chip"
+            app:chipIcon="@drawable/ic_directions_car"
+            app:closeIcon="@drawable/ic_close"
+            app:closeIconVisible="true" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/suggestionChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/suggestion_chip" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/filterChip"
+            style="@style/Widget.Material3.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/filter_chip" />
+
+    </com.google.android.material.chip.ChipGroup>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
