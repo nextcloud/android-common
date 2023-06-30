@@ -81,5 +81,8 @@ class MainActivity : AppCompatActivity() {
         material.themeChipInput(binding.inputChip)
         material.themeChipSuggestion(binding.suggestionChip)
         material.themeChipFilter(binding.filterChip)
+        platform.colorTextView(binding.sampleTextView, ColorRole.ON_SURFACE)
+
+        platform.highlightText(binding.sampleTextView, binding.sampleTextView.text as String, "L")
     }
 }
