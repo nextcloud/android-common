@@ -32,7 +32,8 @@ import com.nextcloud.android.common.ui.theme.utils.ColorRole
 import com.nextcloud.android.common.ui.theme.utils.MaterialViewThemeUtils
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityMainBinding
+    lateinit var binding: ActivityMainBinding
+    lateinit var platform: AndroidViewThemeUtils
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,13 +59,13 @@ class MainActivity : AppCompatActivity() {
         mainViewModel.color.observe(this) { applyTheme(it) }
     }
 
-    private fun applyTheme(color: Int) {
+    fun applyTheme(color: Int) {
         // Define your MaterialSchemes and ColorUtil
         val schemes = MaterialSchemes.Companion.fromColor(color)
         val colorUtil = ColorUtil(this)
 
         // Use them to instantiate ThemUtils you need
-        val platform = AndroidViewThemeUtils(schemes, colorUtil)
+        platform = AndroidViewThemeUtils(schemes, colorUtil)
         val material = MaterialViewThemeUtils(schemes, colorUtil)
         // val androidx = AndroidXViewThemeUtils(schemes, platform)
         // val dialog = DialogViewThemeUtils(schemes)
