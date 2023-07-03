@@ -41,8 +41,13 @@ class MainActivityIT {
             
             binding.sampleTextView.text = "11111"
             platform.highlightText(binding.sampleTextView, binding.sampleTextView.text as String, "1")
+            
+            Thread.sleep(2000)
 
-            Thread.sleep(5000)
+            binding.sampleTextView.text = "LLorem ipsum dolor sit amet."
+            platform.highlightText(binding.sampleTextView, binding.sampleTextView.text.toString() , "L")
+            
+            Thread.sleep(2000)
         }
     }
 }

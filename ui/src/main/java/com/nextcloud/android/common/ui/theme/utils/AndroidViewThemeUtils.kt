@@ -673,14 +673,16 @@ class AndroidViewThemeUtils
                     .compile(constraint, Pattern.CASE_INSENSITIVE or Pattern.LITERAL)
                     .matcher(originalText)
 
-            matcher.find(start)
 
-            do {
-                val mStart = matcher.start()
-                val mEnd = matcher.end()
-                spanText.setSpan(ForegroundColorSpan(color), mStart, mEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                spanText.setSpan(StyleSpan(Typeface.BOLD), mStart, mEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            } while (matcher.find())
+        while (matcher.find()) {
+            val end = matcher.end()
+            
+            if (start > 0 && start >= end) {
+                spanText.setSpan(ForegroundColorSpan(color), index, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                spanText.setSpan(StyleSpan(Typeface.BOLD), index, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+            
+            index = originalText.lowercase().indexOf(constraint, end + 1) // +1 skips the consecutive span
         }
 
         // here for backwards compatibility
