@@ -573,19 +573,18 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
         start: Int,
         spanText: Spannable
     ) {
-        var index = start
-
         val matcher = Pattern
             .compile(constraint, Pattern.CASE_INSENSITIVE or Pattern.LITERAL)
             .matcher(originalText)
 
-        while (matcher.find()) {
-            val end = matcher.end()
-            spanText.setSpan(ForegroundColorSpan(color), index, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            spanText.setSpan(StyleSpan(Typeface.BOLD), index, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            index =
-                originalText.lowercase().indexOf(constraint, end + 1) // +1 skips the consecutive span
-        }
+        matcher.find(start)
+
+        do {
+            val mStart = matcher.start()
+            val mEnd = matcher.end()
+            spanText.setSpan(ForegroundColorSpan(color), mStart, mEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            spanText.setSpan(StyleSpan(Typeface.BOLD), mStart, mEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        } while (matcher.find())
     }
 
     // here for backwards compatibility
