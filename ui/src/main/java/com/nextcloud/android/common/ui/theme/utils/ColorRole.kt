@@ -27,7 +27,7 @@ import scheme.Scheme
 /**
  * Parameter for library methods so that clients can choose color roles without accessing the Scheme directly
  */
-enum class ColorRole(internal val select: (Scheme) -> Int) {
+enum class ColorRole(val select: (Scheme) -> Int) {
     PRIMARY({ it.primary }),
     ON_PRIMARY({ it.onPrimary }),
     PRIMARY_CONTAINER({ it.primaryContainer }),
