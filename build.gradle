@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        daggerVersion = "2.47"
+        daggerVersion = "2.48"
         kotlinVersion = "1.8.22"
     }
 }
