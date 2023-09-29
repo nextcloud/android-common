@@ -232,7 +232,7 @@ class AndroidViewThemeUtils @Inject constructor(schemes: MaterialSchemes, privat
         }
     }
 
-    @Deprecated(message = "Use themeStatusBar(activity) instead", replaceWith = ReplaceWith("themeStatusBar(activity)"))
+    @Deprecated(message = "Use themeStatusBar(activity)", replaceWith = ReplaceWith("themeStatusBar(activity)"))
     @Suppress("Detekt.UnusedPrivateMember") // deprecated, to be removed
     fun themeStatusBar(activity: Activity, view: View) {
         themeStatusBar(activity)
