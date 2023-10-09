@@ -33,7 +33,6 @@ import scheme.Scheme
  * To be used to calculate color lists for both Switch and SwitchCompat
  */
 internal object SwitchColorUtils {
-
     private const val SWITCH_COMPAT_TRACK_ALPHA: Int = 77
 
     data class SwitchColors(
@@ -41,34 +40,42 @@ internal object SwitchColorUtils {
         val trackColor: ColorStateList
     )
 
-    fun calculateSwitchColors(context: Context, scheme: Scheme): SwitchColors {
-        val thumbUncheckedColor = ResourcesCompat.getColor(
-            context.resources,
-            R.color.switch_thumb_color_unchecked,
-            context.theme
-        )
-        val trackUncheckedColor = ResourcesCompat.getColor(
-            context.resources,
-            R.color.switch_track_color_unchecked,
-            context.theme
-        )
+    fun calculateSwitchColors(
+        context: Context,
+        scheme: Scheme
+    ): SwitchColors {
+        val thumbUncheckedColor =
+            ResourcesCompat.getColor(
+                context.resources,
+                R.color.switch_thumb_color_unchecked,
+                context.theme
+            )
+        val trackUncheckedColor =
+            ResourcesCompat.getColor(
+                context.resources,
+                R.color.switch_track_color_unchecked,
+                context.theme
+            )
 
-        val trackColor = Color.argb(
-            SWITCH_COMPAT_TRACK_ALPHA,
-            Color.red(scheme.primary),
-            Color.green(scheme.primary),
-            Color.blue(scheme.primary)
-        )
+        val trackColor =
+            Color.argb(
+                SWITCH_COMPAT_TRACK_ALPHA,
+                Color.red(scheme.primary),
+                Color.green(scheme.primary),
+                Color.blue(scheme.primary)
+            )
 
         return SwitchColors(
-            thumbColor = ColorStateList(
-                arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
-                intArrayOf(scheme.primary, thumbUncheckedColor)
-            ),
-            trackColor = ColorStateList(
-                arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
-                intArrayOf(trackColor, trackUncheckedColor)
-            )
+            thumbColor =
+                ColorStateList(
+                    arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+                    intArrayOf(scheme.primary, thumbUncheckedColor)
+                ),
+            trackColor =
+                ColorStateList(
+                    arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+                    intArrayOf(trackColor, trackUncheckedColor)
+                )
         )
     }
 }

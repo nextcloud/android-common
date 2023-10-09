@@ -41,14 +41,21 @@ open class ViewThemeUtilsBase(private val schemes: MaterialSchemes) {
 
     @Suppress("MemberVisibilityCanBePrivate")
     // TODO cache by context hashcode
-    protected fun getSchemeInternal(context: Context): Scheme = when {
-        PlatformThemeUtil.isDarkMode(context) -> schemes.darkScheme
-        else -> schemes.lightScheme
-    }
+    protected fun getSchemeInternal(context: Context): Scheme =
+        when {
+            PlatformThemeUtil.isDarkMode(context) -> schemes.darkScheme
+            else -> schemes.lightScheme
+        }
 
-    protected fun <R> withScheme(view: View, block: (Scheme) -> R): R = block(getSchemeInternal(view.context))
+    protected fun <R> withScheme(
+        view: View,
+        block: (Scheme) -> R
+    ): R = block(getSchemeInternal(view.context))
 
-    protected fun <R> withScheme(context: Context, block: (Scheme) -> R): R = block(getSchemeInternal(context))
+    protected fun <R> withScheme(
+        context: Context,
+        block: (Scheme) -> R
+    ): R = block(getSchemeInternal(context))
 
     protected fun <R> withSchemeDark(block: (Scheme) -> R): R = block(schemes.darkScheme)
 }
