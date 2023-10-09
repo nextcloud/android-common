@@ -30,7 +30,10 @@ internal class MaterialSchemesImpl :
     override val lightScheme: Scheme
     override val darkScheme: Scheme
 
-    constructor(@ColorInt primaryColor: Int, primaryAsBackground: Boolean = false) {
+    constructor(
+        @ColorInt primaryColor: Int,
+        primaryAsBackground: Boolean = false
+    ) {
         if (primaryAsBackground) {
             val scheme = primaryAsBackgroundScheme(primaryColor)
             darkScheme = scheme
@@ -44,11 +47,12 @@ internal class MaterialSchemesImpl :
     private fun primaryAsBackgroundScheme(primaryColor: Int): Scheme {
         val hct = Hct.fromInt(primaryColor)
         val isDark = hct.tone < DARK_TONE_THRESHOLD
-        val scheme = if (isDark) {
-            Scheme.lightContent(primaryColor).withPrimary(primaryColor)
-        } else {
-            Scheme.darkContent(primaryColor).withPrimary(primaryColor)
-        }
+        val scheme =
+            if (isDark) {
+                Scheme.lightContent(primaryColor).withPrimary(primaryColor)
+            } else {
+                Scheme.darkContent(primaryColor).withPrimary(primaryColor)
+            }
         return scheme
     }
 
