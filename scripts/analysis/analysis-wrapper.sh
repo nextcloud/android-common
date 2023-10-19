@@ -8,7 +8,7 @@ PR_NUMBER=$5
 
 
 stableBranch="master"
-repository="talk-android"
+repository="android-common"
 
 ruby scripts/analysis/lint-up.rb
 lintValue=$?
