@@ -51,7 +51,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--total", help="print total count instead of summary HTML",
                         action="store_true")
-    parser.add_argument("--file", help="file to parse", default="app/build/reports/spotbugs/gplayDebug.xml")
+    parser.add_argument("--file", help="file to parse", default="core/build/reports/spotbugs/debug.xml")
     args = parser.parse_args()
     tree = ET.parse(args.file)
     summary = get_counts(tree)
