@@ -2,35 +2,36 @@
  * Nextcloud Android Common Library
  *
  * SPDX-FileCopyrightText: 2022-2023 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-FileCopyrightText: 2023 Andy Scherzinger <info@andy-scherzinger.de>
  * SPDX-FileCopyrightText: 2022 Álvaro Brey <alvaro@alvarobrey.com>
  * SPDX-License-Identifier: MIT
  */
 package com.nextcloud.android.common.ui.theme.utils
 
-import scheme.Scheme
+import scheme.DynamicScheme
 
 /**
  * Parameter for library methods so that clients can choose color roles without accessing the Scheme directly
  */
-enum class ColorRole(internal val select: (Scheme) -> Int) {
-    PRIMARY({ it.primary }),
-    ON_PRIMARY({ it.onPrimary }),
-    PRIMARY_CONTAINER({ it.primaryContainer }),
-    ON_PRIMARY_CONTAINER({ it.onPrimaryContainer }),
-    SECONDARY({ it.secondary }),
-    ON_SECONDARY({ it.onSecondary }),
-    SECONDARY_CONTAINER({ it.secondaryContainer }),
-    ON_SECONDARY_CONTAINER({ it.onSecondaryContainer }),
-    ERROR({ it.error }),
-    ON_ERROR({ it.onError }),
-    ERROR_CONTAINER({ it.errorContainer }),
-    ON_ERROR_CONTAINER({ it.onErrorContainer }),
-    BACKGROUND({ it.background }),
-    ON_BACKGROUND({ it.onBackground }),
-    SURFACE({ it.surface }),
-    ON_SURFACE({ it.onSurface }),
-    SURFACE_VARIANT({ it.surfaceVariant }),
-    ON_SURFACE_VARIANT({ it.onSurfaceVariant }),
-    OUTLINE({ it.outline }),
-    OUTLINE_VARIANT({ it.outlineVariant })
+enum class ColorRole(internal val select: (DynamicScheme) -> Int) {
+    PRIMARY({ dynamiccolor.MaterialDynamicColors().primary().getArgb(it) }),
+    ON_PRIMARY({ dynamiccolor.MaterialDynamicColors().onPrimary().getArgb(it) }),
+    PRIMARY_CONTAINER({ dynamiccolor.MaterialDynamicColors().primaryContainer().getArgb(it) }),
+    ON_PRIMARY_CONTAINER({ dynamiccolor.MaterialDynamicColors().onPrimaryContainer().getArgb(it) }),
+    SECONDARY({ dynamiccolor.MaterialDynamicColors().secondary().getArgb(it) }),
+    ON_SECONDARY({ dynamiccolor.MaterialDynamicColors().onSecondary().getArgb(it) }),
+    SECONDARY_CONTAINER({ dynamiccolor.MaterialDynamicColors().secondaryContainer().getArgb(it) }),
+    ON_SECONDARY_CONTAINER({ dynamiccolor.MaterialDynamicColors().onSecondaryContainer().getArgb(it) }),
+    ERROR({ dynamiccolor.MaterialDynamicColors().error().getArgb(it) }),
+    ON_ERROR({ dynamiccolor.MaterialDynamicColors().onError().getArgb(it) }),
+    ERROR_CONTAINER({ dynamiccolor.MaterialDynamicColors().errorContainer().getArgb(it) }),
+    ON_ERROR_CONTAINER({ dynamiccolor.MaterialDynamicColors().onErrorContainer().getArgb(it) }),
+    BACKGROUND({ dynamiccolor.MaterialDynamicColors().background().getArgb(it) }),
+    ON_BACKGROUND({ dynamiccolor.MaterialDynamicColors().onBackground().getArgb(it) }),
+    SURFACE({ dynamiccolor.MaterialDynamicColors().surface().getArgb(it) }),
+    ON_SURFACE({ dynamiccolor.MaterialDynamicColors().onSurface().getArgb(it) }),
+    SURFACE_VARIANT({ dynamiccolor.MaterialDynamicColors().surfaceVariant().getArgb(it) }),
+    ON_SURFACE_VARIANT({ dynamiccolor.MaterialDynamicColors().onSurfaceVariant().getArgb(it) }),
+    OUTLINE({ dynamiccolor.MaterialDynamicColors().outline().getArgb(it) }),
+    OUTLINE_VARIANT({ dynamiccolor.MaterialDynamicColors().outlineVariant().getArgb(it) })
 }
