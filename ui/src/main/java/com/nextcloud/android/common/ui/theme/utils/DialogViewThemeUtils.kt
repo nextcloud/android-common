@@ -37,6 +37,7 @@ import com.google.android.material.shape.MaterialShapeDrawable
 import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.theme.MaterialSchemes
 import com.nextcloud.android.common.ui.theme.ViewThemeUtilsBase
+import dynamiccolor.MaterialDynamicColors
 import javax.inject.Inject
 
 /**
@@ -46,6 +47,8 @@ class DialogViewThemeUtils
     @Inject
     constructor(schemes: MaterialSchemes) :
     ViewThemeUtilsBase(schemes) {
+        private val dynamicColor = MaterialDynamicColors()
+
         fun colorMaterialAlertDialogBackground(
             context: Context,
             dialogBuilder: MaterialAlertDialogBuilder
@@ -59,7 +62,7 @@ class DialogViewThemeUtils
                         com.google.android.material.R.style.MaterialAlertDialog_MaterialComponents
                     )
                 materialShapeDrawable.initializeElevationOverlay(context)
-                materialShapeDrawable.fillColor = ColorStateList.valueOf(scheme.surface)
+                materialShapeDrawable.fillColor = ColorStateList.valueOf(dynamicColor.surface().getArgb(scheme))
 
                 // dialogCornerRadius first appeared in Android Pie
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -73,26 +76,26 @@ class DialogViewThemeUtils
 
         fun colorDialogMenuText(button: MaterialButton) {
             withScheme(button) { scheme ->
-                button.setTextColor(scheme.onSurface)
-                button.iconTint = ColorStateList.valueOf(scheme.onSurface)
+                button.setTextColor(dynamicColor.onSurface().getArgb(scheme))
+                button.iconTint = ColorStateList.valueOf(dynamicColor.onSurface().getArgb(scheme))
             }
         }
 
         fun colorDialogHeadline(textView: TextView) {
             withScheme(textView) { scheme ->
-                textView.setTextColor(scheme.onSurface)
+                textView.setTextColor(dynamicColor.onSurface().getArgb(scheme))
             }
         }
 
         fun colorDialogSupportingText(textView: TextView) {
             withScheme(textView) { scheme ->
-                textView.setTextColor(scheme.onSurfaceVariant)
+                textView.setTextColor(dynamicColor.onSurfaceVariant().getArgb(scheme))
             }
         }
 
         fun colorDialogIcon(icon: ImageView) {
             withScheme(icon) { scheme ->
-                icon.setColorFilter(scheme.secondary)
+                icon.setColorFilter(dynamicColor.secondary().getArgb(scheme))
             }
         }
 
@@ -102,7 +105,7 @@ class DialogViewThemeUtils
         ): Drawable {
             val drawable = AppCompatResources.getDrawable(context, drawableId)!!
             withScheme(context) { scheme ->
-                DrawableCompat.setTint(drawable, scheme.secondary)
+                DrawableCompat.setTint(drawable, dynamicColor.secondary().getArgb(scheme))
             }
             return drawable
         }

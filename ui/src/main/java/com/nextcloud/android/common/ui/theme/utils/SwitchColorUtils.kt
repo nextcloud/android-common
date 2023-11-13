@@ -27,6 +27,8 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import androidx.core.content.res.ResourcesCompat
 import com.nextcloud.android.common.ui.R
+import dynamiccolor.MaterialDynamicColors
+import scheme.DynamicScheme
 import scheme.Scheme
 
 /**
@@ -42,8 +44,10 @@ internal object SwitchColorUtils {
 
     fun calculateSwitchColors(
         context: Context,
-        scheme: Scheme
+        scheme: DynamicScheme
     ): SwitchColors {
+        val dynamicColor = MaterialDynamicColors()
+        
         val thumbUncheckedColor =
             ResourcesCompat.getColor(
                 context.resources,
@@ -60,16 +64,16 @@ internal object SwitchColorUtils {
         val trackColor =
             Color.argb(
                 SWITCH_COMPAT_TRACK_ALPHA,
-                Color.red(scheme.primary),
-                Color.green(scheme.primary),
-                Color.blue(scheme.primary)
+                Color.red(dynamicColor.primary().getArgb(scheme)),
+                Color.green(dynamicColor.primary().getArgb(scheme)),
+                Color.blue(dynamicColor.primary().getArgb(scheme))
             )
 
         return SwitchColors(
             thumbColor =
                 ColorStateList(
                     arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
-                    intArrayOf(scheme.primary, thumbUncheckedColor)
+                    intArrayOf(dynamicColor.primary().getArgb(scheme), thumbUncheckedColor)
                 ),
             trackColor =
                 ColorStateList(

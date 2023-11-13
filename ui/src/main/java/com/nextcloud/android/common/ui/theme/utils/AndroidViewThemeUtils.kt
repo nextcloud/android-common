@@ -65,7 +65,8 @@ import com.nextcloud.android.common.ui.color.ColorUtil
 import com.nextcloud.android.common.ui.theme.MaterialSchemes
 import com.nextcloud.android.common.ui.theme.ViewThemeUtilsBase
 import com.nextcloud.android.common.ui.util.buildColorStateList
-import scheme.Scheme
+import dynamiccolor.MaterialDynamicColors
+import scheme.DynamicScheme
 import java.util.regex.Pattern
 import javax.inject.Inject
 
@@ -77,23 +78,25 @@ class AndroidViewThemeUtils
     @Inject
     constructor(schemes: MaterialSchemes, private val colorUtil: ColorUtil) :
     ViewThemeUtilsBase(schemes) {
+        private val dynamicColor = MaterialDynamicColors()
+
         fun colorBottomNavigationView(bottomNavigationView: BottomNavigationView) {
             withScheme(bottomNavigationView) { scheme ->
-                bottomNavigationView.setBackgroundColor(scheme.surface)
+                bottomNavigationView.setBackgroundColor(dynamicColor.surface().getArgb(scheme))
 
                 bottomNavigationView.itemIconTintList =
                     buildColorStateList(
-                        android.R.attr.state_checked to scheme.onSecondaryContainer,
-                        -android.R.attr.state_checked to scheme.onSurfaceVariant
+                        android.R.attr.state_checked to dynamicColor.onSecondaryContainer().getArgb(scheme),
+                        -android.R.attr.state_checked to dynamicColor.onSurfaceVariant().getArgb(scheme)
                     )
 
                 bottomNavigationView.itemTextColor =
                     buildColorStateList(
-                        android.R.attr.state_checked to scheme.onSurface,
-                        -android.R.attr.state_checked to scheme.onSurfaceVariant
+                        android.R.attr.state_checked to dynamicColor.surface().getArgb(scheme),
+                        -android.R.attr.state_checked to dynamicColor.onSurfaceVariant().getArgb(scheme)
                     )
 
-                bottomNavigationView.itemActiveIndicatorColor = ColorStateList.valueOf(scheme.secondaryContainer)
+                bottomNavigationView.itemActiveIndicatorColor = ColorStateList.valueOf(dynamicColor.secondaryContainer().getArgb(scheme))
             }
         }
 
@@ -116,17 +119,17 @@ class AndroidViewThemeUtils
                 if (navigationView.itemBackground != null) {
                     navigationView.itemBackground!!.setTintList(
                         buildColorStateList(
-                            android.R.attr.state_checked to scheme.secondaryContainer,
+                            android.R.attr.state_checked to dynamicColor.secondaryContainer().getArgb(scheme),
                             -android.R.attr.state_checked to Color.TRANSPARENT
                         )
                     )
                 }
-                navigationView.background.setTintList(ColorStateList.valueOf(scheme.surface))
+                navigationView.background.setTintList(ColorStateList.valueOf(dynamicColor.surface().getArgb(scheme)))
 
                 val colorStateList =
                     buildColorStateList(
-                        android.R.attr.state_checked to scheme.onSecondaryContainer,
-                        -android.R.attr.state_checked to scheme.onSurfaceVariant
+                        android.R.attr.state_checked to dynamicColor.onSecondaryContainer().getArgb(scheme),
+                        -android.R.attr.state_checked to dynamicColor.onSurfaceVariant().getArgb(scheme)
                     )
 
                 navigationView.itemTextColor = colorStateList
@@ -138,7 +141,7 @@ class AndroidViewThemeUtils
 
         fun getPrimaryColorDrawable(context: Context): Drawable {
             return withScheme(context) { scheme ->
-                ColorDrawable(scheme.primary)
+                ColorDrawable(dynamicColor.primary().getArgb(scheme))
             }
         }
 
@@ -147,7 +150,7 @@ class AndroidViewThemeUtils
             item: MenuItem
         ) {
             withScheme(context) { scheme ->
-                colorMenuItemIcon(scheme.onSurfaceVariant, item)
+                colorMenuItemIcon(dynamicColor.onSurfaceVariant().getArgb(scheme), item)
             }
         }
 
@@ -155,8 +158,8 @@ class AndroidViewThemeUtils
             context: Context,
             item: MenuItem
         ) {
-            withScheme(context) { scheme: Scheme ->
-                colorMenuItemText(scheme.onSurface, item)
+            withScheme(context) { scheme: DynamicScheme ->
+                colorMenuItemText(dynamicColor.surface().getArgb(scheme), item)
             }
         }
 
@@ -214,7 +217,7 @@ class AndroidViewThemeUtils
             drawable: Drawable,
             colorRole: ColorRole = ColorRole.PRIMARY
         ): Drawable {
-            return withScheme(context) { scheme: Scheme ->
+            return withScheme(context) { scheme: DynamicScheme ->
                 colorDrawable(drawable, colorRole.select(scheme))
             }
         }
@@ -270,11 +273,11 @@ class AndroidViewThemeUtils
             drawerToggle: ActionBarDrawerToggle,
             drawable: Drawable
         ) {
-            withScheme(context) { scheme: Scheme ->
+            withScheme(context) { scheme: DynamicScheme ->
                 val wrap = DrawableCompat.wrap(drawable)
-                wrap.setColorFilter(scheme.onSurface, PorterDuff.Mode.SRC_ATOP)
+                wrap.setColorFilter(dynamicColor.surface().getArgb(scheme), PorterDuff.Mode.SRC_ATOP)
                 drawerToggle.setHomeAsUpIndicator(wrap)
-                drawerToggle.drawerArrowDrawable.color = scheme.onSurface
+                drawerToggle.drawerArrowDrawable.color = dynamicColor.surface().getArgb(scheme)
             }
         }
 
@@ -329,32 +332,32 @@ class AndroidViewThemeUtils
 
         fun themeDialog(view: View) {
             withScheme(view) { scheme ->
-                view.setBackgroundColor(scheme.surface)
+                view.setBackgroundColor(dynamicColor.surface().getArgb(scheme))
             }
         }
 
         fun themeDialogDark(view: View) {
             withSchemeDark { scheme ->
-                view.setBackgroundColor(scheme.surface)
+                view.setBackgroundColor(dynamicColor.surface().getArgb(scheme))
             }
         }
 
         fun themeDialogDivider(view: View) {
             withScheme(view) { scheme ->
-                view.setBackgroundColor(scheme.surfaceVariant)
+                view.setBackgroundColor(dynamicColor.surfaceVariant().getArgb(scheme))
             }
         }
 
         fun themeHorizontalSeekBar(seekBar: SeekBar) {
             withScheme(seekBar) { scheme ->
-                themeHorizontalProgressBar(seekBar, scheme.primary)
-                seekBar.thumb.setColorFilter(scheme.primary, PorterDuff.Mode.SRC_IN)
+                themeHorizontalProgressBar(seekBar, dynamicColor.primary().getArgb(scheme))
+                seekBar.thumb.setColorFilter(dynamicColor.primary().getArgb(scheme), PorterDuff.Mode.SRC_IN)
             }
         }
 
         fun themeHorizontalProgressBar(progressBar: ProgressBar) {
             withScheme(progressBar) { scheme ->
-                themeHorizontalProgressBar(progressBar, scheme.primary)
+                themeHorizontalProgressBar(progressBar, dynamicColor.primary().getArgb(scheme))
             }
         }
 
@@ -398,7 +401,7 @@ class AndroidViewThemeUtils
 
         fun colorPrimaryTextViewElementDarkMode(textView: TextView) {
             withSchemeDark { scheme ->
-                textView.setTextColor(scheme.primary)
+                textView.setTextColor(dynamicColor.primary().getArgb(scheme))
             }
         }
 
@@ -408,7 +411,7 @@ class AndroidViewThemeUtils
         )
         fun colorPrimaryView(view: View) {
             withScheme(view) { scheme ->
-                view.setBackgroundColor(scheme.primary)
+                view.setBackgroundColor(dynamicColor.primary().getArgb(scheme))
             }
         }
 
@@ -429,8 +432,8 @@ class AndroidViewThemeUtils
          */
         fun colorImageViewBackgroundAndIcon(imageView: ImageView) {
             withScheme(imageView) { scheme ->
-                imageView.imageTintList = ColorStateList.valueOf(scheme.onPrimaryContainer)
-                imageView.backgroundTintList = ColorStateList.valueOf(scheme.primaryContainer)
+                imageView.imageTintList = ColorStateList.valueOf(dynamicColor.onPrimaryContainer().getArgb(scheme))
+                imageView.backgroundTintList = ColorStateList.valueOf(dynamicColor.primaryContainer().getArgb(scheme))
             }
         }
 
@@ -438,12 +441,12 @@ class AndroidViewThemeUtils
             withScheme(imageButton) { scheme ->
                 imageButton.imageTintList =
                     buildColorStateList(
-                        android.R.attr.state_selected to scheme.primary,
-                        -android.R.attr.state_selected to scheme.onSurfaceVariant,
-                        android.R.attr.state_enabled to scheme.onSurfaceVariant,
+                        android.R.attr.state_selected to dynamicColor.primary().getArgb(scheme),
+                        -android.R.attr.state_selected to dynamicColor.onSurfaceVariant().getArgb(scheme),
+                        android.R.attr.state_enabled to dynamicColor.onSurfaceVariant().getArgb(scheme),
                         -android.R.attr.state_enabled to
                             colorUtil.adjustOpacity(
-                                scheme.onSurface,
+                                dynamicColor.surface().getArgb(scheme),
                                 ON_SURFACE_OPACITY_BUTTON_DISABLED
                             )
                     )
@@ -482,7 +485,7 @@ class AndroidViewThemeUtils
 
         fun colorTextButtons(vararg buttons: Button) {
             withScheme(buttons[0]) { scheme ->
-                colorTextButtons(scheme.primary, *buttons)
+                colorTextButtons(dynamicColor.primary().getArgb(scheme), *buttons)
             }
         }
 
@@ -500,7 +503,7 @@ class AndroidViewThemeUtils
                             android.R.attr.state_enabled to color,
                             -android.R.attr.state_enabled to
                                 colorUtil.adjustOpacity(
-                                    scheme.onSurface,
+                                    dynamicColor.surface().getArgb(scheme),
                                     ON_SURFACE_OPACITY_BUTTON_DISABLED
                                 )
                         )
@@ -560,7 +563,7 @@ class AndroidViewThemeUtils
                     buildColorStateList(
                         -android.R.attr.state_checked to Color.GRAY,
                         -android.R.attr.state_enabled to Color.GRAY,
-                        android.R.attr.state_checked to scheme.primary
+                        android.R.attr.state_checked to dynamicColor.primary().getArgb(scheme)
                     )
 
                 checkedTextViews.forEach {
@@ -575,7 +578,7 @@ class AndroidViewThemeUtils
                     buildColorStateList(
                         -android.R.attr.state_checked to Color.GRAY,
                         -android.R.attr.state_enabled to Color.GRAY,
-                        android.R.attr.state_checked to scheme.primary
+                        android.R.attr.state_checked to dynamicColor.primary().getArgb(scheme)
                     )
                 checkboxes.forEach {
                     it.buttonTintList = colorStateList
@@ -588,7 +591,7 @@ class AndroidViewThemeUtils
                 radioButton.buttonTintList =
                     buildColorStateList(
                         -android.R.attr.state_checked to Color.GRAY,
-                        android.R.attr.state_checked to scheme.primary
+                        android.R.attr.state_checked to dynamicColor.primary().getArgb(scheme)
                     )
             }
         }
@@ -599,23 +602,23 @@ class AndroidViewThemeUtils
                 // editText.background.setColorFilter(color, PorterDuff.Mode.SRC_ATOP)
                 editText.backgroundTintList =
                     buildColorStateList(
-                        -android.R.attr.state_focused to scheme.outline,
-                        android.R.attr.state_focused to scheme.primary
+                        -android.R.attr.state_focused to dynamicColor.outline().getArgb(scheme),
+                        android.R.attr.state_focused to dynamicColor.primary().getArgb(scheme)
                     )
 
-                editText.setHintTextColor(scheme.onSurfaceVariant)
-                editText.setTextColor(scheme.onSurface)
+                editText.setHintTextColor(dynamicColor.onSurfaceVariant().getArgb(scheme))
+                editText.setTextColor(dynamicColor.surface().getArgb(scheme))
             }
         }
 
         fun colorEditTextOnPrimary(editText: EditText) {
             withScheme(editText) { scheme ->
                 // TODO check API-level compatibility
-                editText.setHintTextColor(scheme.onPrimary)
-                editText.setTextColor(scheme.onPrimary)
+                editText.setHintTextColor(dynamicColor.onPrimary().getArgb(scheme))
+                editText.setTextColor(dynamicColor.onPrimary().getArgb(scheme))
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     editText.textCursorDrawable?.let {
-                        editText.textCursorDrawable = colorDrawable(it, scheme.onPrimary)
+                        editText.textCursorDrawable = colorDrawable(it, dynamicColor.onPrimary().getArgb(scheme))
                     }
                 }
             }
@@ -685,7 +688,7 @@ class AndroidViewThemeUtils
         @Deprecated("Don't do this, implement custom viewThemeUtils instead")
         fun primaryColor(activity: Activity): Int {
             return withScheme(activity) { scheme ->
-                scheme.primary
+                dynamicColor.primary().getArgb(scheme)
             }
         }
 

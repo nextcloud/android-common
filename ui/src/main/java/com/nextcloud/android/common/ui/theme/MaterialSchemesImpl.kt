@@ -23,12 +23,15 @@ package com.nextcloud.android.common.ui.theme
 
 import androidx.annotation.ColorInt
 import hct.Hct
-import scheme.Scheme
+import scheme.DynamicScheme
+import scheme.SchemeContent
+import scheme.SchemeTonalSpot
+
 
 internal class MaterialSchemesImpl :
     MaterialSchemes {
-    override val lightScheme: Scheme
-    override val darkScheme: Scheme
+    override val lightScheme: DynamicScheme
+    override val darkScheme: DynamicScheme
 
     constructor(
         @ColorInt primaryColor: Int,
@@ -39,21 +42,15 @@ internal class MaterialSchemesImpl :
             darkScheme = scheme
             lightScheme = scheme
         } else {
-            lightScheme = Scheme.light(primaryColor)
-            darkScheme = Scheme.dark(primaryColor)
+            lightScheme = SchemeTonalSpot(Hct.fromInt(primaryColor), false, 0.0)
+            darkScheme = SchemeTonalSpot(Hct.fromInt(primaryColor), true, 0.0)
         }
     }
 
-    private fun primaryAsBackgroundScheme(primaryColor: Int): Scheme {
+    private fun primaryAsBackgroundScheme(primaryColor: Int): DynamicScheme {
         val hct = Hct.fromInt(primaryColor)
         val isDark = hct.tone < DARK_TONE_THRESHOLD
-        val scheme =
-            if (isDark) {
-                Scheme.lightContent(primaryColor).withPrimary(primaryColor)
-            } else {
-                Scheme.darkContent(primaryColor).withPrimary(primaryColor)
-            }
-        return scheme
+        return SchemeContent(Hct.fromInt(primaryColor), !isDark, 0.0)
     }
 
     constructor(serverTheme: ServerTheme) : this(serverTheme.primaryColor)

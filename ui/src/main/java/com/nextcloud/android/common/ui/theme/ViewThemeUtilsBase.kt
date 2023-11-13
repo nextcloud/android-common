@@ -26,6 +26,7 @@ package com.nextcloud.android.common.ui.theme
 import android.content.Context
 import android.view.View
 import com.nextcloud.android.common.ui.util.PlatformThemeUtil
+import scheme.DynamicScheme
 import scheme.Scheme
 
 open class ViewThemeUtilsBase(private val schemes: MaterialSchemes) {
@@ -37,11 +38,11 @@ open class ViewThemeUtilsBase(private val schemes: MaterialSchemes) {
         "Implement view-specific theming functions in a `ViewThemeUtilsBase` subclass" +
             " instead of getting the scheme directly"
     )
-    fun getScheme(context: Context): Scheme = getSchemeInternal(context)
+    fun getScheme(context: Context): DynamicScheme = getSchemeInternal(context)
 
     @Suppress("MemberVisibilityCanBePrivate")
     // TODO cache by context hashcode
-    protected fun getSchemeInternal(context: Context): Scheme =
+    protected fun getSchemeInternal(context: Context): DynamicScheme =
         when {
             PlatformThemeUtil.isDarkMode(context) -> schemes.darkScheme
             else -> schemes.lightScheme
@@ -49,13 +50,13 @@ open class ViewThemeUtilsBase(private val schemes: MaterialSchemes) {
 
     protected fun <R> withScheme(
         view: View,
-        block: (Scheme) -> R
+        block: (DynamicScheme) -> R
     ): R = block(getSchemeInternal(view.context))
 
     protected fun <R> withScheme(
         context: Context,
-        block: (Scheme) -> R
+        block: (DynamicScheme) -> R
     ): R = block(getSchemeInternal(context))
 
-    protected fun <R> withSchemeDark(block: (Scheme) -> R): R = block(schemes.darkScheme)
+    protected fun <R> withSchemeDark(block: (DynamicScheme) -> R): R = block(schemes.darkScheme)
 }
