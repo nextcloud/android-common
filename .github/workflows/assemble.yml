@@ -15,7 +15,7 @@ jobs:
       - uses: actions/setup-java@0ab4596768b603586c0de567f2430c30f5b0d2b0 # v3.13.0
         with:
           distribution: "temurin"
-          java-version: 11
+          java-version: 17
       - uses: gradle/gradle-build-action@842c587ad8aa4c68eeba24c396e15af4c2e9f30a # v2.9.0
         with:
           arguments: assembleDebug
