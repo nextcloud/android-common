@@ -26,7 +26,6 @@ package com.nextcloud.android.common.ui.theme.utils
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
 import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
@@ -70,10 +69,11 @@ class MaterialViewThemeUtils
             scheme: Scheme,
             icon: Drawable?
         ) {
-            icon?.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
-                scheme.onSurfaceVariant,
-                BlendModeCompat.SRC_ATOP
-            )
+            icon?.colorFilter =
+                BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
+                    scheme.onSurfaceVariant,
+                    BlendModeCompat.SRC_ATOP
+                )
         }
 
         fun themeSearchBarText(searchText: MaterialTextView) {

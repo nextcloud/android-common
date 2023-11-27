@@ -272,10 +272,11 @@ class AndroidViewThemeUtils
         ) {
             withScheme(context) { scheme: Scheme ->
                 val wrap = DrawableCompat.wrap(drawable)
-                wrap.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
-                    scheme.onSurface,
-                    BlendModeCompat.SRC_ATOP
-                )
+                wrap.colorFilter =
+                    BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
+                        scheme.onSurface,
+                        BlendModeCompat.SRC_ATOP
+                    )
                 drawerToggle.setHomeAsUpIndicator(wrap)
                 drawerToggle.drawerArrowDrawable.color = scheme.onSurface
             }
@@ -351,10 +352,11 @@ class AndroidViewThemeUtils
         fun themeHorizontalSeekBar(seekBar: SeekBar) {
             withScheme(seekBar) { scheme ->
                 themeHorizontalProgressBar(seekBar, scheme.primary)
-                seekBar.thumb.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
-                    scheme.primary,
-                    BlendModeCompat.SRC_IN
-                )
+                seekBar.thumb.colorFilter =
+                    BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
+                        scheme.primary,
+                        BlendModeCompat.SRC_IN
+                    )
             }
         }
 
@@ -374,10 +376,10 @@ class AndroidViewThemeUtils
                     BlendModeCompat.SRC_IN
                 )
             progressBar?.progressDrawable?.colorFilter =
-            BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
-                color,
-                BlendModeCompat.SRC_IN
-            )
+                BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
+                    color,
+                    BlendModeCompat.SRC_IN
+                )
         }
 
         @JvmOverloads
