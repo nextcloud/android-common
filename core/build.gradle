@@ -21,6 +21,7 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    namespace 'com.nextcloud.android.common.core'
 }
 
 dependencies {
