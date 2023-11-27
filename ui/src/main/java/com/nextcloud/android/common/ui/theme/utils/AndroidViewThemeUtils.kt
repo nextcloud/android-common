@@ -272,7 +272,10 @@ class AndroidViewThemeUtils
         ) {
             withScheme(context) { scheme: Scheme ->
                 val wrap = DrawableCompat.wrap(drawable)
-                wrap.setColorFilter(scheme.onSurface, PorterDuff.Mode.SRC_ATOP)
+                wrap.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
+                    scheme.onSurface,
+                    BlendModeCompat.SRC_ATOP
+                )
                 drawerToggle.setHomeAsUpIndicator(wrap)
                 drawerToggle.drawerArrowDrawable.color = scheme.onSurface
             }
@@ -348,7 +351,10 @@ class AndroidViewThemeUtils
         fun themeHorizontalSeekBar(seekBar: SeekBar) {
             withScheme(seekBar) { scheme ->
                 themeHorizontalProgressBar(seekBar, scheme.primary)
-                seekBar.thumb.setColorFilter(scheme.primary, PorterDuff.Mode.SRC_IN)
+                seekBar.thumb.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
+                    scheme.primary,
+                    BlendModeCompat.SRC_IN
+                )
             }
         }
 
@@ -362,8 +368,16 @@ class AndroidViewThemeUtils
             progressBar: ProgressBar?,
             @ColorInt color: Int
         ) {
-            progressBar?.indeterminateDrawable?.setColorFilter(color, PorterDuff.Mode.SRC_IN)
-            progressBar?.progressDrawable?.setColorFilter(color, PorterDuff.Mode.SRC_IN)
+            progressBar?.indeterminateDrawable?.colorFilter =
+                BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
+                    color,
+                    BlendModeCompat.SRC_IN
+                )
+            progressBar?.progressDrawable?.colorFilter =
+            BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
+                color,
+                BlendModeCompat.SRC_IN
+            )
         }
 
         @JvmOverloads
@@ -550,7 +564,11 @@ class AndroidViewThemeUtils
             colorRole: ColorRole
         ) {
             withScheme(progressBar) { scheme ->
-                progressBar.indeterminateDrawable.setColorFilter(colorRole.select(scheme), PorterDuff.Mode.SRC_ATOP)
+                progressBar.indeterminateDrawable.colorFilter =
+                    BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
+                        colorRole.select(scheme),
+                        BlendModeCompat.SRC_ATOP
+                    )
             }
         }
 

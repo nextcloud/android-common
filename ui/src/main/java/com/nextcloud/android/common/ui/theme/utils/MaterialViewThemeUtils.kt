@@ -30,6 +30,8 @@ import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
 import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.BlendModeColorFilterCompat
+import androidx.core.graphics.BlendModeCompat
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
@@ -68,7 +70,10 @@ class MaterialViewThemeUtils
             scheme: Scheme,
             icon: Drawable?
         ) {
-            icon?.setColorFilter(scheme.onSurfaceVariant, PorterDuff.Mode.SRC_ATOP)
+            icon?.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
+                scheme.onSurfaceVariant,
+                BlendModeCompat.SRC_ATOP
+            )
         }
 
         fun themeSearchBarText(searchText: MaterialTextView) {
