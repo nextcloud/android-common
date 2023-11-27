@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
         val mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
 
         // Color should be fetched from the server capabilities or another proper source
-        binding.btn.setOnClickListener { v ->
+        binding.btn.setOnClickListener { _ ->
             try {
                 mainViewModel.color.value = Color.parseColor("#${binding.color.text}")
             } catch (_: java.lang.IllegalArgumentException) {
