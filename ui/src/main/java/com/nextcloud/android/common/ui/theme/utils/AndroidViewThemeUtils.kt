@@ -282,15 +282,6 @@ class AndroidViewThemeUtils
             }
         }
 
-        @Deprecated(message = "Use themeStatusBar(activity)", replaceWith = ReplaceWith("themeStatusBar(activity)"))
-        @Suppress("Detekt.UnusedPrivateMember") // deprecated, to be removed
-        fun themeStatusBar(
-            activity: Activity,
-            view: View
-        ) {
-            themeStatusBar(activity)
-        }
-
         fun themeStatusBar(activity: Activity) {
             themeStatusBar(activity, ColorRole.SURFACE)
         }
