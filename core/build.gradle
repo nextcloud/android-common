@@ -22,6 +22,12 @@ android {
         jvmTarget = '1.8'
     }
     namespace 'com.nextcloud.android.common.core'
+
+    publishing {
+        singleVariant('release') {
+            withSourcesJar()
+        }
+    }
 }
 
 dependencies {
@@ -36,9 +42,12 @@ dependencies {
 afterEvaluate {
     publishing {
         publications {
+            // Creates a Maven publication called "release".
             release(MavenPublication) {
-                from components.release
+                // Applies the component for the release build variant.
+                components.getByName('release')
 
+                // You can then customize attributes of the publication as shown below.
                 groupId = project.group
                 artifactId = project.name
             }
