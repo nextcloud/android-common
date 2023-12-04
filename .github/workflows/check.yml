@@ -21,7 +21,7 @@ jobs:
           distribution: "temurin"
           java-version: 17
       - name: Check ${{ matrix.task }}
-        uses: gradle/gradle-build-action@842c587ad8aa4c68eeba24c396e15af4c2e9f30a # v2.9.0
+        uses: gradle/gradle-build-action@87a9a15658c426a54dd469d4fc7dc1a73ca9d4a6 # v2.10.0
         with:
           arguments: ${{ matrix.task }}
       - uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3.1.3
