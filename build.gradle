@@ -15,15 +15,16 @@ plugins {
     id 'com.android.application' version '8.2.0' apply false
 }
 
-task clean(type: Delete) {
+tasks.register('clean', Delete) {
     delete rootProject.buildDir
 }
 
-task installGitHooks(type: Copy, group: "development") {
+tasks.register('installGitHooks', Copy) {
     def sourceFolder = "${rootProject.projectDir}/scripts/hooks"
     def destFolder = "${rootProject.projectDir}/.git/hooks"
 
     description = "Install git hooks"
+    group = "development"
 
     from(sourceFolder) {
         include '*'
