@@ -14,6 +14,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.Drawable
+import android.view.View
 import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.BlendModeColorFilterCompat
@@ -441,6 +442,24 @@ class MaterialViewThemeUtils
             withScheme(tabLayout) { scheme ->
                 tabLayout.setBackgroundColor(dynamicColor.surface().getArgb(scheme))
                 colorTabLayout(tabLayout, scheme)
+            }
+        }
+
+        fun colorBottomSheetBackground(
+            bottomSheet: View,
+            colorRole: ColorRole = ColorRole.SURFACE_CONTAINER_LOW
+        ) {
+            withScheme(bottomSheet) { scheme ->
+                bottomSheet.setBackgroundColor(colorRole.select(scheme))
+            }
+        }
+
+        fun colorBottomSheetDragHandle(
+            bottomSheetDragHandleView: BottomSheetDragHandleView,
+            colorRole: ColorRole = ColorRole.SURFACE_CONTAINER_LOW
+        ) {
+            withScheme(bottomSheetDragHandleView) { scheme ->
+                bottomSheetDragHandleView.setColorFilter(colorRole.select(scheme))
             }
         }
 

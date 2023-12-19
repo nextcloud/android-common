@@ -33,5 +33,6 @@ enum class ColorRole(internal val select: (DynamicScheme) -> Int) {
     SURFACE_VARIANT({ dynamiccolor.MaterialDynamicColors().surfaceVariant().getArgb(it) }),
     ON_SURFACE_VARIANT({ dynamiccolor.MaterialDynamicColors().onSurfaceVariant().getArgb(it) }),
     OUTLINE({ dynamiccolor.MaterialDynamicColors().outline().getArgb(it) }),
-    OUTLINE_VARIANT({ dynamiccolor.MaterialDynamicColors().outlineVariant().getArgb(it) })
+    OUTLINE_VARIANT({ dynamiccolor.MaterialDynamicColors().outlineVariant().getArgb(it) }),
+    SURFACE_CONTAINER_LOW({ dynamiccolor.MaterialDynamicColors().surfaceContainerLow().getArgb(it) })
 }
