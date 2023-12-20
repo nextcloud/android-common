@@ -456,7 +456,7 @@ class MaterialViewThemeUtils
 
         fun colorBottomSheetDragHandle(
             bottomSheetDragHandleView: BottomSheetDragHandleView,
-            colorRole: ColorRole = ColorRole.SURFACE_CONTAINER_LOW
+            colorRole: ColorRole = ColorRole.ON_SURFACE_VARIANT
         ) {
             withScheme(bottomSheetDragHandleView) { scheme ->
                 bottomSheetDragHandleView.setColorFilter(colorRole.select(scheme))
