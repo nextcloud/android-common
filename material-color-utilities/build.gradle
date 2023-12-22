@@ -28,7 +28,7 @@ java {
 }
 
 dependencies {
-    implementation 'com.google.errorprone:error_prone_annotations:2.23.0'
+    implementation 'com.google.errorprone:error_prone_annotations:2.24.0'
     implementation 'androidx.annotation:annotation-jvm:1.7.0'
 }
 
