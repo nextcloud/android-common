@@ -4,15 +4,15 @@
       <verify-metadata>true</verify-metadata>
       <verify-signatures>true</verify-signatures>
       <trusted-artifacts>
-         <trust group="com.android.tools" name="play-sdk-proto" version="31.2.0" reason="Broken: checksum is missing from verification metadata"/>
-         <trust group="com.android.tools.build" name="aapt2" version="8.2.0-10154469" reason="Broken: checksum is missing from verification metadata"/>
-         <trust group="com.android.tools.external.com-intellij" name="intellij-core" version="31.2.0" reason="Broken: checksum is missing from verification metadata"/>
-         <trust group="com.android.tools.external.com-intellij" name="kotlin-compiler" version="31.2.0" reason="Broken: checksum is missing from verification metadata"/>
-         <trust group="com.android.tools.external.org-jetbrains" name="uast" version="31.2.0" reason="Broken: checksum is missing from verification metadata"/>
-         <trust group="com.android.tools.lint" name="lint" version="31.2.0" reason="Broken: checksum is missing from verification metadata"/>
-         <trust group="com.android.tools.lint" name="lint-api" version="31.2.0" reason="Broken: checksum is missing from verification metadata"/>
-         <trust group="com.android.tools.lint" name="lint-checks" version="31.2.0" reason="Broken: checksum is missing from verification metadata"/>
-         <trust group="com.android.tools.lint" name="lint-gradle" version="31.2.0" reason="Broken: checksum is missing from verification metadata"/>
+         <trust group="com.android.tools" name="play-sdk-proto" version="31.2.2" reason="Broken: checksum is missing from verification metadata"/>
+         <trust group="com.android.tools.build" name="aapt2" version="8.2.2-10154469" reason="Broken: checksum is missing from verification metadata"/>
+         <trust group="com.android.tools.external.com-intellij" name="intellij-core" version="31.2.2" reason="Broken: checksum is missing from verification metadata"/>
+         <trust group="com.android.tools.external.com-intellij" name="kotlin-compiler" version="31.2.2" reason="Broken: checksum is missing from verification metadata"/>
+         <trust group="com.android.tools.external.org-jetbrains" name="uast" version="31.2.2" reason="Broken: checksum is missing from verification metadata"/>
+         <trust group="com.android.tools.lint" name="lint" version="31.2.2" reason="Broken: checksum is missing from verification metadata"/>
+         <trust group="com.android.tools.lint" name="lint-api" version="31.2.2" reason="Broken: checksum is missing from verification metadata"/>
+         <trust group="com.android.tools.lint" name="lint-checks" version="31.2.2" reason="Broken: checksum is missing from verification metadata"/>
+         <trust group="com.android.tools.lint" name="lint-gradle" version="31.2.2" reason="Broken: checksum is missing from verification metadata"/>
          <trust group="org.apache.httpcomponents" name="httpclient" version="4.5.6" reason="Broken: artifact was signed but all keys were ignored, checksum is missing from verification metadata"/>
          <trust group="org.jetbrains.kotlin" name="kotlin-stdlib" version="1.9.0" reason="Broken: artifact was signed but all keys were ignored, checksum is missing from verification metadata"/>
          <trust group="org.jetbrains.kotlin" name="kotlin-stdlib-common" version="1.9.0" reason="Broken: artifact was signed but all keys were ignored, checksum is missing from verification metadata"/>
