@@ -97,13 +97,13 @@ class MaterialViewThemeUtils
             withScheme(fab) { scheme ->
                 fab.backgroundTintList =
                     buildColorStateList(
-                        android.R.attr.state_enabled to scheme.secondaryContainer,
+                        android.R.attr.state_enabled to dynamicColor.secondaryContainer().getArgb(scheme),
                         -android.R.attr.state_enabled to Color.GRAY
                     )
 
                 fab.imageTintList =
                     buildColorStateList(
-                        android.R.attr.state_enabled to scheme.onSecondaryContainer,
+                        android.R.attr.state_enabled to dynamicColor.onSecondaryContainer().getArgb(scheme),
                         -android.R.attr.state_enabled to Color.WHITE
                     )
             }
