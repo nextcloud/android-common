@@ -13,11 +13,15 @@
          <trust group="com.android.tools.lint" name="lint-api" version="31.2.2" reason="Broken: checksum is missing from verification metadata"/>
          <trust group="com.android.tools.lint" name="lint-checks" version="31.2.2" reason="Broken: checksum is missing from verification metadata"/>
          <trust group="com.android.tools.lint" name="lint-gradle" version="31.2.2" reason="Broken: checksum is missing from verification metadata"/>
+         <trust group="com.diffplug.spotless" name="spotless-lib" version="2.45.0" reason="Broken: artifact was signed but all keys were ignored, checksum is missing from verification metadata"/>
+         <trust group="com.diffplug.spotless" name="spotless-lib-extra" version="2.45.0" reason="Broken: artifact was signed but all keys were ignored, checksum is missing from verification metadata"/>
+         <trust group="com.diffplug.spotless" name="spotless-plugin-gradle" version="6.25.0" reason="Broken: artifact was signed but all keys were ignored, checksum is missing from verification metadata"/>
          <trust group="org.apache.httpcomponents" name="httpclient" version="4.5.6" reason="Broken: artifact was signed but all keys were ignored, checksum is missing from verification metadata"/>
          <trust group="org.jetbrains.kotlin" name="kotlin-stdlib" version="1.9.0" reason="Broken: artifact was signed but all keys were ignored, checksum is missing from verification metadata"/>
          <trust group="org.jetbrains.kotlin" name="kotlin-stdlib-common" version="1.9.0" reason="Broken: artifact was signed but all keys were ignored, checksum is missing from verification metadata"/>
       </trusted-artifacts>
       <ignored-keys>
+         <ignored-key id="5f7786df73e61f56" reason="Key couldn't be downloaded from any key server"/>
          <ignored-key id="a41f13c999945293" reason="Key couldn't be downloaded from any key server"/>
          <ignored-key id="296cd27f60eed12c" reason="Key couldn't be downloaded from any key server"/>
          <ignored-key id="700e4f39bc05364b" reason="Key couldn't be downloaded from any key server"/>
@@ -29,7 +33,6 @@
          <ignored-key id="153e7a3c2b4e5118" reason="Key couldn't be downloaded from any key server"/>
          <ignored-key id="7c25280eae63ebe5" reason="Key couldn't be downloaded from any key server"/>
          <ignored-key id="0f9fe62f88e938d8" reason="Key couldn't be downloaded from any key server"/>
-         <ignored-key id="5f7786df73e61f56" reason="Key couldn't be downloaded from any key server"/>
          <ignored-key id="3967d4eda591b991" reason="Key couldn't be downloaded from any key server"/>
          <ignored-key id="5e1f79a7c298661e" reason="Key couldn't be downloaded from any key server"/>
          <ignored-key id="e16ab52d79fd224f" reason="Key couldn't be downloaded from any key server"/>
@@ -146,6 +149,7 @@
          <trusted-key id="c7be5bcc9fec15518cfda882b0f3710fa64900e7" group="^com[.]google($|([.].*))" regex="true"/>
          <trusted-key id="ce8075a251547bee249bc151a2115ae15f6b8b72" group="org.apache.commons" name="commons-compress" version="1.21"/>
          <trusted-key id="d6f1bc78607808ec8e9f69437a8860944fad5f62" group="org.apache.commons" name="commons-parent"/>
+         <trusted-key id="db0597e3144342256bc81e3ec727d053c4481cf5" group="org.tensorflow" name="tensorflow-lite-metadata" version="0.1.0-rc2"/>
          <trusted-key id="dbd744ace7ade6aa50dd591f66b50994442d2d40" group="^com[.]squareup($|([.].*))" regex="true"/>
          <trusted-key id="e77417ac194160a3fabd04969a259c7ee636c5ed" group="^com[.]google($|([.].*))" regex="true"/>
          <trusted-key id="e7dc75fc24fb3c8dfe8086ad3d5839a2262cbbfb" group="org.jetbrains.kotlinx"/>
