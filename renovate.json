@@ -4,9 +4,6 @@
     "config:recommended"
   ],
   "timezone": "Europe/Berlin",
-  "schedule": [
-    "daily"
-  ],
   "labels": [
     "dependencies",
     "3. to review"
