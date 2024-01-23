@@ -12,7 +12,7 @@ plugins {
     id "org.jetbrains.kotlin.kapt" version "$kotlinVersion" apply false
     id "com.diffplug.spotless" version "6.24.0" apply false
     id 'io.gitlab.arturbosch.detekt' version '1.23.4' apply false
-    id 'com.android.application' version '8.2.0' apply false
+    id 'com.android.application' version '8.2.2' apply false
 }
 
 tasks.register('clean', Delete) {
