@@ -32,6 +32,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.bottomsheet.BottomSheetDragHandleView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.Chip
@@ -141,6 +142,12 @@ class MaterialViewThemeUtils
                         -android.R.attr.state_checked to scheme.outline
                     )
                 )
+            }
+        }
+
+        fun themeDragHandleView(dragHandleView: BottomSheetDragHandleView) {
+            withScheme(dragHandleView) { scheme ->
+                dragHandleView.imageTintList = ColorStateList.valueOf(scheme.onSurfaceVariant)
             }
         }
 
