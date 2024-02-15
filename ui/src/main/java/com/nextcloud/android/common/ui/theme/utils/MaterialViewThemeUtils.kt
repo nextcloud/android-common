@@ -141,7 +141,7 @@ class MaterialViewThemeUtils
 
         fun themeDragHandleView(dragHandleView: BottomSheetDragHandleView) {
             withScheme(dragHandleView) { scheme ->
-                dragHandleView.imageTintList = ColorStateList.valueOf(scheme.onSurfaceVariant)
+                dragHandleView.imageTintList = ColorStateList.valueOf(dynamicColor.onSurfaceVariant().getArgb(scheme))
             }
         }
 
