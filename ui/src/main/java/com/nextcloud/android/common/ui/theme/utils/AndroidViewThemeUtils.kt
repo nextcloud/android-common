@@ -383,6 +383,16 @@ class AndroidViewThemeUtils
             }
         }
 
+        @JvmOverloads
+        fun colorTextViewLinks(
+            textView: TextView,
+            colorRole: ColorRole = ColorRole.PRIMARY
+        ) {
+            withScheme(textView.context) { scheme ->
+                textView.setLinkTextColor(colorRole.select(scheme))
+            }
+        }
+
         @Deprecated(
             replaceWith = ReplaceWith("colorTextView(textView)"),
             message = "Use colorTextView(textView) instead"
