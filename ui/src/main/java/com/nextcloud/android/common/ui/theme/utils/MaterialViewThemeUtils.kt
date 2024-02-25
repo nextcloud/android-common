@@ -35,10 +35,13 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomsheet.BottomSheetDragHandleView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
+import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipDrawable
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.materialswitch.MaterialSwitch
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
@@ -368,6 +371,19 @@ class MaterialViewThemeUtils
             progressIndicator.setIndicatorColor(color)
         }
 
+        fun colorProgressBar(progressIndicator: CircularProgressIndicator) {
+            withScheme(progressIndicator) { scheme ->
+                colorProgressBar(progressIndicator, scheme.primary)
+            }
+        }
+
+        fun colorProgressBar(
+            progressIndicator: CircularProgressIndicator,
+            @ColorInt color: Int
+        ) {
+            progressIndicator.setIndicatorColor(color)
+        }
+
         fun colorTextInputLayout(textInputLayout: TextInputLayout) {
             withScheme(textInputLayout) { scheme ->
                 val errorColor = scheme.onSurfaceVariant
@@ -456,6 +472,45 @@ class MaterialViewThemeUtils
             tabLayout.tabTextColors = tabContentColors
             tabLayout.tabIconTint = tabContentColors
             tabLayout.tabRippleColor = rippleColor(scheme)
+        }
+
+        fun colorMaterialCheckBox(materialCheckBox: MaterialCheckBox) {
+            withScheme(materialCheckBox.context) { scheme ->
+                materialCheckBox.buttonTintList =
+                    buildColorStateList(
+                        android.R.attr.state_checked to scheme.primary,
+                        -android.R.attr.state_checked to scheme.outline
+                    )
+
+                materialCheckBox.buttonIconTintList =
+                    buildColorStateList(
+                        android.R.attr.state_checked to scheme.onPrimary,
+                        -android.R.attr.state_checked to android.R.color.transparent
+                    )
+            }
+        }
+
+        fun colorMaterialSwitch(materialSwitch: MaterialSwitch) {
+            withScheme(materialSwitch.context) { scheme ->
+                materialSwitch.thumbTintList =
+                    buildColorStateList(
+                        android.R.attr.state_checked to scheme.onPrimary,
+                        -android.R.attr.state_checked to scheme.outline
+                    )
+
+                materialSwitch.trackTintList =
+                    buildColorStateList(
+                        android.R.attr.state_checked to scheme.primary,
+                        // XXX: specs use surfaceContainerHighest
+                        -android.R.attr.state_checked to scheme.surface
+                    )
+
+                materialSwitch.trackDecorationTintList =
+                    buildColorStateList(
+                        android.R.attr.state_checked to android.R.color.transparent,
+                        -android.R.attr.state_checked to scheme.outline
+                    )
+            }
         }
 
         fun colorChipBackground(chip: Chip) {

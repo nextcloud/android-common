@@ -27,6 +27,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import androidx.preference.PreferenceCategory
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
@@ -134,6 +135,19 @@ class AndroidXViewThemeUtils
         ) {
             withScheme(context) { scheme ->
                 builder.setColor(scheme.primary)
+            }
+        }
+
+        fun themePreferenceCategory(category: PreferenceCategory) {
+            withScheme(category.context) { scheme ->
+                val text: Spannable = SpannableString(category.title)
+                text.setSpan(
+                    ForegroundColorSpan(scheme.primary),
+                    0,
+                    text.length,
+                    Spannable.SPAN_INCLUSIVE_INCLUSIVE
+                )
+                category.title = text
             }
         }
 

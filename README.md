@@ -24,3 +24,4 @@ See `Sample` app → `UiFragment` for a basic usage sample.
 - [Nextcloud Notes](https://github.com/nextcloud/notes-android)
 - [Nextcloud Deck](https://github.com/stefan-niedermann/nextcloud-deck)
 - [Nextcloud Tables](https://github.com/stefan-niedermann/nextcloud-tables)
+- [MoneyBuster](https://gitlab.com/eneiluj/moneybuster)
