@@ -364,7 +364,7 @@ class MaterialViewThemeUtils
 
         fun colorProgressBar(progressIndicator: CircularProgressIndicator) {
             withScheme(progressIndicator) { scheme ->
-                colorProgressBar(progressIndicator, scheme.primary)
+                colorProgressBar(progressIndicator, dynamicColor.primary().getArgb(scheme))
             }
         }
 
@@ -487,13 +487,13 @@ class MaterialViewThemeUtils
             withScheme(materialCheckBox.context) { scheme ->
                 materialCheckBox.buttonTintList =
                     buildColorStateList(
-                        android.R.attr.state_checked to scheme.primary,
-                        -android.R.attr.state_checked to scheme.outline
+                        android.R.attr.state_checked to dynamicColor.primary().getArgb(scheme),
+                        -android.R.attr.state_checked to dynamicColor.outline().getArgb(scheme)
                     )
 
                 materialCheckBox.buttonIconTintList =
                     buildColorStateList(
-                        android.R.attr.state_checked to scheme.onPrimary,
+                        android.R.attr.state_checked to dynamicColor.onPrimary().getArgb(scheme),
                         -android.R.attr.state_checked to android.R.color.transparent
                     )
             }
@@ -503,21 +503,21 @@ class MaterialViewThemeUtils
             withScheme(materialSwitch.context) { scheme ->
                 materialSwitch.thumbTintList =
                     buildColorStateList(
-                        android.R.attr.state_checked to scheme.onPrimary,
-                        -android.R.attr.state_checked to scheme.outline
+                        android.R.attr.state_checked to dynamicColor.onPrimary().getArgb(scheme),
+                        -android.R.attr.state_checked to dynamicColor.outline().getArgb(scheme)
                     )
 
                 materialSwitch.trackTintList =
                     buildColorStateList(
-                        android.R.attr.state_checked to scheme.primary,
+                        android.R.attr.state_checked to dynamicColor.primary().getArgb(scheme),
                         // XXX: specs use surfaceContainerHighest
-                        -android.R.attr.state_checked to scheme.surface
+                        -android.R.attr.state_checked to dynamicColor.surface().getArgb(scheme),
                     )
 
                 materialSwitch.trackDecorationTintList =
                     buildColorStateList(
                         android.R.attr.state_checked to android.R.color.transparent,
-                        -android.R.attr.state_checked to scheme.outline
+                        -android.R.attr.state_checked to dynamicColor.outline().getArgb(scheme)
                     )
             }
         }
