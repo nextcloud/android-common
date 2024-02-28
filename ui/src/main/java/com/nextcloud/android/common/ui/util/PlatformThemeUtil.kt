@@ -3,7 +3,10 @@
  *
  * @author Álvaro Brey
  * Copyright (C) 2022 Álvaro Brey <alvaro@alvarobrey.com>
- * Copyright (C) 2022 Nextcloud GmbH
+ * Copyright (C) 2022-2023 Nextcloud GmbH
+ *
+ * SPDX-FileCopyrightText: 2022-2023 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
