@@ -1,3 +1,7 @@
+<!--
+ ~ SPDX-FileCopyrightText: 2022-2023 Nextcloud GmbH and Nextcloud contributors
+ ~ SPDX-License-Identifier: GPL-3.0-or-later
+-->
 # Common library for Nextcloud Android clients
 
 [![Android CI](https://github.com/nextcloud/android-common/workflows/Assemble/badge.svg)](https://github.com/nextcloud/android-common/actions)
