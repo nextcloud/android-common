@@ -20,6 +20,7 @@ import android.text.style.ForegroundColorSpan
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.appcompat.app.ActionBar
+import androidx.appcompat.widget.AppCompatAutoCompleteTextView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.SwitchCompat
@@ -102,7 +103,7 @@ class AndroidXViewThemeUtils
             withScheme(searchView) { scheme ->
                 // hacky as no default way is provided
                 val editText =
-                    searchView.findViewById<SearchView.SearchAutoComplete>(androidx.appcompat.R.id.search_src_text)
+                    searchView.findViewById<AppCompatAutoCompleteTextView>(androidx.appcompat.R.id.search_src_text)
                 val searchPlate = searchView.findViewById<LinearLayout>(androidx.appcompat.R.id.search_plate)
                 val closeButton = searchView.findViewById<ImageView>(androidx.appcompat.R.id.search_close_btn)
                 val searchButton = searchView.findViewById<ImageView>(androidx.appcompat.R.id.search_button)
