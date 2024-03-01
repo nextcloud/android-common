@@ -2,7 +2,7 @@
   ~ Nextcloud Android Common Library
   ~
   ~ SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
-  ~ SPDX-License-Identifier: GPL-3.0-or-later
+  ~ SPDX-License-Identifier: MIT
   -->
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
