@@ -3,7 +3,7 @@
  *
  * SPDX-FileCopyrightText: 2022-2023 Nextcloud GmbH and Nextcloud contributors
  * SPDX-FileCopyrightText: 2023 Stefan Niedermann <info@niedermann.it>
- * SPDX-License-Identifier: GPL-3.0-or-later
+ * SPDX-License-Identifier: MIT
  */
 package com.nextcloud.android.common.sample
 

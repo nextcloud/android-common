@@ -3,7 +3,7 @@
   ~ Nextcloud Android Common Library
   ~
   ~ SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
-  ~ SPDX-License-Identifier: GPL-3.0-or-later
+  ~ SPDX-License-Identifier: MIT
   -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"

@@ -6,7 +6,7 @@
  * SPDX-FileCopyrightText: 2023 Stefan Niedermann <info@niedermann.it>
  * SPDX-FileCopyrightText: 2023 Thore Goebel <goebel.thore@gmail.com>
  * SPDX-FileCopyrightText: 2022 Álvaro Brey <alvaro@alvarobrey.com>
- * SPDX-License-Identifier: GPL-3.0-or-later
+ * SPDX-License-Identifier: MIT
  */
 package com.nextcloud.android.common.ui.theme.utils
 

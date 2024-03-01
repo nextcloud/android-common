@@ -3,7 +3,7 @@
   ~ Nextcloud Android Common Library
   ~
   ~ SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
-  ~ SPDX-License-Identifier: GPL-3.0-or-later
+  ~ SPDX-License-Identifier: MIT
 -->
 <resources>
     <color name="refresh_spinner_background">#222222</color>
