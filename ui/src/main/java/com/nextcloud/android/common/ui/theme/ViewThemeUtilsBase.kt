@@ -10,6 +10,7 @@ package com.nextcloud.android.common.ui.theme
 
 import android.content.Context
 import android.view.View
+import androidx.compose.material3.ColorScheme
 import com.nextcloud.android.common.ui.util.PlatformThemeUtil
 import scheme.Scheme
 
@@ -18,11 +19,9 @@ open class ViewThemeUtilsBase(private val schemes: MaterialSchemes) {
      * Scheme for painting elements
      */
     @Suppress("DeprecatedCallableAddReplaceWith")
-    @Deprecated(
-        "Implement view-specific theming functions in a `ViewThemeUtilsBase` subclass" +
-            " instead of getting the scheme directly"
-    )
     fun getScheme(context: Context): Scheme = getSchemeInternal(context)
+
+    fun getColorScheme(context: Context): ColorScheme = getScheme(context).toColorScheme()
 
     @Suppress("MemberVisibilityCanBePrivate")
     // TODO cache by context hashcode
