@@ -2,7 +2,6 @@
  * Nextcloud Android Common Library
  *
  * SPDX-FileCopyrightText: 2024 Nextcloud GmbH and Nextcloud contributors
- * SPDX-FileCopyrightText: 2024 Alper Ozturk <alper.ozturk@nextcloud.com>
  * SPDX-License-Identifier: MIT
  */
 
