@@ -7,7 +7,8 @@
 [![Android CI](https://github.com/nextcloud/android-common/workflows/Assemble/badge.svg)](https://github.com/nextcloud/android-common/actions)
 [![GitHub issues](https://img.shields.io/github/issues/nextcloud/android-common.svg)](https://github.com/nextcloud/android-common/issues)
 [![GitHub stars](https://img.shields.io/github/stars/nextcloud/android-common.svg)](https://github.com/nextcloud/android-common/stargazers)
-[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/license/mit/)
+[![REUSE status](https://api.reuse.software/badge/github.com/nextcloud/android-common)](https://api.reuse.software/info/github.com/nextcloud/android-common)
 
 ## How to use
 
