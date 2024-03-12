@@ -511,7 +511,7 @@ class MaterialViewThemeUtils
                     buildColorStateList(
                         android.R.attr.state_checked to dynamicColor.primary().getArgb(scheme),
                         // XXX: specs use surfaceContainerHighest
-                        -android.R.attr.state_checked to dynamicColor.surface().getArgb(scheme),
+                        -android.R.attr.state_checked to dynamicColor.surface().getArgb(scheme)
                     )
 
                 materialSwitch.trackDecorationTintList =
