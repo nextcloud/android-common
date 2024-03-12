@@ -9,18 +9,18 @@
 package com.nextcloud.android.common.ui.theme
 
 import androidx.annotation.ColorInt
-import scheme.Scheme
+import scheme.DynamicScheme
 
 interface MaterialSchemes {
     /**
      * Schema for light theme
      */
-    val lightScheme: Scheme
+    val lightScheme: DynamicScheme
 
     /**
      * Schema for light theme
      */
-    val darkScheme: Scheme
+    val darkScheme: DynamicScheme
 
     companion object {
         fun fromServerTheme(theme: ServerTheme): MaterialSchemes = MaterialSchemesImpl(theme)

@@ -14,6 +14,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.Drawable
+import android.view.View
 import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.BlendModeColorFilterCompat
@@ -39,7 +40,8 @@ import com.nextcloud.android.common.ui.color.ColorUtil
 import com.nextcloud.android.common.ui.theme.MaterialSchemes
 import com.nextcloud.android.common.ui.theme.ViewThemeUtilsBase
 import com.nextcloud.android.common.ui.util.buildColorStateList
-import scheme.Scheme
+import dynamiccolor.MaterialDynamicColors
+import scheme.DynamicScheme
 import javax.inject.Inject
 
 /**
@@ -50,6 +52,8 @@ class MaterialViewThemeUtils
     @Inject
     constructor(schemes: MaterialSchemes, private val colorUtil: ColorUtil) :
     ViewThemeUtilsBase(schemes) {
+        private val dynamicColor = MaterialDynamicColors()
+
         fun colorToolbarOverflowIcon(toolbar: MaterialToolbar) {
             withScheme(toolbar) { scheme ->
                 colorTrailingIcon(scheme, toolbar.overflowIcon)
@@ -57,19 +61,19 @@ class MaterialViewThemeUtils
         }
 
         private fun colorTrailingIcon(
-            scheme: Scheme,
+            scheme: DynamicScheme,
             icon: Drawable?
         ) {
             icon?.colorFilter =
                 BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
-                    scheme.onSurfaceVariant,
+                    dynamicColor.surfaceVariant().getArgb(scheme),
                     BlendModeCompat.SRC_ATOP
                 )
         }
 
         fun themeSearchBarText(searchText: MaterialTextView) {
             withScheme(searchText) { scheme ->
-                searchText.setHintTextColor(scheme.onSurfaceVariant)
+                searchText.setHintTextColor(dynamicColor.surfaceVariant().getArgb(scheme))
             }
         }
 
@@ -77,13 +81,13 @@ class MaterialViewThemeUtils
             withScheme(fab) { scheme ->
                 fab.backgroundTintList =
                     buildColorStateList(
-                        android.R.attr.state_enabled to scheme.primaryContainer,
+                        android.R.attr.state_enabled to dynamicColor.primaryContainer().getArgb(scheme),
                         -android.R.attr.state_enabled to Color.GRAY
                     )
 
                 fab.imageTintList =
                     buildColorStateList(
-                        android.R.attr.state_enabled to scheme.onPrimaryContainer,
+                        android.R.attr.state_enabled to dynamicColor.onPrimaryContainer().getArgb(scheme),
                         -android.R.attr.state_enabled to Color.WHITE
                     )
             }
@@ -93,13 +97,13 @@ class MaterialViewThemeUtils
             withScheme(fab) { scheme ->
                 fab.backgroundTintList =
                     buildColorStateList(
-                        android.R.attr.state_enabled to scheme.secondaryContainer,
+                        android.R.attr.state_enabled to dynamicColor.secondaryContainer().getArgb(scheme),
                         -android.R.attr.state_enabled to Color.GRAY
                     )
 
                 fab.imageTintList =
                     buildColorStateList(
-                        android.R.attr.state_enabled to scheme.onSecondaryContainer,
+                        android.R.attr.state_enabled to dynamicColor.onSecondaryContainer().getArgb(scheme),
                         -android.R.attr.state_enabled to Color.WHITE
                     )
             }
@@ -109,13 +113,13 @@ class MaterialViewThemeUtils
             withScheme(fab) { scheme ->
                 fab.backgroundTintList =
                     buildColorStateList(
-                        android.R.attr.state_enabled to scheme.primaryContainer,
+                        android.R.attr.state_enabled to dynamicColor.primaryContainer().getArgb(scheme),
                         -android.R.attr.state_enabled to Color.GRAY
                     )
 
                 val colorStateList =
                     buildColorStateList(
-                        android.R.attr.state_enabled to scheme.onPrimaryContainer,
+                        android.R.attr.state_enabled to dynamicColor.onPrimaryContainer().getArgb(scheme),
                         -android.R.attr.state_enabled to Color.WHITE
                     )
                 fab.setTextColor(colorStateList)
@@ -125,11 +129,11 @@ class MaterialViewThemeUtils
 
         fun themeCardView(cardView: MaterialCardView) {
             withScheme(cardView) { scheme ->
-                cardView.backgroundTintList = ColorStateList.valueOf(scheme.surface)
+                cardView.backgroundTintList = ColorStateList.valueOf(dynamicColor.surface().getArgb(scheme))
                 cardView.setStrokeColor(
                     buildColorStateList(
-                        android.R.attr.state_checked to scheme.primary,
-                        -android.R.attr.state_checked to scheme.outline
+                        android.R.attr.state_checked to dynamicColor.primary().getArgb(scheme),
+                        -android.R.attr.state_checked to dynamicColor.outline().getArgb(scheme)
                     )
                 )
             }
@@ -137,7 +141,7 @@ class MaterialViewThemeUtils
 
         fun themeDragHandleView(dragHandleView: BottomSheetDragHandleView) {
             withScheme(dragHandleView) { scheme ->
-                dragHandleView.imageTintList = ColorStateList.valueOf(scheme.onSurfaceVariant)
+                dragHandleView.imageTintList = ColorStateList.valueOf(dynamicColor.onSurfaceVariant().getArgb(scheme))
             }
         }
 
@@ -152,7 +156,7 @@ class MaterialViewThemeUtils
                 val disabledColor = ContextCompat.getColor(button.context, R.color.disabled_text)
                 val colorStateList =
                     buildColorStateList(
-                        android.R.attr.state_enabled to scheme.primary,
+                        android.R.attr.state_enabled to dynamicColor.primary().getArgb(scheme),
                         -android.R.attr.state_enabled to disabledColor
                     )
                 button.setTextColor(colorStateList)
@@ -164,20 +168,20 @@ class MaterialViewThemeUtils
             withScheme(button) { scheme ->
                 button.backgroundTintList =
                     buildColorStateList(
-                        android.R.attr.state_enabled to scheme.primary,
+                        android.R.attr.state_enabled to dynamicColor.primary().getArgb(scheme),
                         -android.R.attr.state_enabled to
                             colorUtil.adjustOpacity(
-                                scheme.onSurface,
+                                dynamicColor.onSurface().getArgb(scheme),
                                 SURFACE_OPACITY_BUTTON_DISABLED
                             )
                     )
 
                 val contentColorList =
                     buildColorStateList(
-                        android.R.attr.state_enabled to scheme.onPrimary,
+                        android.R.attr.state_enabled to dynamicColor.onPrimary().getArgb(scheme),
                         -android.R.attr.state_enabled to
                             colorUtil.adjustOpacity(
-                                scheme.onSurface,
+                                dynamicColor.onSurface().getArgb(scheme),
                                 SURFACE_OPACITY_BUTTON_DISABLED
                             )
                     )
@@ -191,28 +195,28 @@ class MaterialViewThemeUtils
             withScheme(button) { scheme ->
                 button.backgroundTintList =
                     buildColorStateList(
-                        android.R.attr.state_enabled to scheme.secondaryContainer,
+                        android.R.attr.state_enabled to dynamicColor.secondaryContainer().getArgb(scheme),
                         -android.R.attr.state_enabled to
                             colorUtil.adjustOpacity(
-                                scheme.onSurface,
+                                dynamicColor.onSurface().getArgb(scheme),
                                 SURFACE_OPACITY_BUTTON_DISABLED
                             ),
-                        -android.R.attr.state_hovered to scheme.onSecondaryContainer,
-                        -android.R.attr.state_focused to scheme.onSecondaryContainer,
-                        -android.R.attr.state_pressed to scheme.onSecondaryContainer
+                        -android.R.attr.state_hovered to dynamicColor.onSecondaryContainer().getArgb(scheme),
+                        -android.R.attr.state_focused to dynamicColor.onSecondaryContainer().getArgb(scheme),
+                        -android.R.attr.state_pressed to dynamicColor.onSecondaryContainer().getArgb(scheme)
                     )
 
                 val contentColorList =
                     buildColorStateList(
-                        android.R.attr.state_enabled to scheme.onSecondaryContainer,
+                        android.R.attr.state_enabled to dynamicColor.onSecondaryContainer().getArgb(scheme),
                         -android.R.attr.state_enabled to
                             colorUtil.adjustOpacity(
-                                scheme.onSurface,
+                                dynamicColor.onSurface().getArgb(scheme),
                                 ON_SURFACE_OPACITY_BUTTON_DISABLED
                             ),
-                        -android.R.attr.state_hovered to scheme.onSecondaryContainer,
-                        -android.R.attr.state_focused to scheme.onSecondaryContainer,
-                        -android.R.attr.state_pressed to scheme.onSecondaryContainer
+                        -android.R.attr.state_hovered to dynamicColor.onSecondaryContainer().getArgb(scheme),
+                        -android.R.attr.state_focused to dynamicColor.onSecondaryContainer().getArgb(scheme),
+                        -android.R.attr.state_pressed to dynamicColor.onSecondaryContainer().getArgb(scheme)
                     )
                 button.setTextColor(contentColorList)
                 button.iconTint = contentColorList
@@ -223,10 +227,10 @@ class MaterialViewThemeUtils
             withScheme(button) { scheme ->
                 val contentColorList =
                     buildColorStateList(
-                        android.R.attr.state_enabled to scheme.primary,
+                        android.R.attr.state_enabled to dynamicColor.primary().getArgb(scheme),
                         -android.R.attr.state_enabled to
                             colorUtil.adjustOpacity(
-                                scheme.onSurface,
+                                dynamicColor.onSurface().getArgb(scheme),
                                 ON_SURFACE_OPACITY_BUTTON_DISABLED
                             )
                     )
@@ -235,15 +239,15 @@ class MaterialViewThemeUtils
                 button.iconTint = contentColorList
                 button.strokeColor =
                     buildColorStateList(
-                        android.R.attr.state_enabled to scheme.outline,
+                        android.R.attr.state_enabled to dynamicColor.outline().getArgb(scheme),
                         -android.R.attr.state_enabled to
                             colorUtil.adjustOpacity(
-                                scheme.onSurface,
+                                dynamicColor.onSurface().getArgb(scheme),
                                 ON_SURFACE_OPACITY_BUTTON_OUTLINE_DISABLED
                             ),
-                        -android.R.attr.state_hovered to scheme.outline,
-                        -android.R.attr.state_focused to scheme.primary,
-                        -android.R.attr.state_pressed to scheme.outline
+                        -android.R.attr.state_hovered to dynamicColor.outline().getArgb(scheme),
+                        -android.R.attr.state_focused to dynamicColor.primary().getArgb(scheme),
+                        -android.R.attr.state_pressed to dynamicColor.outline().getArgb(scheme)
                     )
 
                 button.strokeWidth =
@@ -256,10 +260,10 @@ class MaterialViewThemeUtils
             withScheme(button) { scheme ->
                 val contentColorList =
                     buildColorStateList(
-                        android.R.attr.state_enabled to scheme.primary,
+                        android.R.attr.state_enabled to dynamicColor.primary().getArgb(scheme),
                         -android.R.attr.state_enabled to
                             colorUtil.adjustOpacity(
-                                scheme.onSurface,
+                                dynamicColor.onSurface().getArgb(scheme),
                                 ON_SURFACE_OPACITY_BUTTON_DISABLED
                             )
                     )
@@ -276,28 +280,28 @@ class MaterialViewThemeUtils
             withScheme(button) { scheme ->
                 button.backgroundTintList =
                     buildColorStateList(
-                        android.R.attr.state_enabled to scheme.onPrimary,
+                        android.R.attr.state_enabled to dynamicColor.onPrimary().getArgb(scheme),
                         -android.R.attr.state_enabled to
                             colorUtil.adjustOpacity(
-                                scheme.surface,
+                                dynamicColor.surface().getArgb(scheme),
                                 SURFACE_OPACITY_BUTTON_DISABLED
                             ),
-                        -android.R.attr.state_hovered to scheme.onPrimary,
-                        -android.R.attr.state_focused to scheme.onPrimary,
-                        -android.R.attr.state_pressed to scheme.onPrimary
+                        -android.R.attr.state_hovered to dynamicColor.onPrimary().getArgb(scheme),
+                        -android.R.attr.state_focused to dynamicColor.onPrimary().getArgb(scheme),
+                        -android.R.attr.state_pressed to dynamicColor.onPrimary().getArgb(scheme)
                     )
 
                 val contentColorList =
                     buildColorStateList(
-                        android.R.attr.state_enabled to scheme.primary,
+                        android.R.attr.state_enabled to dynamicColor.primary().getArgb(scheme),
                         -android.R.attr.state_enabled to
                             colorUtil.adjustOpacity(
-                                scheme.primary,
+                                dynamicColor.primary().getArgb(scheme),
                                 ON_SURFACE_OPACITY_BUTTON_DISABLED
                             ),
-                        -android.R.attr.state_hovered to scheme.primary,
-                        -android.R.attr.state_focused to scheme.primary,
-                        -android.R.attr.state_pressed to scheme.primary
+                        -android.R.attr.state_hovered to dynamicColor.primary().getArgb(scheme),
+                        -android.R.attr.state_focused to dynamicColor.primary().getArgb(scheme),
+                        -android.R.attr.state_pressed to dynamicColor.primary().getArgb(scheme)
                     )
 
                 button.setTextColor(
@@ -313,10 +317,10 @@ class MaterialViewThemeUtils
                 button.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
                 val contentColorList =
                     buildColorStateList(
-                        android.R.attr.state_enabled to scheme.onPrimary,
+                        android.R.attr.state_enabled to dynamicColor.onPrimary().getArgb(scheme),
                         -android.R.attr.state_enabled to
                             colorUtil.adjustOpacity(
-                                scheme.onPrimary,
+                                dynamicColor.onPrimary().getArgb(scheme),
                                 ON_SURFACE_OPACITY_BUTTON_DISABLED
                             )
                     )
@@ -332,9 +336,9 @@ class MaterialViewThemeUtils
 
         fun themeToolbar(toolbar: MaterialToolbar) {
             withScheme(toolbar) { scheme ->
-                toolbar.setBackgroundColor(scheme.surface)
-                toolbar.setNavigationIconTint(scheme.onSurface)
-                toolbar.setTitleTextColor(scheme.onSurface)
+                toolbar.setBackgroundColor(dynamicColor.surface().getArgb(scheme))
+                toolbar.setNavigationIconTint(dynamicColor.onSurface().getArgb(scheme))
+                toolbar.setTitleTextColor(dynamicColor.onSurface().getArgb(scheme))
                 colorTrailingIcon(scheme, toolbar.overflowIcon)
             }
         }
@@ -347,7 +351,7 @@ class MaterialViewThemeUtils
 
         fun colorProgressBar(progressIndicator: LinearProgressIndicator) {
             withScheme(progressIndicator) { scheme ->
-                colorProgressBar(progressIndicator, scheme.primary)
+                colorProgressBar(progressIndicator, dynamicColor.primary().getArgb(scheme))
             }
         }
 
@@ -360,7 +364,7 @@ class MaterialViewThemeUtils
 
         fun colorProgressBar(progressIndicator: CircularProgressIndicator) {
             withScheme(progressIndicator) { scheme ->
-                colorProgressBar(progressIndicator, scheme.primary)
+                colorProgressBar(progressIndicator, dynamicColor.primary().getArgb(scheme))
             }
         }
 
@@ -373,7 +377,7 @@ class MaterialViewThemeUtils
 
         fun colorTextInputLayout(textInputLayout: TextInputLayout) {
             withScheme(textInputLayout) { scheme ->
-                val errorColor = scheme.onSurfaceVariant
+                val errorColor = dynamicColor.surfaceVariant().getArgb(scheme)
 
                 val errorColorStateList =
                     buildColorStateList(
@@ -383,8 +387,8 @@ class MaterialViewThemeUtils
 
                 val coloredColorStateList =
                     buildColorStateList(
-                        -android.R.attr.state_focused to scheme.outline,
-                        android.R.attr.state_focused to scheme.primary
+                        -android.R.attr.state_focused to dynamicColor.outline().getArgb(scheme),
+                        android.R.attr.state_focused to dynamicColor.primary().getArgb(scheme)
                     )
 
                 textInputLayout.setBoxStrokeColorStateList(coloredColorStateList)
@@ -393,7 +397,7 @@ class MaterialViewThemeUtils
                 textInputLayout.boxStrokeErrorColor = errorColorStateList
                 textInputLayout.defaultHintTextColor = coloredColorStateList
 
-                textInputLayout.editText?.highlightColor = scheme.primary
+                textInputLayout.editText?.highlightColor = dynamicColor.primary().getArgb(scheme)
             }
         }
 
@@ -402,7 +406,7 @@ class MaterialViewThemeUtils
             colorRole: ColorRole
         ) {
             withScheme(textInputLayout) { scheme ->
-                val errorColor = scheme.error
+                val errorColor = dynamicColor.error().getArgb(scheme)
 
                 val errorColorStateList =
                     buildColorStateList(
@@ -412,7 +416,7 @@ class MaterialViewThemeUtils
 
                 val coloredColorStateList =
                     buildColorStateList(
-                        -android.R.attr.state_focused to scheme.outline,
+                        -android.R.attr.state_focused to dynamicColor.outline().getArgb(scheme),
                         android.R.attr.state_focused to colorRole.select(scheme)
                     )
 
@@ -436,19 +440,37 @@ class MaterialViewThemeUtils
 
         fun themeTabLayoutOnSurface(tabLayout: TabLayout) {
             withScheme(tabLayout) { scheme ->
-                tabLayout.setBackgroundColor(scheme.surface)
+                tabLayout.setBackgroundColor(dynamicColor.surface().getArgb(scheme))
                 colorTabLayout(tabLayout, scheme)
+            }
+        }
+
+        fun colorBottomSheetBackground(
+            bottomSheet: View,
+            colorRole: ColorRole = ColorRole.SURFACE_CONTAINER_LOW
+        ) {
+            withScheme(bottomSheet) { scheme ->
+                bottomSheet.setBackgroundColor(colorRole.select(scheme))
+            }
+        }
+
+        fun colorBottomSheetDragHandle(
+            bottomSheetDragHandleView: BottomSheetDragHandleView,
+            colorRole: ColorRole = ColorRole.ON_SURFACE_VARIANT
+        ) {
+            withScheme(bottomSheetDragHandleView) { scheme ->
+                bottomSheetDragHandleView.setColorFilter(colorRole.select(scheme))
             }
         }
 
         fun colorTabLayout(
             tabLayout: TabLayout,
-            scheme: Scheme
+            scheme: DynamicScheme
         ) {
-            tabLayout.setSelectedTabIndicatorColor(scheme.primary)
+            tabLayout.setSelectedTabIndicatorColor(dynamicColor.primary().getArgb(scheme))
             val tabContentColors =
                 buildColorStateList(
-                    android.R.attr.state_selected to scheme.primary,
+                    android.R.attr.state_selected to dynamicColor.primary().getArgb(scheme),
                     -android.R.attr.state_selected to
                         ContextCompat.getColor(
                             tabLayout.context,
@@ -465,13 +487,13 @@ class MaterialViewThemeUtils
             withScheme(materialCheckBox.context) { scheme ->
                 materialCheckBox.buttonTintList =
                     buildColorStateList(
-                        android.R.attr.state_checked to scheme.primary,
-                        -android.R.attr.state_checked to scheme.outline
+                        android.R.attr.state_checked to dynamicColor.primary().getArgb(scheme),
+                        -android.R.attr.state_checked to dynamicColor.outline().getArgb(scheme)
                     )
 
                 materialCheckBox.buttonIconTintList =
                     buildColorStateList(
-                        android.R.attr.state_checked to scheme.onPrimary,
+                        android.R.attr.state_checked to dynamicColor.onPrimary().getArgb(scheme),
                         -android.R.attr.state_checked to android.R.color.transparent
                     )
             }
@@ -481,29 +503,29 @@ class MaterialViewThemeUtils
             withScheme(materialSwitch.context) { scheme ->
                 materialSwitch.thumbTintList =
                     buildColorStateList(
-                        android.R.attr.state_checked to scheme.onPrimary,
-                        -android.R.attr.state_checked to scheme.outline
+                        android.R.attr.state_checked to dynamicColor.onPrimary().getArgb(scheme),
+                        -android.R.attr.state_checked to dynamicColor.outline().getArgb(scheme)
                     )
 
                 materialSwitch.trackTintList =
                     buildColorStateList(
-                        android.R.attr.state_checked to scheme.primary,
+                        android.R.attr.state_checked to dynamicColor.primary().getArgb(scheme),
                         // XXX: specs use surfaceContainerHighest
-                        -android.R.attr.state_checked to scheme.surface
+                        -android.R.attr.state_checked to dynamicColor.surface().getArgb(scheme)
                     )
 
                 materialSwitch.trackDecorationTintList =
                     buildColorStateList(
                         android.R.attr.state_checked to android.R.color.transparent,
-                        -android.R.attr.state_checked to scheme.outline
+                        -android.R.attr.state_checked to dynamicColor.outline().getArgb(scheme)
                     )
             }
         }
 
         fun colorChipBackground(chip: Chip) {
             withScheme(chip) { scheme ->
-                chip.chipBackgroundColor = ColorStateList.valueOf(scheme.primary)
-                chip.setTextColor(scheme.onPrimary)
+                chip.chipBackgroundColor = ColorStateList.valueOf(dynamicColor.primary().getArgb(scheme))
+                chip.setTextColor(dynamicColor.onPrimary().getArgb(scheme))
             }
         }
 
@@ -512,8 +534,8 @@ class MaterialViewThemeUtils
             chipDrawable: ChipDrawable
         ) {
             withScheme(context) { scheme ->
-                chipDrawable.chipBackgroundColor = ColorStateList.valueOf(scheme.primary)
-                chipDrawable.setTextColor(scheme.onPrimary)
+                chipDrawable.chipBackgroundColor = ColorStateList.valueOf(dynamicColor.primary().getArgb(scheme))
+                chipDrawable.setTextColor(dynamicColor.onPrimary().getArgb(scheme))
             }
         }
 
@@ -524,16 +546,16 @@ class MaterialViewThemeUtils
             withScheme(chip) { scheme ->
                 chip.chipBackgroundColor = ColorStateList.valueOf(Color.TRANSPARENT)
                 chip.chipStrokeWidth = strokeWidth
-                chip.chipStrokeColor = ColorStateList.valueOf(scheme.primary)
-                chip.setTextColor(scheme.primary)
+                chip.chipStrokeColor = ColorStateList.valueOf(dynamicColor.primary().getArgb(scheme))
+                chip.setTextColor(dynamicColor.primary().getArgb(scheme))
             }
         }
 
         fun themeSnackbar(snackbar: Snackbar) {
             withScheme(snackbar.context) { scheme ->
-                snackbar.setBackgroundTint(scheme.inverseSurface)
-                snackbar.setActionTextColor(scheme.inversePrimary)
-                snackbar.setTextColor(scheme.inverseOnSurface)
+                snackbar.setBackgroundTint(dynamicColor.inverseSurface().getArgb(scheme))
+                snackbar.setActionTextColor(dynamicColor.inversePrimary().getArgb(scheme))
+                snackbar.setTextColor(dynamicColor.inverseOnSurface().getArgb(scheme))
             }
         }
 
@@ -548,29 +570,29 @@ class MaterialViewThemeUtils
             withScheme(chip.context) { scheme ->
                 val backgroundColors =
                     buildColorStateList(
-                        android.R.attr.state_checked to scheme.secondaryContainer,
-                        -android.R.attr.state_checked to scheme.surface,
-                        android.R.attr.state_focused to scheme.secondaryContainer,
-                        android.R.attr.state_hovered to scheme.secondaryContainer,
-                        android.R.attr.state_pressed to scheme.secondaryContainer
+                        android.R.attr.state_checked to dynamicColor.secondaryContainer().getArgb(scheme),
+                        -android.R.attr.state_checked to dynamicColor.surface().getArgb(scheme),
+                        android.R.attr.state_focused to dynamicColor.secondaryContainer().getArgb(scheme),
+                        android.R.attr.state_hovered to dynamicColor.secondaryContainer().getArgb(scheme),
+                        android.R.attr.state_pressed to dynamicColor.secondaryContainer().getArgb(scheme)
                     )
 
                 val iconColors =
                     buildColorStateList(
-                        android.R.attr.state_checked to scheme.onSecondaryContainer,
-                        -android.R.attr.state_checked to scheme.onSurfaceVariant,
-                        android.R.attr.state_focused to scheme.onSecondaryContainer,
-                        android.R.attr.state_hovered to scheme.onSecondaryContainer,
-                        android.R.attr.state_pressed to scheme.onSecondaryContainer
+                        android.R.attr.state_checked to dynamicColor.onSecondaryContainer().getArgb(scheme),
+                        -android.R.attr.state_checked to dynamicColor.surfaceVariant().getArgb(scheme),
+                        android.R.attr.state_focused to dynamicColor.onSecondaryContainer().getArgb(scheme),
+                        android.R.attr.state_hovered to dynamicColor.onSecondaryContainer().getArgb(scheme),
+                        android.R.attr.state_pressed to dynamicColor.onSecondaryContainer().getArgb(scheme)
                     )
 
                 val textColors =
                     buildColorStateList(
-                        android.R.attr.state_checked to scheme.onSecondaryContainer,
-                        -android.R.attr.state_checked to scheme.onSurfaceVariant,
-                        android.R.attr.state_hovered to scheme.onSecondaryContainer,
-                        android.R.attr.state_focused to scheme.onSecondaryContainer,
-                        android.R.attr.state_pressed to scheme.onSecondaryContainer
+                        android.R.attr.state_checked to dynamicColor.onSecondaryContainer().getArgb(scheme),
+                        -android.R.attr.state_checked to dynamicColor.surfaceVariant().getArgb(scheme),
+                        android.R.attr.state_hovered to dynamicColor.onSecondaryContainer().getArgb(scheme),
+                        android.R.attr.state_focused to dynamicColor.onSecondaryContainer().getArgb(scheme),
+                        android.R.attr.state_pressed to dynamicColor.onSecondaryContainer().getArgb(scheme)
                     )
 
                 chip.chipBackgroundColor = backgroundColors
@@ -584,28 +606,28 @@ class MaterialViewThemeUtils
             withScheme(chip.context) { scheme ->
                 val iconColors =
                     buildColorStateList(
-                        android.R.attr.state_enabled to scheme.primary,
+                        android.R.attr.state_enabled to dynamicColor.primary().getArgb(scheme),
                         -android.R.attr.state_enabled to
                             colorUtil.adjustOpacity(
-                                scheme.onSurface,
+                                dynamicColor.onSurface().getArgb(scheme),
                                 ON_SURFACE_OPACITY_BUTTON_DISABLED
                             ),
-                        android.R.attr.state_focused to scheme.primary,
-                        android.R.attr.state_hovered to scheme.primary,
-                        android.R.attr.state_pressed to scheme.primary
+                        android.R.attr.state_focused to dynamicColor.primary().getArgb(scheme),
+                        android.R.attr.state_hovered to dynamicColor.primary().getArgb(scheme),
+                        android.R.attr.state_pressed to dynamicColor.primary().getArgb(scheme)
                     )
 
                 val textColors =
                     buildColorStateList(
-                        android.R.attr.state_enabled to scheme.onSurface,
+                        android.R.attr.state_enabled to dynamicColor.onSurface().getArgb(scheme),
                         -android.R.attr.state_enabled to
                             colorUtil.adjustOpacity(
-                                scheme.onSurface,
+                                dynamicColor.onSurface().getArgb(scheme),
                                 ON_SURFACE_OPACITY_BUTTON_DISABLED
                             ),
-                        android.R.attr.state_hovered to scheme.onSurface,
-                        android.R.attr.state_focused to scheme.onSurface,
-                        android.R.attr.state_pressed to scheme.onSurface
+                        android.R.attr.state_hovered to dynamicColor.onSurface().getArgb(scheme),
+                        android.R.attr.state_focused to dynamicColor.onSurface().getArgb(scheme),
+                        android.R.attr.state_pressed to dynamicColor.onSurface().getArgb(scheme)
                     )
 
                 chip.chipStrokeColor = chipOutlineColorList(scheme)
@@ -618,15 +640,15 @@ class MaterialViewThemeUtils
             withScheme(chip.context) { scheme ->
                 val iconColors =
                     buildColorStateList(
-                        android.R.attr.state_enabled to scheme.onSurfaceVariant,
+                        android.R.attr.state_enabled to dynamicColor.surfaceVariant().getArgb(scheme),
                         -android.R.attr.state_enabled to
                             colorUtil.adjustOpacity(
-                                scheme.onSurface,
+                                dynamicColor.onSurface().getArgb(scheme),
                                 ON_SURFACE_OPACITY_BUTTON_DISABLED
                             ),
-                        android.R.attr.state_focused to scheme.onSurfaceVariant,
-                        android.R.attr.state_hovered to scheme.onSurfaceVariant,
-                        android.R.attr.state_pressed to scheme.onSurfaceVariant
+                        android.R.attr.state_focused to dynamicColor.surfaceVariant().getArgb(scheme),
+                        android.R.attr.state_hovered to dynamicColor.surfaceVariant().getArgb(scheme),
+                        android.R.attr.state_pressed to dynamicColor.surfaceVariant().getArgb(scheme)
                     )
 
                 chip.chipStrokeColor = chipOutlineFilterColorList(scheme)
@@ -635,43 +657,43 @@ class MaterialViewThemeUtils
             }
         }
 
-        private fun chipOutlineColorList(scheme: Scheme) =
+        private fun chipOutlineColorList(scheme: DynamicScheme) =
             buildColorStateList(
-                android.R.attr.state_enabled to scheme.outline,
+                android.R.attr.state_enabled to dynamicColor.outline().getArgb(scheme),
                 -android.R.attr.state_enabled to
                     colorUtil.adjustOpacity(
-                        scheme.onSurface,
+                        dynamicColor.onSurface().getArgb(scheme),
                         ON_SURFACE_OPACITY_BUTTON_OUTLINE_DISABLED
                     ),
-                android.R.attr.state_hovered to scheme.outline,
-                android.R.attr.state_focused to scheme.onSurfaceVariant,
-                android.R.attr.state_pressed to scheme.outline
+                android.R.attr.state_hovered to dynamicColor.outline().getArgb(scheme),
+                android.R.attr.state_focused to dynamicColor.surfaceVariant().getArgb(scheme),
+                android.R.attr.state_pressed to dynamicColor.outline().getArgb(scheme)
             )
 
-        private fun chipOutlineFilterColorList(scheme: Scheme) =
+        private fun chipOutlineFilterColorList(scheme: DynamicScheme) =
             buildColorStateList(
-                android.R.attr.state_checked to scheme.secondaryContainer,
-                -android.R.attr.state_checked to scheme.outline
+                android.R.attr.state_checked to dynamicColor.secondaryContainer().getArgb(scheme),
+                -android.R.attr.state_checked to dynamicColor.outline().getArgb(scheme)
             )
 
-        private fun chipSuggestionInputTextColorList(scheme: Scheme) =
+        private fun chipSuggestionInputTextColorList(scheme: DynamicScheme) =
             buildColorStateList(
-                android.R.attr.state_enabled to scheme.onSurfaceVariant,
+                android.R.attr.state_enabled to dynamicColor.surfaceVariant().getArgb(scheme),
                 -android.R.attr.state_enabled to
                     colorUtil.adjustOpacity(
-                        scheme.onSurface,
+                        dynamicColor.onSurface().getArgb(scheme),
                         ON_SURFACE_OPACITY_BUTTON_DISABLED
                     ),
-                android.R.attr.state_hovered to scheme.onSurfaceVariant,
-                android.R.attr.state_focused to scheme.onSurfaceVariant,
-                android.R.attr.state_pressed to scheme.onSurfaceVariant
+                android.R.attr.state_hovered to dynamicColor.surfaceVariant().getArgb(scheme),
+                android.R.attr.state_focused to dynamicColor.surfaceVariant().getArgb(scheme),
+                android.R.attr.state_pressed to dynamicColor.surfaceVariant().getArgb(scheme)
             )
 
-        private fun rippleColor(scheme: Scheme) =
+        private fun rippleColor(scheme: DynamicScheme) =
             buildColorStateList(
                 android.R.attr.state_pressed to
                     colorUtil.adjustOpacity(
-                        scheme.primary,
+                        dynamicColor.primary().getArgb(scheme),
                         SURFACE_OPACITY_BUTTON_DISABLED
                     )
             )
