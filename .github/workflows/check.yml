@@ -30,7 +30,7 @@ jobs:
         uses: gradle/gradle-build-action@8baac4c8ef753599f92eeb509c246d09d6250fa6 # v3.3.0
         with:
           arguments: ${{ matrix.task }}
-      - uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+      - uses: actions/upload-artifact@1746f4ab65b179e0ea60a494b83293b640dd5bba # v4.3.2
         if: ${{ always() }}
         with:
           name: ${{ matrix.task }}-report
