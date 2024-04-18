@@ -1,8 +1,4 @@
 /*
- * SPDX-FileCopyrightText: 2022 Google LLC
- * SPDX-License-Identifier: Apache-2.0
- */
-/*
  * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,7 +25,6 @@ import com.google.errorprone.annotations.Var;
 import contrast.Contrast;
 import hct.Hct;
 import palettes.TonalPalette;
-import scheme.DynamicScheme;
 import utils.MathUtils;
 import java.util.ArrayList;
 import java.util.HashMap;

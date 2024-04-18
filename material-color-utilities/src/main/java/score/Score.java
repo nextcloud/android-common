@@ -1,8 +1,4 @@
 /*
- * SPDX-FileCopyrightText: 2021 Google LLC
- * SPDX-License-Identifier: Apache-2.0
- */
-/*
  * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
