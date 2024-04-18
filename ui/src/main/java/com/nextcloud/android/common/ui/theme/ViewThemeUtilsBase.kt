@@ -13,7 +13,7 @@ import android.view.View
 import androidx.compose.material3.ColorScheme
 import com.nextcloud.android.common.ui.util.PlatformThemeUtil
 import com.nextcloud.android.common.ui.util.extensions.toColorScheme
-import scheme.DynamicScheme
+import dynamiccolor.DynamicScheme
 
 open class ViewThemeUtilsBase(private val schemes: MaterialSchemes) {
     /**

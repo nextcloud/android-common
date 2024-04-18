@@ -9,7 +9,7 @@
 package com.nextcloud.android.common.ui.theme
 
 import androidx.annotation.ColorInt
-import scheme.DynamicScheme
+import dynamiccolor.DynamicScheme
 
 interface MaterialSchemes {
     /**

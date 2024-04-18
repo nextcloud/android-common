@@ -8,8 +8,8 @@
 package com.nextcloud.android.common.ui.theme
 
 import androidx.annotation.ColorInt
+import dynamiccolor.DynamicScheme
 import hct.Hct
-import scheme.DynamicScheme
 import scheme.SchemeContent
 import scheme.SchemeTonalSpot
 

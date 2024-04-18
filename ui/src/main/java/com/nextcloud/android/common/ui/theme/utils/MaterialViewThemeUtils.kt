@@ -40,8 +40,8 @@ import com.nextcloud.android.common.ui.color.ColorUtil
 import com.nextcloud.android.common.ui.theme.MaterialSchemes
 import com.nextcloud.android.common.ui.theme.ViewThemeUtilsBase
 import com.nextcloud.android.common.ui.util.buildColorStateList
+import dynamiccolor.DynamicScheme
 import dynamiccolor.MaterialDynamicColors
-import scheme.DynamicScheme
 import javax.inject.Inject
 
 /**

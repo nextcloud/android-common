@@ -10,8 +10,8 @@ package com.nextcloud.android.common.ui.util.extensions
 
 import androidx.compose.material3.ColorScheme
 import androidx.compose.ui.graphics.Color
+import dynamiccolor.DynamicScheme
 import dynamiccolor.MaterialDynamicColors
-import scheme.DynamicScheme
 
 fun DynamicScheme.toColorScheme(): ColorScheme {
     return ColorScheme(
