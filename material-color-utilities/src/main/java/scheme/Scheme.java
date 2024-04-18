@@ -26,7 +26,14 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.CheckReturnValue;
 import palettes.CorePalette;
 
-/** Represents a Material color scheme, a mapping of color roles to colors. */
+/**
+ * Represents a Material color scheme, a mapping of color roles to colors.
+ *
+ * @deprecated Please use dynamiccolor.DynamicScheme instead. Refer
+ *     to https://github.com/material-foundation/material-color-utilities/blob/main/make_schemes.md
+ *     for migration guidance.
+ */
+@Deprecated
 @CheckReturnValue
 public class Scheme {
   private int primary;
@@ -687,9 +694,6 @@ public class Scheme {
     if (!(object instanceof Scheme)) {
       return false;
     }
-    if (!super.equals(object)) {
-      return false;
-    }
 
     Scheme scheme = (Scheme) object;
 
@@ -786,7 +790,7 @@ public class Scheme {
 
   @Override
   public int hashCode() {
-    int result = super.hashCode();
+    int result = System.identityHashCode(this);
     result = 31 * result + primary;
     result = 31 * result + onPrimary;
     result = 31 * result + primaryContainer;

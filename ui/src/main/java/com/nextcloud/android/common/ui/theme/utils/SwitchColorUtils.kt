@@ -12,8 +12,8 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import androidx.core.content.res.ResourcesCompat
 import com.nextcloud.android.common.ui.R
+import dynamiccolor.DynamicScheme
 import dynamiccolor.MaterialDynamicColors
-import scheme.DynamicScheme
 
 /**
  * To be used to calculate color lists for both Switch and SwitchCompat

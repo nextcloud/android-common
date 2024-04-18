@@ -19,6 +19,8 @@
  */
 package scheme;
 
+import dynamiccolor.DynamicScheme;
+import dynamiccolor.Variant;
 import hct.Hct;
 import palettes.TonalPalette;
 import utils.MathUtils;

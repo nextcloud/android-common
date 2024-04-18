@@ -8,7 +8,7 @@
  */
 package com.nextcloud.android.common.ui.theme.utils
 
-import scheme.DynamicScheme
+import dynamiccolor.DynamicScheme
 
 /**
  * Parameter for library methods so that clients can choose color roles without accessing the Scheme directly
