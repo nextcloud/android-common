@@ -1,4 +1,7 @@
-# synced from @nextcloud/android-config
+# This workflow is provided via the organization template repository
+#
+# https://github.com/nextcloud/.github
+# https://docs.github.com/en/actions/learn-github-actions/sharing-workflows-with-your-organization
 
 # SPDX-FileCopyrightText: 2022 Free Software Foundation Europe e.V. <https://fsfe.org>
 #
@@ -6,10 +9,10 @@
 
 name: REUSE Compliance Check
 
-on: [push, pull_request]
+on: pull_request
 
 jobs:
-  test:
+  reuse-compliance-check:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
