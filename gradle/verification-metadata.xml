@@ -6,7 +6,7 @@
       <trusted-artifacts>
          <trust file="annotation-jvm-1.6.0.pom"/>
          <trust file="concurrent-futures-1.1.0.pom"/>
-		 <trust file="concurrent-futures-ktx-1.1.0.pom"/>
+         <trust file="concurrent-futures-ktx-1.1.0.pom"/>
          <trust file="constraintlayout-2.1.4.pom"/>
          <trust file="core-common-2.2.0.pom"/>
          <trust file="core-runtime-2.2.0.pom"/>
