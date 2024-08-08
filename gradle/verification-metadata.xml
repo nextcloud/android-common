@@ -43,7 +43,10 @@
          <trusted-key id="19BEAB2D799C020F17C69126B16698A4ADF4D638" group="org.checkerframework"/>
          <trusted-key id="1D0A8B5E77C678A7C724445ABF984B4145EA13F7" group="com.squareup" name="javapoet" version="1.13.0"/>
          <trusted-key id="1D2C7EF8ADA0F794B58C7C63436902AF59EDF60E" group="dev.equo.ide" name="solstice" version="1.7.5"/>
-         <trusted-key id="24D04176586361FDA94EE0315F7786DF73E61F56" group="com.google.devtools.ksp" name="symbol-processing-api" version="1.9.20-1.0.14"/>
+         <trusted-key id="24D04176586361FDA94EE0315F7786DF73E61F56">
+            <trusting group="com.google.devtools.ksp" name="symbol-processing-api" version="1.9.20-1.0.14"/>
+            <trusting group="com.google.devtools.ksp" name="symbol-processing-api" version="1.9.24-1.0.20"/>
+         </trusted-key>
          <trusted-key id="2DB4F1EF0FA761ECC4EA935C86FDC7E2A11262CB">
             <trusting group="commons-codec"/>
             <trusting group="commons-io"/>
@@ -65,6 +68,7 @@
          <trusted-key id="3690C240CE51B4670D30AD1C38EE757D69184620" group="org.tukaani" name="xz" version="1.9"/>
          <trusted-key id="3872ED7D5904493D23D78FA2C4C8CB73B1435348" group="com.android.tools.build" name="transform-api" version="2.0.0-deprecated-use-gradle-api"/>
          <trusted-key id="38FD31D9C6FD39D58EF1AB0DE96EF7AE7D967845" group="com.vanniktech"/>
+         <trusted-key id="4021EEEAFF5DE8404DCD0A270AA3E5C3D232E79B" group="jakarta.inject" name="jakarta.inject-api" version="2.0.1"/>
          <trusted-key id="44FBDBBC1A00FE414F1C1873586654072EAD6677" group="org.sonatype.oss" name="oss-parent" version="9"/>
          <trusted-key id="47504B76CF89C15C0512D9AFE16AB52D79FD224F">
             <trusting group="com.google.api.grpc" name="proto-google-common-protos" version="2.0.1"/>
