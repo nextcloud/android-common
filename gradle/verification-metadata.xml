@@ -51,6 +51,7 @@
          <trusted-key id="19BEAB2D799C020F17C69126B16698A4ADF4D638" group="org.checkerframework"/>
          <trusted-key id="1D0A8B5E77C678A7C724445ABF984B4145EA13F7" group="com.squareup" name="javapoet" version="1.13.0"/>
          <trusted-key id="1D2C7EF8ADA0F794B58C7C63436902AF59EDF60E" group="dev.equo.ide" name="solstice" version="1.7.5"/>
+         <trusted-key id="1D85469D8559C2E1DF5F925131D2D79DF7E85DD3" group="org.jcommander" name="jcommander" version="1.85"/>
          <trusted-key id="24D04176586361FDA94EE0315F7786DF73E61F56">
             <trusting group="com.google.devtools.ksp" name="symbol-processing-api" version="1.9.20-1.0.14"/>
             <trusting group="com.google.devtools.ksp" name="symbol-processing-api" version="1.9.24-1.0.20"/>
