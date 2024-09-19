@@ -79,7 +79,7 @@ class AndroidViewThemeUtils
 
                 bottomNavigationView.itemTextColor =
                     buildColorStateList(
-                        android.R.attr.state_checked to dynamicColor.surface().getArgb(scheme),
+                        android.R.attr.state_checked to dynamicColor.onSurface().getArgb(scheme),
                         -android.R.attr.state_checked to dynamicColor.onSurfaceVariant().getArgb(scheme)
                     )
 
@@ -148,7 +148,7 @@ class AndroidViewThemeUtils
             item: MenuItem
         ) {
             withScheme(context) { scheme: DynamicScheme ->
-                colorMenuItemText(dynamicColor.surface().getArgb(scheme), item)
+                colorMenuItemText(dynamicColor.onSurface().getArgb(scheme), item)
             }
         }
 
@@ -266,11 +266,11 @@ class AndroidViewThemeUtils
                 val wrap = DrawableCompat.wrap(drawable)
                 wrap.colorFilter =
                     BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
-                        dynamicColor.surface().getArgb(scheme),
+                        dynamicColor.onSurface().getArgb(scheme),
                         BlendModeCompat.SRC_ATOP
                     )
                 drawerToggle.setHomeAsUpIndicator(wrap)
-                drawerToggle.drawerArrowDrawable.color = dynamicColor.surface().getArgb(scheme)
+                drawerToggle.drawerArrowDrawable.color = dynamicColor.onSurface().getArgb(scheme)
             }
         }
 
@@ -452,7 +452,7 @@ class AndroidViewThemeUtils
                         android.R.attr.state_enabled to dynamicColor.onSurfaceVariant().getArgb(scheme),
                         -android.R.attr.state_enabled to
                             colorUtil.adjustOpacity(
-                                dynamicColor.surface().getArgb(scheme),
+                                dynamicColor.onSurface().getArgb(scheme),
                                 ON_SURFACE_OPACITY_BUTTON_DISABLED
                             )
                     )
@@ -509,7 +509,7 @@ class AndroidViewThemeUtils
                             android.R.attr.state_enabled to color,
                             -android.R.attr.state_enabled to
                                 colorUtil.adjustOpacity(
-                                    dynamicColor.surface().getArgb(scheme),
+                                    dynamicColor.onSurface().getArgb(scheme),
                                     ON_SURFACE_OPACITY_BUTTON_DISABLED
                                 )
                         )
@@ -617,7 +617,7 @@ class AndroidViewThemeUtils
                     )
 
                 editText.setHintTextColor(dynamicColor.onSurfaceVariant().getArgb(scheme))
-                editText.setTextColor(dynamicColor.surface().getArgb(scheme))
+                editText.setTextColor(dynamicColor.onSurface().getArgb(scheme))
             }
         }
 
