@@ -43,8 +43,9 @@ class MainActivity : AppCompatActivity() {
                 ).show()
             }
         }
-
+        
         mainViewModel.color.observe(this) { applyTheme(it) }
+        applyTheme(Color.parseColor("#${binding.color.text}"))
     }
 
     private fun applyTheme(color: Int) {
@@ -63,7 +64,9 @@ class MainActivity : AppCompatActivity() {
         platform.colorViewBackground(binding.container, ColorRole.SURFACE)
         platform.colorTextView(binding.headlineLib, ColorRole.PRIMARY)
         platform.colorTextView(binding.headlineModuleUi, ColorRole.SECONDARY)
+        platform.colorTextView(binding.toolbarTitle, ColorRole.ON_SURFACE)
         platform.themeStatusBar(this)
+        material.themeToolbar(binding.toolbar)
         material.colorTextInputLayout(binding.colorTil)
         material.themeExtendedFAB(binding.btn)
         material.themeChipAssist(binding.assistChip)
