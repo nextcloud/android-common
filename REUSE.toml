@@ -4,4 +4,9 @@ version = 1
 SPDX-PackageName = "android-common"
 SPDX-PackageSupplier = "Nextcloud Android team <android@nextcloud.com>"
 SPDX-PackageDownloadLocation = "https://github.com/nextcloud/android-common"
-annotations = []
+
+[[annotations]]
+path = ["material-color-utilities/src/main/java/**"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2021-2024 Google LLC"
+SPDX-License-Identifier = "Apache-2.0"

@@ -1,8 +1,4 @@
 /*
- * SPDX-FileCopyrightText: 2022 Google LLC
- * SPDX-License-Identifier: Apache-2.0
- */
-/*
  * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,6 +19,7 @@ package dynamiccolor;
 import hct.Hct;
 import palettes.TonalPalette;
 import utils.MathUtils;
+import java.util.Optional;
 
 /**
  * Provides important settings for creating colors dynamically, and 6 color palettes. Requires: 1. A
@@ -53,6 +50,30 @@ public class DynamicScheme {
       TonalPalette tertiaryPalette,
       TonalPalette neutralPalette,
       TonalPalette neutralVariantPalette) {
+    this(
+        sourceColorHct,
+        variant,
+        isDark,
+        contrastLevel,
+        primaryPalette,
+        secondaryPalette,
+        tertiaryPalette,
+        neutralPalette,
+        neutralVariantPalette,
+        Optional.empty());
+  }
+
+  public DynamicScheme(
+      Hct sourceColorHct,
+      Variant variant,
+      boolean isDark,
+      double contrastLevel,
+      TonalPalette primaryPalette,
+      TonalPalette secondaryPalette,
+      TonalPalette tertiaryPalette,
+      TonalPalette neutralPalette,
+      TonalPalette neutralVariantPalette,
+      Optional<TonalPalette> errorPalette) {
     this.sourceColorArgb = sourceColorHct.toInt();
     this.sourceColorHct = sourceColorHct;
     this.variant = variant;
@@ -64,7 +85,7 @@ public class DynamicScheme {
     this.tertiaryPalette = tertiaryPalette;
     this.neutralPalette = neutralPalette;
     this.neutralVariantPalette = neutralVariantPalette;
-    this.errorPalette = TonalPalette.fromHueAndChroma(25.0, 84.0);
+    this.errorPalette = errorPalette.orElse(TonalPalette.fromHueAndChroma(25.0, 84.0));
   }
 
   /**
