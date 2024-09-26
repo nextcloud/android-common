@@ -66,7 +66,7 @@ class MaterialViewThemeUtils
         ) {
             icon?.colorFilter =
                 BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
-                    dynamicColor.surfaceVariant().getArgb(scheme),
+                    dynamicColor.onSurfaceVariant().getArgb(scheme),
                     BlendModeCompat.SRC_ATOP
                 )
         }
