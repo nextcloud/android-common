@@ -43,7 +43,9 @@ class MainActivity : AppCompatActivity() {
                 ).show()
             }
         }
-        
+
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         mainViewModel.color.observe(this) { applyTheme(it) }
         applyTheme(Color.parseColor("#${binding.color.text}"))
     }
