@@ -73,6 +73,7 @@
          <trusted-key id="34441E504A937F43EB0DAEF96A65176A0FB1CD0B">
             <trusting group="org.codehaus.groovy" name="groovy" version="3.0.10"/>
             <trusting group="org.codehaus.groovy" name="groovy" version="3.0.17"/>
+            <trusting group="org.codehaus.groovy" name="groovy" version="3.0.21"/>
          </trusted-key>
          <trusted-key id="3690C240CE51B4670D30AD1C38EE757D69184620" group="org.tukaani" name="xz" version="1.9"/>
          <trusted-key id="3872ED7D5904493D23D78FA2C4C8CB73B1435348" group="com.android.tools.build" name="transform-api" version="2.0.0-deprecated-use-gradle-api"/>
