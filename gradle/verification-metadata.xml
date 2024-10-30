@@ -144,10 +144,12 @@
             <trusting group="androidx.annotation"/>
             <trusting group="androidx.appcompat"/>
             <trusting group="androidx.collection"/>
+            <trusting group="androidx.constraintlayout"/>
             <trusting group="androidx.core"/>
             <trusting group="androidx.databinding"/>
             <trusting group="androidx.graphics" name="graphics-path" version="1.0.1"/>
             <trusting group="androidx.lifecycle"/>
+            <trusting group="androidx.profileinstaller"/>
             <trusting group="androidx.transition" name="transition" version="1.5.0"/>
             <trusting group="androidx.webkit"/>
             <trusting group="^androidx[.]compose($|([.].*))" regex="true"/>
