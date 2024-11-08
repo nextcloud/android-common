@@ -580,7 +580,7 @@ class MaterialViewThemeUtils
                 val iconColors =
                     buildColorStateList(
                         android.R.attr.state_checked to dynamicColor.onSecondaryContainer().getArgb(scheme),
-                        -android.R.attr.state_checked to dynamicColor.surfaceVariant().getArgb(scheme),
+                        -android.R.attr.state_checked to dynamicColor.onSurfaceVariant().getArgb(scheme),
                         android.R.attr.state_focused to dynamicColor.onSecondaryContainer().getArgb(scheme),
                         android.R.attr.state_hovered to dynamicColor.onSecondaryContainer().getArgb(scheme),
                         android.R.attr.state_pressed to dynamicColor.onSecondaryContainer().getArgb(scheme)
@@ -589,7 +589,7 @@ class MaterialViewThemeUtils
                 val textColors =
                     buildColorStateList(
                         android.R.attr.state_checked to dynamicColor.onSecondaryContainer().getArgb(scheme),
-                        -android.R.attr.state_checked to dynamicColor.surfaceVariant().getArgb(scheme),
+                        -android.R.attr.state_checked to dynamicColor.onSurfaceVariant().getArgb(scheme),
                         android.R.attr.state_hovered to dynamicColor.onSecondaryContainer().getArgb(scheme),
                         android.R.attr.state_focused to dynamicColor.onSecondaryContainer().getArgb(scheme),
                         android.R.attr.state_pressed to dynamicColor.onSecondaryContainer().getArgb(scheme)
@@ -640,15 +640,15 @@ class MaterialViewThemeUtils
             withScheme(chip.context) { scheme ->
                 val iconColors =
                     buildColorStateList(
-                        android.R.attr.state_enabled to dynamicColor.surfaceVariant().getArgb(scheme),
+                        android.R.attr.state_enabled to dynamicColor.onSurfaceVariant().getArgb(scheme),
                         -android.R.attr.state_enabled to
                             colorUtil.adjustOpacity(
                                 dynamicColor.onSurface().getArgb(scheme),
                                 ON_SURFACE_OPACITY_BUTTON_DISABLED
                             ),
-                        android.R.attr.state_focused to dynamicColor.surfaceVariant().getArgb(scheme),
-                        android.R.attr.state_hovered to dynamicColor.surfaceVariant().getArgb(scheme),
-                        android.R.attr.state_pressed to dynamicColor.surfaceVariant().getArgb(scheme)
+                        android.R.attr.state_focused to dynamicColor.onSurfaceVariant().getArgb(scheme),
+                        android.R.attr.state_hovered to dynamicColor.onSurfaceVariant().getArgb(scheme),
+                        android.R.attr.state_pressed to dynamicColor.onSurfaceVariant().getArgb(scheme)
                     )
 
                 chip.chipStrokeColor = chipOutlineFilterColorList(scheme)
@@ -659,34 +659,34 @@ class MaterialViewThemeUtils
 
         private fun chipOutlineColorList(scheme: DynamicScheme) =
             buildColorStateList(
-                android.R.attr.state_enabled to dynamicColor.outline().getArgb(scheme),
+                android.R.attr.state_enabled to dynamicColor.outlineVariant().getArgb(scheme),
                 -android.R.attr.state_enabled to
                     colorUtil.adjustOpacity(
                         dynamicColor.onSurface().getArgb(scheme),
                         ON_SURFACE_OPACITY_BUTTON_OUTLINE_DISABLED
                     ),
-                android.R.attr.state_hovered to dynamicColor.outline().getArgb(scheme),
-                android.R.attr.state_focused to dynamicColor.surfaceVariant().getArgb(scheme),
-                android.R.attr.state_pressed to dynamicColor.outline().getArgb(scheme)
+                android.R.attr.state_hovered to dynamicColor.outlineVariant().getArgb(scheme),
+                android.R.attr.state_focused to dynamicColor.onSurfaceVariant().getArgb(scheme),
+                android.R.attr.state_pressed to dynamicColor.outlineVariant().getArgb(scheme)
             )
 
         private fun chipOutlineFilterColorList(scheme: DynamicScheme) =
             buildColorStateList(
                 android.R.attr.state_checked to dynamicColor.secondaryContainer().getArgb(scheme),
-                -android.R.attr.state_checked to dynamicColor.outline().getArgb(scheme)
+                -android.R.attr.state_checked to dynamicColor.outlineVariant().getArgb(scheme)
             )
 
         private fun chipSuggestionInputTextColorList(scheme: DynamicScheme) =
             buildColorStateList(
-                android.R.attr.state_enabled to dynamicColor.surfaceVariant().getArgb(scheme),
+                android.R.attr.state_enabled to dynamicColor.onSurfaceVariant().getArgb(scheme),
                 -android.R.attr.state_enabled to
                     colorUtil.adjustOpacity(
                         dynamicColor.onSurface().getArgb(scheme),
                         ON_SURFACE_OPACITY_BUTTON_DISABLED
                     ),
-                android.R.attr.state_hovered to dynamicColor.surfaceVariant().getArgb(scheme),
-                android.R.attr.state_focused to dynamicColor.surfaceVariant().getArgb(scheme),
-                android.R.attr.state_pressed to dynamicColor.surfaceVariant().getArgb(scheme)
+                android.R.attr.state_hovered to dynamicColor.onSurfaceVariant().getArgb(scheme),
+                android.R.attr.state_focused to dynamicColor.onSurfaceVariant().getArgb(scheme),
+                android.R.attr.state_pressed to dynamicColor.onSurfaceVariant().getArgb(scheme)
             )
 
         private fun rippleColor(scheme: DynamicScheme) =
