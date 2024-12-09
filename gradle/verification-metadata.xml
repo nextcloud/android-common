@@ -55,6 +55,7 @@
          <trusted-key id="24D04176586361FDA94EE0315F7786DF73E61F56">
             <trusting group="com.google.devtools.ksp" name="symbol-processing-api" version="1.9.20-1.0.14"/>
             <trusting group="com.google.devtools.ksp" name="symbol-processing-api" version="1.9.24-1.0.20"/>
+            <trusting group="com.google.devtools.ksp" name="symbol-processing-api" version="2.0.21-1.0.28"/>
          </trusted-key>
          <trusted-key id="2DB4F1EF0FA761ECC4EA935C86FDC7E2A11262CB">
             <trusting group="commons-codec"/>
