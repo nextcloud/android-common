@@ -21,41 +21,36 @@ import kotlin.math.roundToInt
 
 class ColorUtil
     @Inject
-    constructor(private val context: Context) {
+    constructor(
+        private val context: Context
+    ) {
         @ColorInt
         fun getNullSafeColor(
             color: String?,
             @ColorInt fallbackColor: Int
-        ): Int {
-            return color.parseColorOrFallback { fallbackColor }
-        }
+        ): Int = color.parseColorOrFallback { fallbackColor }
 
         @ColorInt
         fun getNullSafeColorWithFallbackRes(
             color: String?,
             @ColorRes fallbackColorRes: Int
-        ): Int {
-            return color.parseColorOrFallback { ContextCompat.getColor(context, fallbackColorRes) }
-        }
+        ): Int = color.parseColorOrFallback { ContextCompat.getColor(context, fallbackColorRes) }
 
         @ColorInt
         fun getTextColor(
             colorText: String?,
             @ColorInt backgroundColor: Int
-        ): Int {
-            return colorText.parseColorOrFallback { getForegroundColorForBackgroundColor(backgroundColor) }
-        }
+        ): Int = colorText.parseColorOrFallback { getForegroundColorForBackgroundColor(backgroundColor) }
 
         @ColorInt
         fun getForegroundColorForBackgroundColor(
             @ColorInt color: Int
-        ): Int {
-            return if (isDarkBackground(color)) {
+        ): Int =
+            if (isDarkBackground(color)) {
                 Color.WHITE
             } else {
                 ContextCompat.getColor(context, R.color.grey_900)
             }
-        }
 
         fun isDarkBackground(
             @ColorInt color: Int
