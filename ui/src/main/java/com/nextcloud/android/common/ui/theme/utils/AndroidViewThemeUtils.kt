@@ -63,8 +63,10 @@ import javax.inject.Inject
 @Suppress("TooManyFunctions")
 class AndroidViewThemeUtils
     @Inject
-    constructor(schemes: MaterialSchemes, private val colorUtil: ColorUtil) :
-    ViewThemeUtilsBase(schemes) {
+    constructor(
+        schemes: MaterialSchemes,
+        private val colorUtil: ColorUtil
+    ) : ViewThemeUtilsBase(schemes) {
         private val dynamicColor = MaterialDynamicColors()
 
         fun colorBottomNavigationView(bottomNavigationView: BottomNavigationView) {
@@ -128,11 +130,10 @@ class AndroidViewThemeUtils
             }
         }
 
-        fun getPrimaryColorDrawable(context: Context): Drawable {
-            return withScheme(context) { scheme ->
+        fun getPrimaryColorDrawable(context: Context): Drawable =
+            withScheme(context) { scheme ->
                 ColorDrawable(dynamicColor.primary().getArgb(scheme))
             }
-        }
 
         fun colorToolbarMenuIcon(
             context: Context,
@@ -196,20 +197,17 @@ class AndroidViewThemeUtils
         fun tintPrimaryDrawable(
             context: Context,
             @DrawableRes id: Int
-        ): Drawable? {
-            return tintDrawable(context, id, ColorRole.PRIMARY)
-        }
+        ): Drawable? = tintDrawable(context, id, ColorRole.PRIMARY)
 
         @JvmOverloads
         fun tintDrawable(
             context: Context,
             drawable: Drawable,
             colorRole: ColorRole = ColorRole.PRIMARY
-        ): Drawable {
-            return withScheme(context) { scheme: DynamicScheme ->
+        ): Drawable =
+            withScheme(context) { scheme: DynamicScheme ->
                 colorDrawable(drawable, colorRole.select(scheme))
             }
-        }
 
         @Deprecated(
             replaceWith =
@@ -222,9 +220,7 @@ class AndroidViewThemeUtils
         fun tintPrimaryDrawable(
             context: Context,
             drawable: Drawable?
-        ): Drawable? {
-            return drawable?.let { tintDrawable(context, it, ColorRole.PRIMARY) }
-        }
+        ): Drawable? = drawable?.let { tintDrawable(context, it, ColorRole.PRIMARY) }
 
         @Deprecated(
             replaceWith =
@@ -237,9 +233,7 @@ class AndroidViewThemeUtils
         fun tintTextDrawable(
             context: Context,
             drawable: Drawable?
-        ): Drawable? {
-            return drawable?.let { tintDrawable(context, it, ColorRole.ON_SURFACE) }
-        }
+        ): Drawable? = drawable?.let { tintDrawable(context, it, ColorRole.ON_SURFACE) }
 
         /**
          * Public for edge cases. For most cases use [tintDrawable] instead
@@ -696,11 +690,10 @@ class AndroidViewThemeUtils
         }
 
         @Deprecated("Don't do this, implement custom viewThemeUtils instead")
-        fun primaryColor(activity: Activity): Int {
-            return withScheme(activity) { scheme ->
+        fun primaryColor(activity: Activity): Int =
+            withScheme(activity) { scheme ->
                 dynamicColor.primary().getArgb(scheme)
             }
-        }
 
         companion object {
             private const val ON_SURFACE_OPACITY_BUTTON_DISABLED: Float = 0.38f

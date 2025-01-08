@@ -76,13 +76,11 @@ class ColorUtil
 
         fun colorToHexString(
             @ColorInt color: Int
-        ): String {
-            return String.format(null, "#%06X", HEX_WHITE and color)
-        }
+        ): String = String.format(null, "#%06X", HEX_WHITE and color)
 
         @ColorInt
-        private fun String?.parseColorOrFallback(fallback: () -> Int): Int {
-            return if (this?.isNotBlank() == true) {
+        private fun String?.parseColorOrFallback(fallback: () -> Int): Int =
+            if (this?.isNotBlank() == true) {
                 try {
                     Color.parseColor(this)
                 } catch (e: IllegalArgumentException) {
@@ -92,20 +90,18 @@ class ColorUtil
             } else {
                 fallback()
             }
-        }
 
         @ColorInt
         fun adjustOpacity(
             color: Int,
             opacity: Float
-        ): Int {
-            return Color.argb(
+        ): Int =
+            Color.argb(
                 (Color.alpha(color) * opacity).roundToInt(),
                 Color.red(color),
                 Color.green(color),
                 Color.blue(color)
             )
-        }
 
         companion object {
             private const val HSL_SIZE: Int = 3

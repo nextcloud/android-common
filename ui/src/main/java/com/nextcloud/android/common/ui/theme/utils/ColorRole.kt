@@ -13,7 +13,9 @@ import dynamiccolor.DynamicScheme
 /**
  * Parameter for library methods so that clients can choose color roles without accessing the Scheme directly
  */
-enum class ColorRole(internal val select: (DynamicScheme) -> Int) {
+enum class ColorRole(
+    internal val select: (DynamicScheme) -> Int
+) {
     PRIMARY({ dynamiccolor.MaterialDynamicColors().primary().getArgb(it) }),
     ON_PRIMARY({ dynamiccolor.MaterialDynamicColors().onPrimary().getArgb(it) }),
     PRIMARY_CONTAINER({ dynamiccolor.MaterialDynamicColors().primaryContainer().getArgb(it) }),

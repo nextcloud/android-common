@@ -40,8 +40,7 @@ class AndroidXViewThemeUtils
     constructor(
         schemes: MaterialSchemes,
         private val androidViewThemeUtils: AndroidViewThemeUtils
-    ) :
-    ViewThemeUtilsBase(schemes) {
+    ) : ViewThemeUtilsBase(schemes) {
         private val dynamicColor = MaterialDynamicColors()
 
         fun colorSwitchCompat(switchCompat: SwitchCompat) {

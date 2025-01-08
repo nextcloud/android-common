@@ -30,8 +30,9 @@ import javax.inject.Inject
  */
 class DialogViewThemeUtils
     @Inject
-    constructor(schemes: MaterialSchemes) :
-    ViewThemeUtilsBase(schemes) {
+    constructor(
+        schemes: MaterialSchemes
+    ) : ViewThemeUtilsBase(schemes) {
         private val dynamicColor = MaterialDynamicColors()
 
         fun colorMaterialAlertDialogBackground(
