@@ -21,41 +21,36 @@ import kotlin.math.roundToInt
 
 class ColorUtil
     @Inject
-    constructor(private val context: Context) {
+    constructor(
+        private val context: Context
+    ) {
         @ColorInt
         fun getNullSafeColor(
             color: String?,
             @ColorInt fallbackColor: Int
-        ): Int {
-            return color.parseColorOrFallback { fallbackColor }
-        }
+        ): Int = color.parseColorOrFallback { fallbackColor }
 
         @ColorInt
         fun getNullSafeColorWithFallbackRes(
             color: String?,
             @ColorRes fallbackColorRes: Int
-        ): Int {
-            return color.parseColorOrFallback { ContextCompat.getColor(context, fallbackColorRes) }
-        }
+        ): Int = color.parseColorOrFallback { ContextCompat.getColor(context, fallbackColorRes) }
 
         @ColorInt
         fun getTextColor(
             colorText: String?,
             @ColorInt backgroundColor: Int
-        ): Int {
-            return colorText.parseColorOrFallback { getForegroundColorForBackgroundColor(backgroundColor) }
-        }
+        ): Int = colorText.parseColorOrFallback { getForegroundColorForBackgroundColor(backgroundColor) }
 
         @ColorInt
         fun getForegroundColorForBackgroundColor(
             @ColorInt color: Int
-        ): Int {
-            return if (isDarkBackground(color)) {
+        ): Int =
+            if (isDarkBackground(color)) {
                 Color.WHITE
             } else {
                 ContextCompat.getColor(context, R.color.grey_900)
             }
-        }
 
         fun isDarkBackground(
             @ColorInt color: Int
@@ -81,13 +76,11 @@ class ColorUtil
 
         fun colorToHexString(
             @ColorInt color: Int
-        ): String {
-            return String.format(null, "#%06X", HEX_WHITE and color)
-        }
+        ): String = String.format(null, "#%06X", HEX_WHITE and color)
 
         @ColorInt
-        private fun String?.parseColorOrFallback(fallback: () -> Int): Int {
-            return if (this?.isNotBlank() == true) {
+        private fun String?.parseColorOrFallback(fallback: () -> Int): Int =
+            if (this?.isNotBlank() == true) {
                 try {
                     Color.parseColor(this)
                 } catch (e: IllegalArgumentException) {
@@ -97,20 +90,18 @@ class ColorUtil
             } else {
                 fallback()
             }
-        }
 
         @ColorInt
         fun adjustOpacity(
             color: Int,
             opacity: Float
-        ): Int {
-            return Color.argb(
+        ): Int =
+            Color.argb(
                 (Color.alpha(color) * opacity).roundToInt(),
                 Color.red(color),
                 Color.green(color),
                 Color.blue(color)
             )
-        }
 
         companion object {
             private const val HSL_SIZE: Int = 3

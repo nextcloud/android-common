@@ -13,8 +13,8 @@ import androidx.compose.ui.graphics.Color
 import dynamiccolor.DynamicScheme
 import dynamiccolor.MaterialDynamicColors
 
-fun DynamicScheme.toColorScheme(): ColorScheme {
-    return ColorScheme(
+fun DynamicScheme.toColorScheme(): ColorScheme =
+    ColorScheme(
         primary = Color(MaterialDynamicColors().primary().getArgb(this)),
         onPrimary = Color(MaterialDynamicColors().onPrimary().getArgb(this)),
         primaryContainer = Color(MaterialDynamicColors().primaryContainer().getArgb(this)),
@@ -45,4 +45,3 @@ fun DynamicScheme.toColorScheme(): ColorScheme {
         outlineVariant = Color(MaterialDynamicColors().outlineVariant().getArgb(this)),
         scrim = Color(MaterialDynamicColors().scrim().getArgb(this))
     )
-}

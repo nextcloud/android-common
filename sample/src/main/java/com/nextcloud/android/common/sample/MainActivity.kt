@@ -36,11 +36,12 @@ class MainActivity : AppCompatActivity() {
             try {
                 mainViewModel.color.value = Color.parseColor("#${binding.color.text}")
             } catch (_: java.lang.IllegalArgumentException) {
-                Toast.makeText(
-                    this,
-                    "#${binding.color.text} is not a valid color.",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast
+                    .makeText(
+                        this,
+                        "#${binding.color.text} is not a valid color.",
+                        Toast.LENGTH_SHORT
+                    ).show()
             }
         }
 

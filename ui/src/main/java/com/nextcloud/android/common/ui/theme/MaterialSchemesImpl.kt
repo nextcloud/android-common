@@ -13,8 +13,7 @@ import hct.Hct
 import scheme.SchemeContent
 import scheme.SchemeTonalSpot
 
-internal class MaterialSchemesImpl :
-    MaterialSchemes {
+internal class MaterialSchemesImpl : MaterialSchemes {
     override val lightScheme: DynamicScheme
     override val darkScheme: DynamicScheme
 

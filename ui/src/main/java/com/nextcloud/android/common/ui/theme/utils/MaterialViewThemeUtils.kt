@@ -50,8 +50,10 @@ import javax.inject.Inject
 @Suppress("TooManyFunctions")
 class MaterialViewThemeUtils
     @Inject
-    constructor(schemes: MaterialSchemes, private val colorUtil: ColorUtil) :
-    ViewThemeUtilsBase(schemes) {
+    constructor(
+        schemes: MaterialSchemes,
+        private val colorUtil: ColorUtil
+    ) : ViewThemeUtilsBase(schemes) {
         private val dynamicColor = MaterialDynamicColors()
 
         fun colorToolbarOverflowIcon(toolbar: MaterialToolbar) {
