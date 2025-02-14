@@ -22,6 +22,21 @@
          <trust file="tracing-1.0.0.pom"/>
          <trust file="tracing-1.1.0.pom"/>
          <trust file="viewbinding-8.4.1.pom"/>
+         <trust file="animation-android-1.7.8.pom"/>
+         <trust file="animation-core-android-1.7.8.pom"/>
+         <trust file="foundation-android-1.7.8.pom"/>
+         <trust file="foundation-layout-android-1.7.8.pom"/>
+         <trust file="material-icons-core-android-1.7.8.pom"/>
+         <trust file="material-ripple-android-1.7.8.pom"/>
+         <trust file="runtime-android-1.7.8.pom"/>
+         <trust file="runtime-saveable-android-1.7.8.pom"/>
+         <trust file="ui-android-1.7.8.pom"/>
+         <trust file="ui-geometry-android-1.7.8.pom"/>
+         <trust file="ui-graphics-android-1.7.8.pom"/>
+         <trust file="ui-text-android-1.7.8.pom"/>
+         <trust file="ui-unit-android-1.7.8.pom"/>
+         <trust file="ui-util-android-1.7.8.pom"/>
+         <trust file="viewbinding-8.8.1.pom"/>
          <trust group="com.android.tools.build" name="aapt2" version="8.8.1-12006047" reason="ships OS specific artifacts (win/linux) - temp global trust"/>
          <trust file=".*-javadoc[.]jar" regex="true"/>
          <trust file=".*-sources[.]jar" regex="true"/>
