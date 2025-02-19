@@ -4,6 +4,8 @@
       <verify-metadata>true</verify-metadata>
       <verify-signatures>true</verify-signatures>
       <trusted-artifacts>
+         <trust file="animation-android-1.7.8.pom"/>
+         <trust file="animation-core-android-1.7.8.pom"/>
          <trust file="annotation-jvm-1.6.0.pom"/>
          <trust file="concurrent-futures-1.1.0.pom"/>
          <trust file="concurrent-futures-ktx-1.1.0.pom"/>
@@ -11,31 +13,29 @@
          <trust file="core-common-2.2.0.pom"/>
          <trust file="core-runtime-2.2.0.pom"/>
          <trust file="flexbox-3.0.0.pom"/>
+         <trust file="foundation-android-1.7.8.pom"/>
+         <trust file="foundation-layout-android-1.7.8.pom"/>
          <trust file="fragment-1.5.4.pom"/>
          <trust file="fragment-ktx-1.3.6.pom"/>
          <trust file="material-1.12.0.pom"/>
+         <trust file="material-icons-core-android-1.7.8.pom"/>
+         <trust file="material-ripple-android-1.7.8.pom"/>
          <trust file="preference-1.2.1.pom"/>
          <trust file="resourceinspection-annotation-1.0.1.pom"/>
+         <trust file="runtime-android-1.7.8.pom"/>
+         <trust file="runtime-saveable-android-1.7.8.pom"/>
          <trust file="savedstate-1.2.1.pom"/>
          <trust file="savedstate-ktx-1.2.1.pom"/>
          <trust file="slidingpanelayout-1.2.0.pom"/>
          <trust file="tracing-1.0.0.pom"/>
          <trust file="tracing-1.1.0.pom"/>
-         <trust file="viewbinding-8.4.1.pom"/>
-         <trust file="animation-android-1.7.8.pom"/>
-         <trust file="animation-core-android-1.7.8.pom"/>
-         <trust file="foundation-android-1.7.8.pom"/>
-         <trust file="foundation-layout-android-1.7.8.pom"/>
-         <trust file="material-icons-core-android-1.7.8.pom"/>
-         <trust file="material-ripple-android-1.7.8.pom"/>
-         <trust file="runtime-android-1.7.8.pom"/>
-         <trust file="runtime-saveable-android-1.7.8.pom"/>
          <trust file="ui-android-1.7.8.pom"/>
          <trust file="ui-geometry-android-1.7.8.pom"/>
          <trust file="ui-graphics-android-1.7.8.pom"/>
          <trust file="ui-text-android-1.7.8.pom"/>
          <trust file="ui-unit-android-1.7.8.pom"/>
          <trust file="ui-util-android-1.7.8.pom"/>
+         <trust file="viewbinding-8.4.1.pom"/>
          <trust file="viewbinding-8.8.1.pom"/>
          <trust group="com.android.tools.build" name="aapt2" version="8.8.1-12006047" reason="ships OS specific artifacts (win/linux) - temp global trust"/>
          <trust file=".*-javadoc[.]jar" regex="true"/>
