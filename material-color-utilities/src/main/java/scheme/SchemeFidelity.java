@@ -16,12 +16,11 @@
 
 package scheme;
 
-import dislike.DislikeAnalyzer;
+import dynamiccolor.ColorSpec.SpecVersion;
+import dynamiccolor.ColorSpecs;
 import dynamiccolor.DynamicScheme;
 import dynamiccolor.Variant;
 import hct.Hct;
-import palettes.TonalPalette;
-import temperature.TemperatureCache;
 
 /**
  * A scheme that places the source color in Scheme.primaryContainer.
@@ -34,20 +33,36 @@ import temperature.TemperatureCache;
  * maintains constant appearance.
  */
 public class SchemeFidelity extends DynamicScheme {
+
   public SchemeFidelity(Hct sourceColorHct, boolean isDark, double contrastLevel) {
+    this(sourceColorHct, isDark, contrastLevel, DEFAULT_SPEC_VERSION, DEFAULT_PLATFORM);
+  }
+
+  public SchemeFidelity(
+      Hct sourceColorHct,
+      boolean isDark,
+      double contrastLevel,
+      SpecVersion specVersion,
+      Platform platform) {
     super(
         sourceColorHct,
         Variant.FIDELITY,
         isDark,
         contrastLevel,
-        TonalPalette.fromHueAndChroma(sourceColorHct.getHue(), sourceColorHct.getChroma()),
-        TonalPalette.fromHueAndChroma(
-            sourceColorHct.getHue(),
-            Math.max(sourceColorHct.getChroma() - 32.0, sourceColorHct.getChroma() * 0.5)),
-        TonalPalette.fromHct(
-            DislikeAnalyzer.fixIfDisliked(new TemperatureCache(sourceColorHct).getComplement())),
-        TonalPalette.fromHueAndChroma(sourceColorHct.getHue(), sourceColorHct.getChroma() / 8.0),
-        TonalPalette.fromHueAndChroma(
-            sourceColorHct.getHue(), (sourceColorHct.getChroma() / 8.0) + 4.0));
+        platform,
+        specVersion,
+        ColorSpecs.get(specVersion)
+            .getPrimaryPalette(Variant.FIDELITY, sourceColorHct, isDark, platform, contrastLevel),
+        ColorSpecs.get(specVersion)
+            .getSecondaryPalette(Variant.FIDELITY, sourceColorHct, isDark, platform, contrastLevel),
+        ColorSpecs.get(specVersion)
+            .getTertiaryPalette(Variant.FIDELITY, sourceColorHct, isDark, platform, contrastLevel),
+        ColorSpecs.get(specVersion)
+            .getNeutralPalette(Variant.FIDELITY, sourceColorHct, isDark, platform, contrastLevel),
+        ColorSpecs.get(specVersion)
+            .getNeutralVariantPalette(
+                Variant.FIDELITY, sourceColorHct, isDark, platform, contrastLevel),
+        ColorSpecs.get(specVersion)
+            .getErrorPalette(Variant.FIDELITY, sourceColorHct, isDark, platform, contrastLevel));
   }
 }
