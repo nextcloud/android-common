@@ -16,23 +16,46 @@
 
 package scheme;
 
+import dynamiccolor.ColorSpec.SpecVersion;
+import dynamiccolor.ColorSpecs;
 import dynamiccolor.DynamicScheme;
 import dynamiccolor.Variant;
 import hct.Hct;
-import palettes.TonalPalette;
 
 /** A monochrome theme, colors are purely black / white / gray. */
 public class SchemeMonochrome extends DynamicScheme {
+
   public SchemeMonochrome(Hct sourceColorHct, boolean isDark, double contrastLevel) {
+    this(sourceColorHct, isDark, contrastLevel, DEFAULT_SPEC_VERSION, DEFAULT_PLATFORM);
+  }
+
+  public SchemeMonochrome(
+      Hct sourceColorHct,
+      boolean isDark,
+      double contrastLevel,
+      SpecVersion specVersion,
+      Platform platform) {
     super(
         sourceColorHct,
         Variant.MONOCHROME,
         isDark,
         contrastLevel,
-        TonalPalette.fromHueAndChroma(sourceColorHct.getHue(), 0.0),
-        TonalPalette.fromHueAndChroma(sourceColorHct.getHue(), 0.0),
-        TonalPalette.fromHueAndChroma(sourceColorHct.getHue(), 0.0),
-        TonalPalette.fromHueAndChroma(sourceColorHct.getHue(), 0.0),
-        TonalPalette.fromHueAndChroma(sourceColorHct.getHue(), 0.0));
+        platform,
+        specVersion,
+        ColorSpecs.get(specVersion)
+            .getPrimaryPalette(Variant.MONOCHROME, sourceColorHct, isDark, platform, contrastLevel),
+        ColorSpecs.get(specVersion)
+            .getSecondaryPalette(
+                Variant.MONOCHROME, sourceColorHct, isDark, platform, contrastLevel),
+        ColorSpecs.get(specVersion)
+            .getTertiaryPalette(
+                Variant.MONOCHROME, sourceColorHct, isDark, platform, contrastLevel),
+        ColorSpecs.get(specVersion)
+            .getNeutralPalette(Variant.MONOCHROME, sourceColorHct, isDark, platform, contrastLevel),
+        ColorSpecs.get(specVersion)
+            .getNeutralVariantPalette(
+                Variant.MONOCHROME, sourceColorHct, isDark, platform, contrastLevel),
+        ColorSpecs.get(specVersion)
+            .getErrorPalette(Variant.MONOCHROME, sourceColorHct, isDark, platform, contrastLevel));
   }
 }
