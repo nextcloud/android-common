@@ -35,16 +35,13 @@ fun AppCompatActivity.setStatusBarColor(
     @ColorInt color: Int
 ) {
     window.decorView.setOnApplyWindowInsetsListener { view, insets ->
-        val statusBarHeight =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                insets.getInsets(WindowInsets.Type.statusBars()).top
-            } else {
-                @Suppress("DEPRECATION")
-                insets.systemWindowInsetTop
-            }
-
         view.setBackgroundColor(color)
-        view.setPadding(0, statusBarHeight, 0, 0)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            val statusBarHeight = insets.getInsets(WindowInsets.Type.statusBars()).top
+            view.setPadding(0, statusBarHeight, 0, 0)
+        }
+
         insets
     }
 }
