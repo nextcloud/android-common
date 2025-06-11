@@ -31,7 +31,7 @@ fun AppCompatActivity.adjustUIForAPILevel35(
     window.addSystemBarPaddings()
 }
 
-fun AppCompatActivity. initStatusBar(
+fun AppCompatActivity.initStatusBar(
     @ColorInt color: Int
 ) {
     window.decorView.setOnApplyWindowInsetsListener { view, insets ->
