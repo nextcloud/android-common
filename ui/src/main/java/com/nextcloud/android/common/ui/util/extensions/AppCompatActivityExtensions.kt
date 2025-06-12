@@ -31,7 +31,6 @@ fun AppCompatActivity.adjustUIForAPILevel35(
     window.addSystemBarPaddings()
 }
 
-
 /**
  *
  * This function provides a unified approach to setting status bar colors across different
