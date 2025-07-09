@@ -141,6 +141,21 @@ class MaterialViewThemeUtils
             }
         }
 
+        fun themeSearchCardView(cardView: MaterialCardView) {
+            withScheme(cardView) { scheme ->
+                cardView.backgroundTintList =
+                    ColorStateList.valueOf(
+                        dynamicColor.surfaceContainerHigh().getArgb(scheme)
+                    )
+                cardView.setStrokeColor(
+                    buildColorStateList(
+                        android.R.attr.state_checked to dynamicColor.surfaceContainerHigh().getArgb(scheme),
+                        -android.R.attr.state_checked to dynamicColor.surfaceContainerHigh().getArgb(scheme)
+                    )
+                )
+            }
+        }
+
         fun themeDragHandleView(dragHandleView: BottomSheetDragHandleView) {
             withScheme(dragHandleView) { scheme ->
                 dragHandleView.imageTintList = ColorStateList.valueOf(dynamicColor.onSurfaceVariant().getArgb(scheme))
@@ -293,17 +308,26 @@ class MaterialViewThemeUtils
                         -android.R.attr.state_pressed to dynamicColor.onPrimary().getArgb(scheme)
                     )
 
+                colorMaterialButtonContent(button)
+            }
+        }
+
+        fun colorMaterialButtonContent(
+            button: MaterialButton,
+            colorRole: ColorRole = ColorRole.PRIMARY
+        ) {
+            withScheme(button) { scheme ->
                 val contentColorList =
                     buildColorStateList(
-                        android.R.attr.state_enabled to dynamicColor.primary().getArgb(scheme),
+                        android.R.attr.state_enabled to colorRole.select(scheme),
                         -android.R.attr.state_enabled to
                             colorUtil.adjustOpacity(
-                                dynamicColor.primary().getArgb(scheme),
+                                colorRole.select(scheme),
                                 ON_SURFACE_OPACITY_BUTTON_DISABLED
                             ),
-                        -android.R.attr.state_hovered to dynamicColor.primary().getArgb(scheme),
-                        -android.R.attr.state_focused to dynamicColor.primary().getArgb(scheme),
-                        -android.R.attr.state_pressed to dynamicColor.primary().getArgb(scheme)
+                        -android.R.attr.state_hovered to colorRole.select(scheme),
+                        -android.R.attr.state_focused to colorRole.select(scheme),
+                        -android.R.attr.state_pressed to colorRole.select(scheme)
                     )
 
                 button.setTextColor(
