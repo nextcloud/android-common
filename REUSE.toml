@@ -6,6 +6,12 @@ SPDX-PackageSupplier = "Nextcloud Android team <android@nextcloud.com>"
 SPDX-PackageDownloadLocation = "https://github.com/nextcloud/android-common"
 
 [[annotations]]
+path = [".idea/icon.svg"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2025 Nextcloud Gmbh and Nextcloud contributors, Google LLC"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
 path = ["material-color-utilities/src/main/java/**"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2021-2024 Google LLC"
