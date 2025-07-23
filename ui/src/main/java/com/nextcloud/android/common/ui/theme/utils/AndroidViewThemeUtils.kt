@@ -628,6 +628,15 @@ class AndroidViewThemeUtils
             }
         }
 
+        fun themeViewBackground(
+            view: View,
+            colorRole: ColorRole = ColorRole.SURFACE
+        ) {
+            withScheme(view) { scheme ->
+                view.setBackgroundColor(colorRole.select(scheme))
+            }
+        }
+
         @JvmOverloads
         fun highlightText(
             textView: TextView,
