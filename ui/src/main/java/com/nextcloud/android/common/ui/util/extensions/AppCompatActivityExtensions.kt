@@ -17,17 +17,11 @@ import androidx.appcompat.app.AppCompatActivity
 
 @JvmOverloads
 @Suppress("MagicNumber")
-fun AppCompatActivity.adjustUIForAPILevel35(
+fun AppCompatActivity.applyEdgeToEdgeWithSystemBarPadding(
     statusBarStyle: SystemBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT),
     navigationBarStyle: SystemBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT)
 ) {
-    val isApiLevel35OrHigher = (Build.VERSION.SDK_INT >= 35)
-    if (!isApiLevel35OrHigher) {
-        return
-    }
-
     enableEdgeToEdge(statusBarStyle, navigationBarStyle)
-
     window.addSystemBarPaddings()
 }
 

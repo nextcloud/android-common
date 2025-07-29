@@ -19,13 +19,15 @@ fun Window?.addSystemBarPaddings() {
     }
 
     ViewCompat.setOnApplyWindowInsetsListener(decorView) { v: View, insets: WindowInsetsCompat ->
-        val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+        val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+        val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
+        val bottomInset = maxOf(systemBars.bottom, ime.bottom)
 
         v.updatePadding(
-            left = bars.left,
-            top = bars.top,
-            right = bars.right,
-            bottom = bars.bottom
+            left = systemBars.left,
+            top = systemBars.top,
+            right = systemBars.right,
+            bottom = bottomInset
         )
 
         WindowInsetsCompat.CONSUMED
