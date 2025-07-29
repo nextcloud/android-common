@@ -17,7 +17,7 @@ import androidx.appcompat.app.AppCompatActivity
 
 @JvmOverloads
 @Suppress("MagicNumber")
-fun AppCompatActivity.prepareWindowForEdgeToEdge(
+fun AppCompatActivity.applyEdgeToEdgeWithSystemBarPadding(
     statusBarStyle: SystemBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT),
     navigationBarStyle: SystemBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT)
 ) {
