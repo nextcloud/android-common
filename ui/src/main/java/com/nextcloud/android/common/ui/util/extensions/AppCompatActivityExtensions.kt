@@ -17,7 +17,7 @@ import androidx.appcompat.app.AppCompatActivity
 
 @JvmOverloads
 @Suppress("MagicNumber")
-fun AppCompatActivity.adjustUIForAPILevel35(
+fun AppCompatActivity.prepareWindowForEdgeToEdge(
     statusBarStyle: SystemBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT),
     navigationBarStyle: SystemBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT)
 ) {
