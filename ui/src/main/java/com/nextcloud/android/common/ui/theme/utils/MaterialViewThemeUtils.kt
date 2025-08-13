@@ -403,7 +403,7 @@ class MaterialViewThemeUtils
 
         fun colorTextInputLayout(textInputLayout: TextInputLayout) {
             withScheme(textInputLayout) { scheme ->
-                val errorColor = dynamicColor.surfaceVariant().getArgb(scheme)
+                val errorColor = dynamicColor.error().getArgb(scheme)
 
                 val errorColorStateList =
                     buildColorStateList(
