@@ -8,16 +8,20 @@
  */
 package com.nextcloud.android.common.sample
 
-import android.graphics.Color
 import android.os.Bundle
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.toColorInt
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.nextcloud.android.common.sample.databinding.ActivityMainBinding
 import com.nextcloud.android.common.ui.color.ColorUtil
 import com.nextcloud.android.common.ui.theme.MaterialSchemes
 import com.nextcloud.android.common.ui.theme.utils.AndroidViewThemeUtils
 import com.nextcloud.android.common.ui.theme.utils.ColorRole
+import com.nextcloud.android.common.ui.theme.utils.DialogViewThemeUtils
 import com.nextcloud.android.common.ui.theme.utils.MaterialViewThemeUtils
 
 class MainActivity : AppCompatActivity() {
@@ -34,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         // Color should be fetched from the server capabilities or another proper source
         binding.btn.setOnClickListener { _ ->
             try {
-                mainViewModel.color.value = Color.parseColor("#${binding.color.text}")
+                mainViewModel.color.value = "#${binding.color.text}".toColorInt()
             } catch (_: java.lang.IllegalArgumentException) {
                 Toast
                     .makeText(
@@ -45,10 +49,39 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        binding.dialogBtn.setOnClickListener { _ ->
+            // launch MaterialDialog
+            val builder =
+                MaterialAlertDialogBuilder(this)
+                    .setPositiveButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
+                    .setNeutralButton(R.string.dismiss) { dialog, _ -> dialog.dismiss() }
+                    .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
+                    .setTitle(R.string.dialog_title)
+                    .setMessage(getString(R.string.dialog_message))
+            val schemes = MaterialSchemes.Companion.fromColor("#${binding.color.text}".toColorInt())
+            val colorUtil = ColorUtil(this)
+            val dialogViewThemeUtils = DialogViewThemeUtils(schemes)
+            val material = MaterialViewThemeUtils(schemes, colorUtil)
+
+            dialogViewThemeUtils.colorMaterialAlertDialogBackground(this, builder)
+
+            val dialog = builder.create()
+            dialog.show()
+
+            val positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE) as MaterialButton
+            material.colorMaterialButtonPrimaryTonal(positiveButton)
+
+            val neutralButton = dialog.getButton(AlertDialog.BUTTON_NEUTRAL) as MaterialButton
+            material.colorMaterialButtonPrimaryOutlined(neutralButton)
+
+            val negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE) as MaterialButton
+            material.colorMaterialButtonPrimaryBorderless(negativeButton)
+        }
+
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         mainViewModel.color.observe(this) { applyTheme(it) }
-        applyTheme(Color.parseColor("#${binding.color.text}"))
+        applyTheme("#${binding.color.text}".toColorInt())
     }
 
     private fun applyTheme(color: Int) {
@@ -76,5 +109,6 @@ class MainActivity : AppCompatActivity() {
         material.themeChipInput(binding.inputChip)
         material.themeChipSuggestion(binding.suggestionChip)
         material.themeChipFilter(binding.filterChip)
+        material.colorMaterialButtonPrimaryFilled(binding.dialogBtn)
     }
 }
