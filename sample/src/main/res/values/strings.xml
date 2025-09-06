@@ -8,6 +8,12 @@
     <string name="app_name">Sample</string>
     <string name="title_ui">UI</string>
     <string name="apply_theme">Apply Theme</string>
+    <string name="open_dialog">Open Dialog</string>
+    <string name="ok">Ok</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="cancel">Cancel</string>
+    <string name="dialog_title">Example title</string>
+    <string name="dialog_message">This is an example message</string>
     <string name="assist_chip">Assist Chip</string>
     <string name="input_chip">Input Chip</string>
     <string name="suggestion_chip">Suggestion Chip</string>
