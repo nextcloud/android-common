@@ -44,7 +44,7 @@ class DialogViewThemeUtils
                     MaterialShapeDrawable(
                         context,
                         null,
-                        com.google.android.material.R.attr.alertDialogStyle,
+                        androidx.appcompat.R.attr.alertDialogStyle,
                         com.google.android.material.R.style.MaterialAlertDialog_MaterialComponents
                     )
                 materialShapeDrawable.initializeElevationOverlay(context)
