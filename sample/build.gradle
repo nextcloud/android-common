@@ -12,12 +12,12 @@ plugins {
 
 android {
     namespace 'com.nextcloud.android.common.sample'
-    compileSdk 35
+    compileSdk 36
 
     defaultConfig {
         applicationId "com.nextcloud.android.common.sample"
         minSdk 26
-        targetSdk 35
+        targetSdk 36
         versionCode 1
         versionName "1.0"
 
