@@ -1,9 +1,10 @@
-/**
+/*
  * Nextcloud Android Common Library
  *
  * SPDX-FileCopyrightText: 2025 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: MIT
  */
+
 package com.nextcloud.android.common.core.utils
 
 import android.content.Context
