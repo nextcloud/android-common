@@ -43,5 +43,12 @@ fun DynamicScheme.toColorScheme(): ColorScheme =
         onErrorContainer = Color(MaterialDynamicColors().onErrorContainer().getArgb(this)),
         outline = Color(MaterialDynamicColors().outline().getArgb(this)),
         outlineVariant = Color(MaterialDynamicColors().outlineVariant().getArgb(this)),
-        scrim = Color(MaterialDynamicColors().scrim().getArgb(this))
+        scrim = Color(MaterialDynamicColors().scrim().getArgb(this)),
+        surfaceBright = Color(MaterialDynamicColors().surfaceBright().getArgb(this)),
+        surfaceDim = Color(MaterialDynamicColors().surfaceDim().getArgb(this)),
+        surfaceContainer = Color(MaterialDynamicColors().surfaceContainer().getArgb(this)),
+        surfaceContainerHigh = Color(MaterialDynamicColors().surfaceContainerHigh().getArgb(this)),
+        surfaceContainerHighest = Color(MaterialDynamicColors().surfaceContainerHighest().getArgb(this)),
+        surfaceContainerLow = Color(MaterialDynamicColors().surfaceContainerLow().getArgb(this)),
+        surfaceContainerLowest = Color(MaterialDynamicColors().surfaceContainerLowest().getArgb(this))
     )
