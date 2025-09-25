@@ -9,6 +9,12 @@ buildscript {
     ext {
         daggerVersion = "2.57.1"
         kotlinVersion = "2.2.20"
+        jUnitVersion = "4.13.2"
+        androidXTestVersion = "1.3.0"
+        androidXEspressoTestVersion = "3.7.0"
+        mockkVersion = "1.14.5"
+        mockitoVersion = "5.20.0"
+        mockitoKotlinVersion = "6.0.0"
     }
 }
 
