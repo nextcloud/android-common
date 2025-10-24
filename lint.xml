@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Nextcloud - Android common
+  ~ 
+  ~ SPDX-FileCopyrightText: 2025 Nextcloud GmbH and Nextcloud contributors
+  ~ SPDX-License-Identifier: MIT
+-->
+<lint>
+    <issue id="ExtraTranslation">
+        <ignore path="**/strings.xml"/>
+        <ignore path="**/values-b+en+001/strings.xml"/>
+    </issue>
+
+    <issue id="ImpliedQuantity">
+        <ignore path="**/values-**/strings.xml" />
+    </issue>
+
+    <issue id="MissingQuantity">
+        <ignore path="**/values-**/strings.xml" />
+    </issue>
+
+	<issue id="MissingTranslation">
+        <ignore path="**/strings.xml"/>
+    </issue>
+
+	<issue id="UnusedAttribute">
+        <ignore regexp="importantForAutofill"/>
+        <ignore regexp="autofillHints"/>
+    </issue>
+
+    <issue id="UnusedQuantity">
+        <ignore path="**/values-**/strings.xml" />
+    </issue>
+
+    <issue id="TypographyEllipsis">
+        <ignore path="**/values-**/strings.xml" />
+    </issue>
+
+    <issue id="Typos">
+        <ignore path="**/values-**/strings.xml" />
+        <ignore path="**/values/setup.xml" />
+    </issue>
+</lint>
