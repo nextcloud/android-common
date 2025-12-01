@@ -36,5 +36,9 @@ enum class ColorRole(
     ON_SURFACE_VARIANT({ dynamiccolor.MaterialDynamicColors().onSurfaceVariant().getArgb(it) }),
     OUTLINE({ dynamiccolor.MaterialDynamicColors().outline().getArgb(it) }),
     OUTLINE_VARIANT({ dynamiccolor.MaterialDynamicColors().outlineVariant().getArgb(it) }),
-    SURFACE_CONTAINER_LOW({ dynamiccolor.MaterialDynamicColors().surfaceContainerLow().getArgb(it) })
+    SURFACE_CONTAINER_LOWEST({ dynamiccolor.MaterialDynamicColors().surfaceContainerLowest().getArgb(it) }),
+    SURFACE_CONTAINER_LOW({ dynamiccolor.MaterialDynamicColors().surfaceContainerLow().getArgb(it) }),
+    SURFACE_CONTAINER({ dynamiccolor.MaterialDynamicColors().surfaceContainerLow().getArgb(it) }),
+    SURFACE_CONTAINER_HIGH({ dynamiccolor.MaterialDynamicColors().surfaceContainerHigh().getArgb(it) }),
+    SURFACE_CONTAINER_HIGHEST({ dynamiccolor.MaterialDynamicColors().surfaceContainerHighest().getArgb(it) })
 }
