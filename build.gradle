@@ -50,7 +50,6 @@ tasks.register('installGitHooks', Copy) {
     }
 }
 
-
 allprojects {
     group = 'com.nextcloud.android-common'
 }
