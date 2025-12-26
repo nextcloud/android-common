@@ -47,7 +47,7 @@ import javax.inject.Inject
 /**
  * View theme utils for Material views (com.google.android.material.*)
  */
-@Suppress("TooManyFunctions")
+@Suppress("TooManyFunctions", "LargeClass")
 class MaterialViewThemeUtils
     @Inject
     constructor(
@@ -375,30 +375,66 @@ class MaterialViewThemeUtils
         )
         fun colorCardViewBackground(card: MaterialCardView) = themeCardView(card)
 
-        fun colorProgressBar(progressIndicator: LinearProgressIndicator) {
-            withScheme(progressIndicator) { scheme ->
-                colorProgressBar(progressIndicator, dynamicColor.primary().getArgb(scheme))
+        /**
+         * Themes a [LinearProgressIndicator] using the provided [ColorRole].
+         *
+         * @param linearProgressIndicator The progress indicator to theme.
+         * @param colorRole The color role to be used for the active indicator part. Defaults to [ColorRole.PRIMARY].
+         */
+        fun colorProgressBar(
+            linearProgressIndicator: LinearProgressIndicator,
+            colorRole: ColorRole = ColorRole.PRIMARY
+        ) {
+            withScheme(linearProgressIndicator) { scheme ->
+                colorProgressBar(linearProgressIndicator, colorRole.select(scheme))
             }
         }
 
+        /**
+         * Themes a [LinearProgressIndicator] using the provided color [Int].
+         *
+         * @param linearProgressIndicator The progress indicator to theme.
+         * @param color The color to be used for the active indicator part.
+         */
         fun colorProgressBar(
-            progressIndicator: LinearProgressIndicator,
+            linearProgressIndicator: LinearProgressIndicator,
             @ColorInt color: Int
         ) {
-            progressIndicator.setIndicatorColor(color)
-        }
-
-        fun colorProgressBar(progressIndicator: CircularProgressIndicator) {
-            withScheme(progressIndicator) { scheme ->
-                colorProgressBar(progressIndicator, dynamicColor.primary().getArgb(scheme))
+            withScheme(linearProgressIndicator) { scheme ->
+                linearProgressIndicator.setIndicatorColor(color)
+                linearProgressIndicator.trackColor = dynamicColor.secondaryContainer().getArgb(scheme)
             }
         }
 
+        /**
+         * Themes a [CircularProgressIndicator] using the provided [ColorRole].
+         *
+         * @param circularProgressIndicator The progress indicator to theme.
+         * @param colorRole The color role to be used for the active indicator part. Defaults to [ColorRole.PRIMARY].
+         */
         fun colorProgressBar(
-            progressIndicator: CircularProgressIndicator,
+            circularProgressIndicator: CircularProgressIndicator,
+            colorRole: ColorRole = ColorRole.PRIMARY
+        ) {
+            withScheme(circularProgressIndicator) { scheme ->
+                colorProgressBar(circularProgressIndicator, colorRole.select(scheme))
+            }
+        }
+
+        /**
+         * Themes a [CircularProgressIndicator] using the provided color [Int].
+         *
+         * @param circularProgressIndicator The progress indicator to theme.
+         * @param color The color to be used for the active indicator part.
+         */
+        fun colorProgressBar(
+            circularProgressIndicator: CircularProgressIndicator,
             @ColorInt color: Int
         ) {
-            progressIndicator.setIndicatorColor(color)
+            withScheme(circularProgressIndicator) { scheme ->
+                circularProgressIndicator.setIndicatorColor(color)
+                circularProgressIndicator.trackColor = dynamicColor.secondaryContainer().getArgb(scheme)
+            }
         }
 
         fun colorTextInputLayout(textInputLayout: TextInputLayout) {

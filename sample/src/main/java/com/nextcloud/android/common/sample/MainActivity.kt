@@ -8,8 +8,11 @@
  */
 package com.nextcloud.android.common.sample
 
+import android.graphics.Color
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.toColorInt
@@ -23,11 +26,15 @@ import com.nextcloud.android.common.ui.theme.utils.AndroidViewThemeUtils
 import com.nextcloud.android.common.ui.theme.utils.ColorRole
 import com.nextcloud.android.common.ui.theme.utils.DialogViewThemeUtils
 import com.nextcloud.android.common.ui.theme.utils.MaterialViewThemeUtils
+import com.nextcloud.android.common.ui.util.extensions.addSystemBarPaddings
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val style = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT)
+        enableEdgeToEdge(style, style)
+        window.addSystemBarPaddings()
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -109,6 +116,8 @@ class MainActivity : AppCompatActivity() {
         material.themeChipInput(binding.inputChip)
         material.themeChipSuggestion(binding.suggestionChip)
         material.themeChipFilter(binding.filterChip)
+        material.colorProgressBar(binding.circularProgressBar)
+        material.colorProgressBar(binding.linearProgressBar)
         material.colorMaterialButtonPrimaryFilled(binding.dialogBtn)
     }
 }
