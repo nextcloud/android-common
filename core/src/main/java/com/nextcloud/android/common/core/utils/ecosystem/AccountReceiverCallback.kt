@@ -7,7 +7,12 @@
 
 package com.nextcloud.android.common.core.utils.ecosystem
 
+/**
+ * Callback interface for receiving account information from another Nextcloud app.
+ *
+ */
 interface AccountReceiverCallback {
     fun onAccountReceived(accountName: String)
+
     fun onAccountError(reason: String)
 }

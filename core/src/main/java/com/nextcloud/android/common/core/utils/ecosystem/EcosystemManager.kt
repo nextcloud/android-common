@@ -28,8 +28,9 @@ import java.util.regex.Pattern
  *  - Redirecting to Play Store if app not installed
  *  - Receiving account info from intents with callback support
  */
-class EcosystemManager(private val activity: Activity) {
-
+class EcosystemManager(
+    private val activity: Activity
+) {
     private val tag = "EcosystemManager"
 
     /**
@@ -39,11 +40,16 @@ class EcosystemManager(private val activity: Activity) {
 
     private val ecoSystemIntentAction = "com.nextcloud.intent.OPEN_ECOSYSTEM_APP"
 
-    private val accountNamePattern = Pattern.compile(
-        "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-z]{2,}"
-    )
+    private val accountNamePattern =
+        Pattern.compile(
+            "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-z]{2,}"
+        )
 
-    fun openApp(app: EcosystemApp, accountName: String?) {
+    @Suppress("TooGenericExceptionCaught", "ReturnCount")
+    fun openApp(
+        app: EcosystemApp,
+        accountName: String?
+    ) {
         Log.d(tag, "open app, package name: ${app.packageNames}, account name: $accountName")
 
         // check account name emptiness
@@ -71,11 +77,12 @@ class EcosystemManager(private val activity: Activity) {
 
         try {
             Log.d(tag, "launching app ${app.name} with account=$accountName")
-            val launchIntent = Intent(ecoSystemIntentAction).apply {
-                setPackage(intent.`package`)
-                putExtra(keyAccount, accountName)
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            }
+            val launchIntent =
+                Intent(ecoSystemIntentAction).apply {
+                    setPackage(intent.`package`)
+                    putExtra(keyAccount, accountName)
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                }
             activity.startActivity(launchIntent)
         } catch (e: Exception) {
             showSnackbar(R.string.ecosystem_store_open_failed)
@@ -83,41 +90,40 @@ class EcosystemManager(private val activity: Activity) {
         }
     }
 
-
     /**
      * Finds the first launchable intent from a list of package names.
      *
      * @return launch Intent or null if none of the apps are installed
      */
-    private fun Context.getLaunchIntentForPackages(
-        packageNames: List<String>
-    ): Intent? {
+    private fun Context.getLaunchIntentForPackages(packageNames: List<String>): Intent? {
         val pm: PackageManager = packageManager
         return packageNames.firstNotNullOfOrNull { packageName ->
             pm.getLaunchIntentForPackage(packageName)
         }
     }
 
+    @Suppress("TooGenericExceptionCaught")
     private fun openAppInStore(app: EcosystemApp) {
         Log.d(tag, "open app in store: $app")
 
         val firstPackageName = app.packageNames.firstOrNull() ?: return
 
-        val intent = Intent(Intent.ACTION_VIEW, "market://details?id=${firstPackageName}".toUri())
+        val intent = Intent(Intent.ACTION_VIEW, "market://details?id=$firstPackageName".toUri())
 
         try {
             activity.startActivity(intent)
         } catch (_: ActivityNotFoundException) {
-            val webIntent = Intent(
-                Intent.ACTION_VIEW,
-                "https://play.google.com/store/apps/details?id=${firstPackageName}".toUri()
-            )
+            val webIntent =
+                Intent(
+                    Intent.ACTION_VIEW,
+                    "https://play.google.com/store/apps/details?id=$firstPackageName".toUri()
+                )
 
             try {
                 activity.startActivity(webIntent)
             } catch (e: Exception) {
                 showSnackbar(R.string.ecosystem_store_open_failed)
-                Log.e(tag, "No browser available to open store for ${firstPackageName}, exception: ", e)
+                Log.e(tag, "No browser available to open store for $firstPackageName, exception: ", e)
             }
         }
     }
@@ -142,7 +148,11 @@ class EcosystemManager(private val activity: Activity) {
      * </activity>
      *
      */
-    fun receiveAccount(intent: Intent?, callback: AccountReceiverCallback) {
+    @Suppress("ReturnCount")
+    fun receiveAccount(
+        intent: Intent?,
+        callback: AccountReceiverCallback
+    ) {
         Log.d(tag, "receive account started")
 
         if (intent == null) {
