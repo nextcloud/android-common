@@ -39,14 +39,14 @@ class EcosystemManager(private val activity: Activity) {
         "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-z]{2,}"
     )
 
-    fun openApp(appPackage: EcosystemAppPackage, accountName: String?) {
-        Log.d(tag, "open app, package name: ${appPackage.name}, account name: $accountName")
+    fun openApp(app: EcosystemApp, accountName: String?) {
+        Log.d(tag, "open app, package name: ${app.packageName}, account name: $accountName")
 
         // check account name emptiness
         if (accountName.isNullOrBlank()) {
             Log.w(tag, "given account name is null")
             showSnackbar(R.string.ecosystem_null_account)
-            openAppInStore(appPackage)
+            openAppInStore(app)
             return
         }
 
@@ -57,42 +57,42 @@ class EcosystemManager(private val activity: Activity) {
         }
 
         // validate package name
-        val intent = activity.packageManager.getLaunchIntentForPackage(appPackage.name)
+        val intent = activity.packageManager.getLaunchIntentForPackage(app.packageName)
         if (intent == null) {
             Log.w(tag, "given package name cannot be found")
             showSnackbar(R.string.ecosystem_app_not_found)
-            openAppInStore(appPackage)
+            openAppInStore(app)
             return
         }
 
         try {
-            Log.d(tag, "launching app ${appPackage.name} with userHash=$accountName")
+            Log.d(tag, "launching app ${app.name} with userHash=$accountName")
             intent.putExtra(keyAccount, accountName)
             activity.startActivity(intent)
         } catch (e: Exception) {
             showSnackbar(R.string.ecosystem_store_open_failed)
-            Log.e(tag, "exception launching app ${appPackage.name}: $e")
+            Log.e(tag, "exception launching app ${app.packageName}: $e")
         }
     }
 
-    private fun openAppInStore(appPackage: EcosystemAppPackage) {
-        Log.d(tag, "open app in store: $appPackage")
+    private fun openAppInStore(app: EcosystemApp) {
+        Log.d(tag, "open app in store: $app")
 
-        val intent = Intent(Intent.ACTION_VIEW, "market://details?id=${appPackage.name}".toUri())
+        val intent = Intent(Intent.ACTION_VIEW, "market://details?id=${app.packageName}".toUri())
 
         try {
             activity.startActivity(intent)
         } catch (_: ActivityNotFoundException) {
             val webIntent = Intent(
                 Intent.ACTION_VIEW,
-                "https://play.google.com/store/apps/details?id=${appPackage.name}".toUri()
+                "https://play.google.com/store/apps/details?id=${app.packageName}".toUri()
             )
 
             try {
                 activity.startActivity(webIntent)
             } catch (e: Exception) {
                 showSnackbar(R.string.ecosystem_store_open_failed)
-                Log.e(tag, "No browser available to open store for ${appPackage.name}, exception: ", e)
+                Log.e(tag, "No browser available to open store for ${app.packageName}, exception: ", e)
             }
         }
     }

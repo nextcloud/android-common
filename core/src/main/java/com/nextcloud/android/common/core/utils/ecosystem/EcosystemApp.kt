@@ -7,7 +7,7 @@
 
 package com.nextcloud.android.common.core.utils.ecosystem
 
-enum class EcosystemAppPackage(name: String) {
+enum class EcosystemApp(val packageName: String) {
     FILES("com.nextcloud.client"),
     NOTES("it.niedermann.owncloud.notes"),
     TALK("com.nextcloud.talk2")
