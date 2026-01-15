@@ -71,10 +71,12 @@ class EcosystemManager(private val activity: Activity) {
 
         try {
             Log.d(tag, "launching app ${app.name} with account=$accountName")
-            intent.action = ecoSystemIntentAction
-            intent.putExtra(keyAccount, accountName)
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            activity.startActivity(intent)
+            val launchIntent = Intent(ecoSystemIntentAction).apply {
+                setPackage(intent.`package`)
+                putExtra(keyAccount, accountName)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            }
+            activity.startActivity(launchIntent)
         } catch (e: Exception) {
             showSnackbar(R.string.ecosystem_store_open_failed)
             Log.e(tag, "exception launching app ${app.packageNames}: $e")
@@ -99,21 +101,23 @@ class EcosystemManager(private val activity: Activity) {
     private fun openAppInStore(app: EcosystemApp) {
         Log.d(tag, "open app in store: $app")
 
-        val intent = Intent(Intent.ACTION_VIEW, "market://details?id=${app.packageNames}".toUri())
+        val firstPackageName = app.packageNames.firstOrNull() ?: return
+
+        val intent = Intent(Intent.ACTION_VIEW, "market://details?id=${firstPackageName}".toUri())
 
         try {
             activity.startActivity(intent)
         } catch (_: ActivityNotFoundException) {
             val webIntent = Intent(
                 Intent.ACTION_VIEW,
-                "https://play.google.com/store/apps/details?id=${app.packageNames}".toUri()
+                "https://play.google.com/store/apps/details?id=${firstPackageName}".toUri()
             )
 
             try {
                 activity.startActivity(webIntent)
             } catch (e: Exception) {
                 showSnackbar(R.string.ecosystem_store_open_failed)
-                Log.e(tag, "No browser available to open store for ${app.packageNames}, exception: ", e)
+                Log.e(tag, "No browser available to open store for ${firstPackageName}, exception: ", e)
             }
         }
     }
