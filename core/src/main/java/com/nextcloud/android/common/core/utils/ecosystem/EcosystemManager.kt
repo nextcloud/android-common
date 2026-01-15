@@ -131,7 +131,7 @@ class EcosystemManager(
     /**
      * Receives account from an intent and triggers the callback.
      *
-     * This method should be called from your Activity's `onNewIntent()`
+     * This method should be called from your Activity's `onCreate()` and `onNewIntent()`
      * to handle incoming ecosystem intents from other ecosystem apps.
      *
      * Important:
