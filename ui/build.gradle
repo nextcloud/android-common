@@ -8,8 +8,8 @@
 plugins {
     id 'org.jetbrains.kotlin.plugin.compose'
     id 'com.android.library'
-    id 'org.jetbrains.kotlin.android'
-    id 'org.jetbrains.kotlin.kapt'
+    id 'com.android.built-in-kotlin'
+    id 'com.android.legacy-kapt'
     id 'maven-publish'
 }
 
@@ -17,7 +17,6 @@ android {
     defaultConfig {
         minSdk = 21
         compileSdk = 36
-        targetSdk = 36
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -30,15 +29,18 @@ android {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = '17'
-    }
     namespace 'com.nextcloud.android.common.ui'
 
     publishing {
         singleVariant('release') {
             withSourcesJar()
         }
+    }
+    lint {
+        targetSdk 36
+    }
+    testOptions {
+        targetSdk 36
     }
 }
 

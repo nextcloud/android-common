@@ -7,7 +7,6 @@
 
 plugins {
     id 'com.android.library'
-    id 'org.jetbrains.kotlin.android'
     id 'maven-publish'
 }
 
@@ -16,7 +15,6 @@ android {
     defaultConfig {
         minSdk = 21
         compileSdk = 36
-        targetSdk = 36
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -25,14 +23,12 @@ android {
         unitTests {
             includeAndroidResources = true
         }
+        targetSdk 36
     }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
-    }
-    kotlinOptions {
-        jvmTarget = '17'
     }
     namespace 'com.nextcloud.android.common.core'
 
@@ -40,6 +36,9 @@ android {
         singleVariant('release') {
             withSourcesJar()
         }
+    }
+    lint {
+        targetSdk 36
     }
 }
 
