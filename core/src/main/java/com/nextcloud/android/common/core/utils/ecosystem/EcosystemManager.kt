@@ -37,6 +37,8 @@ class EcosystemManager(private val activity: Activity) {
      */
     private val keyAccount = "KEY_ACCOUNT"
 
+    private val ecoSystemIntentAction = "com.nextcloud.intent.OPEN_ECOSYSTEM_APP"
+
     private val accountNamePattern = Pattern.compile(
         "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-z]{2,}"
     )
@@ -68,8 +70,10 @@ class EcosystemManager(private val activity: Activity) {
         }
 
         try {
-            Log.d(tag, "launching app ${app.name} with userHash=$accountName")
+            Log.d(tag, "launching app ${app.name} with account=$accountName")
+            intent.action = ecoSystemIntentAction
             intent.putExtra(keyAccount, accountName)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
             activity.startActivity(intent)
         } catch (e: Exception) {
             showSnackbar(R.string.ecosystem_store_open_failed)
@@ -115,35 +119,38 @@ class EcosystemManager(private val activity: Activity) {
     }
 
     /**
-     * Receives account info from an intent and triggers the callback.
+     * Receives account from an intent and triggers the callback.
      *
-     * @param intent The Intent received in onCreate() or onNewIntent()
-     * @param callback Callback to notify the client about success or failure
+     * This method should be called from your Activity's `onNewIntent()`
+     * to handle incoming ecosystem intents from other ecosystem apps.
      *
-     * Usage example in Activity:
+     * Important:
+     * 1. The sending app calls openApp.
+     * 2. The receiving app must declare an intent-filter in its manifest to handle this action:
      *
-     * override fun onCreate(savedInstanceState: Bundle?) {
-     *     super.onCreate(savedInstanceState)
-     *     setContentView(R.layout.activity_main)
+     * <activity android:name=".ui.activity.MainActivity"
+     *           android:exported="true"
+     *           android:launchMode="singleTop">
+     *     <intent-filter>
+     *         <action android:name="com.nextcloud.intent.OPEN_ECOSYSTEM_APP" />
+     *         <category android:name="android.intent.category.DEFAULT" />
+     *     </intent-filter>
+     * </activity>
      *
-     *     EcosystemManager(rootView = findViewById(R.id.root_layout))
-     *         .receiveAccount(intent, object : EcosystemManager.AccountReceiverCallback {
-     *             override fun onAccountReceived(accountName: String) {
-     *                 // Use accountName for login or other actions
-     *                 Log.d("Receiver", "Received account: $accountName")
-     *             }
-     *
-     *             override fun onAccountError(reason: String) {
-     *                 // Show error or fallback
-     *                 Log.w("Receiver", "Error receiving account: $reason")
-     *             }
-     *         })
-     * }
      */
     fun receiveAccount(intent: Intent?, callback: AccountReceiverCallback) {
+        Log.d(tag, "receive account started")
+
         if (intent == null) {
             Log.d(tag, "received intent is null")
             val message = activity.getString(R.string.ecosystem_null_intent)
+            callback.onAccountError(message)
+            return
+        }
+
+        if (intent.action != ecoSystemIntentAction) {
+            Log.d(tag, "received intent action is not matching")
+            val message = activity.getString(R.string.ecosystem_received_intent_action_not_matching)
             callback.onAccountError(message)
             return
         }
