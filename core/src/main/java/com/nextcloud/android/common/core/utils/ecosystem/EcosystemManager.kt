@@ -9,7 +9,9 @@ package com.nextcloud.android.common.core.utils.ecosystem
 
 import android.app.Activity
 import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.util.Log
 import android.view.View
 import androidx.core.net.toUri
@@ -40,7 +42,7 @@ class EcosystemManager(private val activity: Activity) {
     )
 
     fun openApp(app: EcosystemApp, accountName: String?) {
-        Log.d(tag, "open app, package name: ${app.packageName}, account name: $accountName")
+        Log.d(tag, "open app, package name: ${app.packageNames}, account name: $accountName")
 
         // check account name emptiness
         if (accountName.isNullOrBlank()) {
@@ -57,7 +59,7 @@ class EcosystemManager(private val activity: Activity) {
         }
 
         // validate package name
-        val intent = activity.packageManager.getLaunchIntentForPackage(app.packageName)
+        val intent = activity.getLaunchIntentForPackages(app.packageNames)
         if (intent == null) {
             Log.w(tag, "given package name cannot be found")
             showSnackbar(R.string.ecosystem_app_not_found)
@@ -71,28 +73,43 @@ class EcosystemManager(private val activity: Activity) {
             activity.startActivity(intent)
         } catch (e: Exception) {
             showSnackbar(R.string.ecosystem_store_open_failed)
-            Log.e(tag, "exception launching app ${app.packageName}: $e")
+            Log.e(tag, "exception launching app ${app.packageNames}: $e")
+        }
+    }
+
+
+    /**
+     * Finds the first launchable intent from a list of package names.
+     *
+     * @return launch Intent or null if none of the apps are installed
+     */
+    private fun Context.getLaunchIntentForPackages(
+        packageNames: List<String>
+    ): Intent? {
+        val pm: PackageManager = packageManager
+        return packageNames.firstNotNullOfOrNull { packageName ->
+            pm.getLaunchIntentForPackage(packageName)
         }
     }
 
     private fun openAppInStore(app: EcosystemApp) {
         Log.d(tag, "open app in store: $app")
 
-        val intent = Intent(Intent.ACTION_VIEW, "market://details?id=${app.packageName}".toUri())
+        val intent = Intent(Intent.ACTION_VIEW, "market://details?id=${app.packageNames}".toUri())
 
         try {
             activity.startActivity(intent)
         } catch (_: ActivityNotFoundException) {
             val webIntent = Intent(
                 Intent.ACTION_VIEW,
-                "https://play.google.com/store/apps/details?id=${app.packageName}".toUri()
+                "https://play.google.com/store/apps/details?id=${app.packageNames}".toUri()
             )
 
             try {
                 activity.startActivity(webIntent)
             } catch (e: Exception) {
                 showSnackbar(R.string.ecosystem_store_open_failed)
-                Log.e(tag, "No browser available to open store for ${app.packageName}, exception: ", e)
+                Log.e(tag, "No browser available to open store for ${app.packageNames}, exception: ", e)
             }
         }
     }
