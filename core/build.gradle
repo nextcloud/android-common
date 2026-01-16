@@ -12,6 +12,7 @@ plugins {
 }
 
 android {
+    namespace 'com.nextcloud.android.common.core'
     defaultConfig {
         minSdk = 21
         compileSdk = 36

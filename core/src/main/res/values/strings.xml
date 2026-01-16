@@ -15,4 +15,13 @@
         <item quantity="one">%dh</item>
         <item quantity="other">%dh</item>
     </plurals>
+
+
+    <string name="ecosystem_null_account">Account is missing. Cannot open the app.</string>
+    <string name="ecosystem_null_intent">Received intent is null.</string>
+    <string name="ecosystem_received_intent_action_not_matching">Received intent is not matching.</string>
+    <string name="ecosystem_received_account_invalid">Received account is invalid.</string>
+    <string name="ecosystem_invalid_account">Invalid account format. Must be an email.</string>
+    <string name="ecosystem_app_not_found">App not installed. Redirecting to store…</string>
+    <string name="ecosystem_store_open_failed">Cannot open app store. Please install manually.</string>
 </resources>
