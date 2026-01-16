@@ -31,30 +31,44 @@ import java.util.regex.Pattern
 class EcosystemManager(
     private val activity: Activity
 ) {
-    private val tag = "EcosystemManager"
+    companion object {
+        private const val TAG = "EcosystemManager"
 
-    /**
-     * Key used to pass account name e.g. abc@example.cloud.com
-     */
-    private val keyAccount = "KEY_ACCOUNT"
-
-    private val ecoSystemIntentAction = "com.nextcloud.intent.OPEN_ECOSYSTEM_APP"
+        private const val ECOSYSTEM_INTENT_ACTION = "com.nextcloud.intent.OPEN_ECOSYSTEM_APP"
+        private const val PLAY_STORE_LINK = "https://play.google.com/store/apps/details?id="
+        private const val PLAY_STORE_MARKET_LINK = "market://details?id="
+        private const val EXTRA_KEY_ACCOUNT = "KEY_ACCOUNT"
+    }
 
     private val accountNamePattern =
         Pattern.compile(
             "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-z]{2,}"
         )
 
+    /**
+     * Opens an ecosystem app with the given account information.
+     *
+     * If the target app is installed, it will be launched using the
+     * {@link #ECOSYSTEM_INTENT_ACTION} intent action and the account name
+     * will be passed as an intent extra.
+     *
+     * If the app is not installed or cannot be launched, the user will be
+     * redirected to the Google Play Store page for the app.
+     *
+     * @param app The ecosystem app to be opened (e.g. Notes, Files, Talk)
+     * @param accountName The account name associated with the user,
+     *        e.g. "abc@example.cloud.com"
+     */
     @Suppress("TooGenericExceptionCaught", "ReturnCount")
     fun openApp(
         app: EcosystemApp,
         accountName: String?
     ) {
-        Log.d(tag, "open app, package name: ${app.packageNames}, account name: $accountName")
+        Log.d(TAG, "open app, package name: ${app.packageNames}, account name: $accountName")
 
         // check account name emptiness
         if (accountName.isNullOrBlank()) {
-            Log.w(tag, "given account name is null")
+            Log.w(TAG, "given account name is null")
             showSnackbar(R.string.ecosystem_null_account)
             openAppInStore(app)
             return
@@ -67,26 +81,26 @@ class EcosystemManager(
         }
 
         // validate package name
-        val intent = activity.getLaunchIntentForPackages(app.packageNames)
+        val intent = activity.findLaunchIntentForInstalledPackage(app.packageNames)
         if (intent == null) {
-            Log.w(tag, "given package name cannot be found")
+            Log.w(TAG, "given package name cannot be found")
             showSnackbar(R.string.ecosystem_app_not_found)
             openAppInStore(app)
             return
         }
 
         try {
-            Log.d(tag, "launching app ${app.name} with account=$accountName")
+            Log.d(TAG, "launching app ${app.name} with account=$accountName")
             val launchIntent =
-                Intent(ecoSystemIntentAction).apply {
+                Intent(ECOSYSTEM_INTENT_ACTION).apply {
                     setPackage(intent.`package`)
-                    putExtra(keyAccount, accountName)
+                    putExtra(EXTRA_KEY_ACCOUNT, accountName)
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
                 }
             activity.startActivity(launchIntent)
         } catch (e: Exception) {
             showSnackbar(R.string.ecosystem_store_open_failed)
-            Log.e(tag, "exception launching app ${app.packageNames}: $e")
+            Log.e(TAG, "exception launching app ${app.packageNames}: $e")
         }
     }
 
@@ -95,7 +109,7 @@ class EcosystemManager(
      *
      * @return launch Intent or null if none of the apps are installed
      */
-    private fun Context.getLaunchIntentForPackages(packageNames: List<String>): Intent? {
+    private fun Context.findLaunchIntentForInstalledPackage(packageNames: List<String>): Intent? {
         val pm: PackageManager = packageManager
         return packageNames.firstNotNullOfOrNull { packageName ->
             pm.getLaunchIntentForPackage(packageName)
@@ -104,26 +118,23 @@ class EcosystemManager(
 
     @Suppress("TooGenericExceptionCaught")
     private fun openAppInStore(app: EcosystemApp) {
-        Log.d(tag, "open app in store: $app")
+        Log.d(TAG, "open app in store: $app")
 
         val firstPackageName = app.packageNames.firstOrNull() ?: return
 
-        val intent = Intent(Intent.ACTION_VIEW, "market://details?id=$firstPackageName".toUri())
+        val marketUri = "$PLAY_STORE_MARKET_LINK$firstPackageName".toUri()
+        val intent = Intent(Intent.ACTION_VIEW, marketUri)
 
         try {
             activity.startActivity(intent)
         } catch (_: ActivityNotFoundException) {
-            val webIntent =
-                Intent(
-                    Intent.ACTION_VIEW,
-                    "https://play.google.com/store/apps/details?id=$firstPackageName".toUri()
-                )
-
+            val playStoreUri = "$PLAY_STORE_LINK$firstPackageName".toUri()
+            val webIntent = Intent(Intent.ACTION_VIEW, playStoreUri)
             try {
                 activity.startActivity(webIntent)
             } catch (e: Exception) {
                 showSnackbar(R.string.ecosystem_store_open_failed)
-                Log.e(tag, "No browser available to open store for $firstPackageName, exception: ", e)
+                Log.e(TAG, "No browser available to open store for $firstPackageName, exception: ", e)
             }
         }
     }
@@ -153,23 +164,23 @@ class EcosystemManager(
         intent: Intent?,
         callback: AccountReceiverCallback
     ) {
-        Log.d(tag, "receive account started")
+        Log.d(TAG, "receive account started")
 
         if (intent == null) {
-            Log.d(tag, "received intent is null")
+            Log.d(TAG, "received intent is null")
             val message = activity.getString(R.string.ecosystem_null_intent)
             callback.onAccountError(message)
             return
         }
 
-        if (intent.action != ecoSystemIntentAction) {
-            Log.d(tag, "received intent action is not matching")
+        if (intent.action != ECOSYSTEM_INTENT_ACTION) {
+            Log.d(TAG, "received intent action is not matching")
             val message = activity.getString(R.string.ecosystem_received_intent_action_not_matching)
             callback.onAccountError(message)
             return
         }
 
-        val account = intent.getStringExtra(keyAccount)
+        val account = intent.getStringExtra(EXTRA_KEY_ACCOUNT)
 
         if (account.isNullOrBlank()) {
             val message = activity.getString(R.string.ecosystem_null_account)
@@ -183,7 +194,7 @@ class EcosystemManager(
             return
         }
 
-        Log.d(tag, "Account received from intent: $account")
+        Log.d(TAG, "Account received from intent: $account")
         callback.onAccountReceived(account)
     }
 
