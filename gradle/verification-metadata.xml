@@ -97,6 +97,7 @@
             <trusting group="com.google.devtools.ksp" name="symbol-processing-api" version="2.0.21-1.0.28"/>
             <trusting group="com.google.devtools.ksp" name="symbol-processing-api" version="2.1.10-1.0.31"/>
             <trusting group="com.google.devtools.ksp" name="symbol-processing-api" version="2.1.21-2.0.2"/>
+            <trusting group="com.google.devtools.ksp" name="symbol-processing-api" version="2.2.20-2.0.3"/>
          </trusted-key>
          <trusted-key id="2BAB4466B44F54F8F99BBBDD5ED22F661BBF0ACC" group="com.almworks.sqlite4java" name="sqlite4java" version="1.0.392"/>
          <trusted-key id="2BCBDD0F23EA1CAFCC11D4860374CF2E8DD1BDFD" group="org.sonatype.oss"/>
@@ -258,7 +259,10 @@
          <trusted-key id="E82D2EAF2E83830CE1F7F6BE571A5291E827E1C7" group="net.java" name="jvnet-parent" version="3"/>
          <trusted-key id="E85AED155021AF8A6C6B7A4A7C7D8456294423BA" group="org.objenesis"/>
          <trusted-key id="EB1B3DE71713C9EC2E87CC26EE92349AD86DE446" group="com.google.j2objc" name="j2objc-annotations" version="2.8"/>
-         <trusted-key id="EE0CA873074092F806F59B65D364ABAA39A47320" group="com.google.errorprone"/>
+         <trusted-key id="EE0CA873074092F806F59B65D364ABAA39A47320">
+            <trusting group="com.google.errorprone"/>
+            <trusting group="com.google.googlejavaformat"/>
+         </trusted-key>
          <trusted-key id="F1A51E051F527E0C8E24D54D4B1E11D5A4B91E89" group="com.google.protobuf"/>
          <trusted-key id="F254B35617DC255D9344BCFA873A8E86B4372146" group="org.codehaus.mojo"/>
          <trusted-key id="FA77DCFEF2EE6EB2DEBEDD2C012579464D01C06A" group="org.apache" name="apache"/>
