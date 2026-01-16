@@ -38,12 +38,11 @@ class EcosystemManager(
         private const val PLAY_STORE_LINK = "https://play.google.com/store/apps/details?id="
         private const val PLAY_STORE_MARKET_LINK = "market://details?id="
         private const val EXTRA_KEY_ACCOUNT = "KEY_ACCOUNT"
+
+        const val ACCOUNT_NAME_PATTERN_REGEX = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-z]{2,}"
     }
 
-    private val accountNamePattern =
-        Pattern.compile(
-            "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-z]{2,}"
-        )
+    private val accountNamePattern = Pattern.compile(ACCOUNT_NAME_PATTERN_REGEX)
 
     /**
      * Opens an ecosystem app with the given account information.
