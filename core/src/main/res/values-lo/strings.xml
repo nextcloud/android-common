@@ -14,4 +14,6 @@
     <plurals name="date_formatting_relative_hours">
         <item quantity="other">%dຊມ</item>
     </plurals>
-</resources>
+
+
+    </resources>

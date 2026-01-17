@@ -15,4 +15,6 @@
         <item quantity="one">%dч</item>
         <item quantity="other">%dч</item>
     </plurals>
-</resources>
+
+
+    </resources>

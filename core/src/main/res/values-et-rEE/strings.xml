@@ -15,4 +15,6 @@
         <item quantity="one">%d t</item>
         <item quantity="other">%d t</item>
     </plurals>
-</resources>
+
+
+    </resources>
