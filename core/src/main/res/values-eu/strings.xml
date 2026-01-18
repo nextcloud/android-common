@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~  Nextcloud Android Common Library
+  ~ 
+  ~ SPDX-FileCopyrightText: 2025 Nextcloud GmbH and Nextcloud contributors
+  ~ SPDX-License-Identifier: MIT
+-->
+<resources>
+    <!-- relative time less than 1 minute using the term: Now -->
+    <string name="date_formatting_now">Orain</string>
+    <!-- relative time in minutes, less than 1 hour, i.e. 1m, 5m, 59m -->
+    <string name="date_formatting_relative_minutes">%dm</string>
+    <!-- relative time in hours, less than 1 day, i.e. 1h, 5h, 23h -->
+    <plurals name="date_formatting_relative_hours">
+        <item quantity="one">Ordu %d</item>
+        <item quantity="other">%d h</item>
+    </plurals>
+
+
+    <string name="ecosystem_null_account">Kontua falta da. Ezin da aplikazioa ireki.</string>
+    <string name="ecosystem_received_account_invalid">Jasotako kontua baliogabea da.</string>
+    <string name="ecosystem_invalid_account">Kontuaren formatu baliogabea. Posta elektronikoa izan behar du.</string>
+    <string name="ecosystem_app_not_found">Aplikazioa ez dago instalatuta. Biltegira birbideratzen…</string>
+    <string name="ecosystem_store_open_failed">Ezin da aplikazioen Biltegia ireki. Instalatu eskuz.</string>
+</resources>
