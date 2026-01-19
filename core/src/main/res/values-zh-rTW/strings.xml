@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~  Nextcloud Android Common Library
+  ~ 
+  ~ SPDX-FileCopyrightText: 2025 Nextcloud GmbH and Nextcloud contributors
+  ~ SPDX-License-Identifier: MIT
+-->
+<resources>
+    <!-- relative time less than 1 minute using the term: Now -->
+    <string name="date_formatting_now">現在</string>
+    <!-- relative time in minutes, less than 1 hour, i.e. 1m, 5m, 59m -->
+    <string name="date_formatting_relative_minutes">%d分鐘</string>
+    <!-- relative time in hours, less than 1 day, i.e. 1h, 5h, 23h -->
+    <plurals name="date_formatting_relative_hours">
+        <item quantity="other">%d小時</item>
+    </plurals>
+
+
+    <string name="ecosystem_null_account">缺少帳號。無法開啟應用程式。</string>
+    <string name="ecosystem_null_intent">收到的 intent 為空值。</string>
+    <string name="ecosystem_received_intent_action_not_matching">收到的 intent 不相符。</string>
+    <string name="ecosystem_received_account_invalid">收到的帳號無效。</string>
+    <string name="ecosystem_invalid_account">無效的帳號格式。必須為電子郵件。</string>
+    <string name="ecosystem_app_not_found">應用程式尚未安裝。正在重新導向至商店……</string>
+    <string name="ecosystem_store_open_failed">無法開啟應用程式商店。請手動安裝。</string>
+</resources>
