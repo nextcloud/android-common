@@ -7,7 +7,7 @@
 -->
 <resources>
     <!-- relative time less than 1 minute using the term: Now -->
-    <string name="date_formatting_now">Praegu</string>
+    <string name="date_formatting_now">Äsja</string>
     <!-- relative time in minutes, less than 1 hour, i.e. 1m, 5m, 59m -->
     <string name="date_formatting_relative_minutes">%d min</string>
     <!-- relative time in hours, less than 1 day, i.e. 1h, 5h, 23h -->
@@ -23,5 +23,5 @@
     <string name="ecosystem_received_account_invalid">Saadud kasutajakonto on vigane.</string>
     <string name="ecosystem_invalid_account">Vigane kasutajakonto vorming. Peab olema e-posti aadress.</string>
     <string name="ecosystem_app_not_found">Rakendus pole paigaldatud. Suunan rakendustepoodi…</string>
-    <string name="ecosystem_store_open_failed">Rakendustepoe avamine ei õnnestu. Paul paigalda rakendus käsitsi.</string>
+    <string name="ecosystem_store_open_failed">Rakendustepoe avamine ei õnnestu. Palun paigalda rakendus käsitsi.</string>
 </resources>
