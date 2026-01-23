@@ -167,14 +167,14 @@ class EcosystemManager(
 
         if (intent == null) {
             Log.d(TAG, "received intent is null")
-            val message = activity.getString(R.string.ecosystem_null_intent)
+            val message = activity.getString(R.string.ecosystem_wrong_intent)
             callback.onAccountError(message)
             return
         }
 
         if (intent.action != ECOSYSTEM_INTENT_ACTION) {
             Log.d(TAG, "received intent action is not matching")
-            val message = activity.getString(R.string.ecosystem_received_intent_action_not_matching)
+            val message = activity.getString(R.string.ecosystem_wrong_intent)
             callback.onAccountError(message)
             return
         }
