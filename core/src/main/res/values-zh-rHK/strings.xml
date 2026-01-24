@@ -15,10 +15,7 @@
         <item quantity="other">%d小時</item>
     </plurals>
 
-
     <string name="ecosystem_null_account">帳戶並不存在，無法開啟應用程式。</string>
-    <string name="ecosystem_null_intent">收到的 Intent 為空值。</string>
-    <string name="ecosystem_received_intent_action_not_matching">接收到的 Intent 不符合預期。</string>
     <string name="ecosystem_received_account_invalid">收到的 Intent 為無效。</string>
     <string name="ecosystem_invalid_account">帳戶格式無效，必須為電郵地址。</string>
     <string name="ecosystem_app_not_found">應用程式尚未安裝，正重新導向至商店 …</string>

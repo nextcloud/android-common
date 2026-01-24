@@ -17,10 +17,7 @@
         <item quantity="other">%dh</item>
     </plurals>
 
-
     <string name="ecosystem_null_account">A conta está ausente. Não é possível abrir o aplicativo.</string>
-    <string name="ecosystem_null_intent">A intent recebida é null.</string>
-    <string name="ecosystem_received_intent_action_not_matching">A intent recebida não corresponde.</string>
     <string name="ecosystem_received_account_invalid">A conta recebida é inválida.</string>
     <string name="ecosystem_invalid_account">Formato de conta inválido. Deve ser um endereço de e-mail.</string>
     <string name="ecosystem_app_not_found">Aplicativo não instalado. Redirecionando para a loja…</string>

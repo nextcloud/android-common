@@ -16,10 +16,7 @@
         <item quantity="other">%ds</item>
     </plurals>
 
-
     <string name="ecosystem_null_account">Hesap eksik. Uygulama açılamadı.</string>
-    <string name="ecosystem_null_intent">Alınan niyet boş.</string>
-    <string name="ecosystem_received_intent_action_not_matching">Alınan niyet eşleşmiyor.</string>
     <string name="ecosystem_received_account_invalid">Alınan hesap geçersiz.</string>
     <string name="ecosystem_invalid_account">Hesap biçimi geçersiz. Bir e-posta adresi olmalı.</string>
     <string name="ecosystem_app_not_found">Uygulama kurulmamış. Mağaza açılıyor…</string>

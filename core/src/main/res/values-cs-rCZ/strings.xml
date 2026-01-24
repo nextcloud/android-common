@@ -18,10 +18,7 @@
         <item quantity="other">%dh</item>
     </plurals>
 
-
     <string name="ecosystem_null_account">Účet chybí. Nemohu otevřít aplikaci.</string>
-    <string name="ecosystem_null_intent">Přijatý intent je prázdný.</string>
-    <string name="ecosystem_received_intent_action_not_matching">Přijatý intent se neshoduje.</string>
     <string name="ecosystem_received_account_invalid">Přijatý účet není validní.</string>
     <string name="ecosystem_invalid_account">Špatný formát účtu. Musí to být email.</string>
     <string name="ecosystem_app_not_found">Aplikace není nainstalována. Přesměrovávám do obchodu...</string>

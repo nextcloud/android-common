@@ -16,7 +16,6 @@
         <item quantity="other">%d h</item>
     </plurals>
 
-
     <string name="ecosystem_null_account">Kontua falta da. Ezin da aplikazioa ireki.</string>
     <string name="ecosystem_received_account_invalid">Jasotako kontua baliogabea da.</string>
     <string name="ecosystem_invalid_account">Kontuaren formatu baliogabea. Posta elektronikoa izan behar du.</string>

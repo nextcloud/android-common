@@ -16,10 +16,7 @@
         <item quantity="other">%d u</item>
     </plurals>
 
-
     <string name="ecosystem_null_account">Account niet beschikbaar. Kan app niet openen.</string>
-    <string name="ecosystem_null_intent">Ontvangen intent is null</string>
-    <string name="ecosystem_received_intent_action_not_matching">Ontvangen intent stemt niet overeen</string>
     <string name="ecosystem_received_account_invalid">Ontvangen account is ongeldig</string>
     <string name="ecosystem_invalid_account">Ongeldig accountformat. Moet een email zijn.</string>
     <string name="ecosystem_app_not_found">App niet geïnstalleerd. Doorsturen naar store...</string>
