@@ -16,6 +16,7 @@
     </plurals>
 
     <string name="ecosystem_null_account">帳戶並不存在，無法開啟應用程式。</string>
+    <string name="ecosystem_wrong_intent">無法完成操作：收到意外數據。</string>
     <string name="ecosystem_received_account_invalid">收到的 Intent 為無效。</string>
     <string name="ecosystem_invalid_account">帳戶格式無效，必須為電郵地址。</string>
     <string name="ecosystem_app_not_found">應用程式尚未安裝，正重新導向至商店 …</string>

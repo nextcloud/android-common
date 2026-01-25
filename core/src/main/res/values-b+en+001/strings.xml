@@ -17,6 +17,7 @@
     </plurals>
 
     <string name="ecosystem_null_account">Account is missing. Cannot open the app.</string>
+    <string name="ecosystem_wrong_intent">Cannot complete action: received unexpected data</string>
     <string name="ecosystem_received_account_invalid">Received account is invalid.</string>
     <string name="ecosystem_invalid_account">Invalid account format. Must be an email.</string>
     <string name="ecosystem_app_not_found">App not installed. Redirecting to store…</string>
