@@ -20,6 +20,7 @@
     </plurals>
 
     <string name="ecosystem_null_account">Tá an cuntas ar iarraidh. Ní féidir an aip a oscailt.</string>
+    <string name="ecosystem_wrong_intent">Ní féidir an gníomh a chríochnú: fuarthas sonraí gan choinne</string>
     <string name="ecosystem_received_account_invalid">Tá an cuntas a fuarthas neamhbhailí.</string>
     <string name="ecosystem_invalid_account">Formáid chuntais neamhbhailí. Ní mór ríomhphost a bheith ann.</string>
     <string name="ecosystem_app_not_found">Níl an aip suiteáilte. Ag atreorú chuig an siopa…</string>
