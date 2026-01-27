@@ -9,6 +9,7 @@
     <!-- relative time less than 1 minute using the term: Now -->
     <string name="date_formatting_now">Зараз</string>
     <string name="ecosystem_null_account">Відсутній обліковий запис. Неможливо відкрити застосунок.</string>
+    <string name="ecosystem_wrong_intent">Неможливо виконати дію: отримано неочікувані дані</string>
     <string name="ecosystem_received_account_invalid">Отримано недійсний обліковий запис.</string>
     <string name="ecosystem_invalid_account">Недійсний формат облікового запису. Має бути ел.адреса.</string>
     <string name="ecosystem_app_not_found">Застосунок не встановлено. Переспрямування до крамниці...</string>
