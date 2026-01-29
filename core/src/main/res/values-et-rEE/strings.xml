@@ -17,6 +17,7 @@
     </plurals>
 
     <string name="ecosystem_null_account">Kasutajakonto on puudu. Rakenduse avamine ei õnnestu.</string>
+    <string name="ecosystem_wrong_intent">Tegevust ei saa lõpetada: päringu vastuses on ootamatud andmed</string>
     <string name="ecosystem_received_account_invalid">Saadud kasutajakonto on vigane.</string>
     <string name="ecosystem_invalid_account">Vigane kasutajakonto vorming. Peab olema e-posti aadress.</string>
     <string name="ecosystem_app_not_found">Rakendus pole paigaldatud. Suunan rakendustepoodi…</string>
