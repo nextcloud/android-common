@@ -18,9 +18,10 @@
         <item quantity="other">%dh</item>
     </plurals>
 
-    <string name="ecosystem_null_account">Účet chybí. Nemohu otevřít aplikaci.</string>
-    <string name="ecosystem_received_account_invalid">Přijatý účet není validní.</string>
-    <string name="ecosystem_invalid_account">Špatný formát účtu. Musí to být email.</string>
-    <string name="ecosystem_app_not_found">Aplikace není nainstalována. Přesměrovávám do obchodu...</string>
-    <string name="ecosystem_store_open_failed">Nemohu otevřít obchod. Prosím nainstalujte manuálně.</string>
+    <string name="ecosystem_null_account">Účet chybí. Není možné otevřít aplikaci.</string>
+    <string name="ecosystem_wrong_intent">Nelze dokončit akci: přijata neočekávaná data</string>
+    <string name="ecosystem_received_account_invalid">Obdržený účet není platný.</string>
+    <string name="ecosystem_invalid_account">Nesprávný formát účtu. Je třeba, aby se jednalo o e-mail.</string>
+    <string name="ecosystem_app_not_found">Aplikace není nainstalována. Přesměrovává se do katalogu aplikací…</string>
+    <string name="ecosystem_store_open_failed">Nebylo možné otevřít katalog aplikací. Nainstalujte ručně.</string>
 </resources>
