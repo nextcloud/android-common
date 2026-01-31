@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~  Nextcloud Android Common Library
+  ~ 
+  ~ SPDX-FileCopyrightText: 2025 Nextcloud GmbH and Nextcloud contributors
+  ~ SPDX-License-Identifier: MIT
+-->
+<resources>
+    <!-- relative time less than 1 minute using the term: Now -->
+    <string name="date_formatting_now">Agora</string>
+    <!-- relative time in minutes, less than 1 hour, i.e. 1m, 5m, 59m -->
+    <string name="date_formatting_relative_minutes">%d min</string>
+    <!-- relative time in hours, less than 1 day, i.e. 1h, 5h, 23h -->
+    <plurals name="date_formatting_relative_hours">
+        <item quantity="one">%d h</item>
+        <item quantity="other">%d h</item>
+    </plurals>
+
+    <string name="ecosystem_null_account">Non se atopa a conta. Non é posíbel abrir a aplicación.</string>
+    <string name="ecosystem_wrong_intent">Non é posíbel completar a acción: recibíronse datos non agardados</string>
+    <string name="ecosystem_received_account_invalid">A conta recibida non é válida.</string>
+    <string name="ecosystem_invalid_account">O formato de conta non é válido. Debe ser un correo-e.</string>
+    <string name="ecosystem_app_not_found">A aplicación non está instalada. Redirixindo á tenda...</string>
+    <string name="ecosystem_store_open_failed">Non é posíbel abrir a tenda de aplicacións. Instálea manualmente.</string>
+</resources>
