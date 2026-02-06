@@ -8,7 +8,7 @@
 buildscript {
     ext {
         daggerVersion = "2.59.1"
-        kotlinVersion = "2.3.0"
+        kotlinVersion = "2.3.10"
         jUnitVersion = "4.13.2"
         androidXTestVersion = "1.3.0"
         androidXEspressoTestVersion = "3.7.0"
@@ -20,7 +20,7 @@ buildscript {
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
-    id 'org.jetbrains.kotlin.plugin.compose' version '2.3.0' apply false
+    id 'org.jetbrains.kotlin.plugin.compose' version '2.3.10' apply false
     id 'com.android.library' version '9.0.0' apply false
     id 'org.jetbrains.kotlin.android' version "$kotlinVersion" apply false
     id 'com.android.legacy-kapt' version '9.0.0' apply false
