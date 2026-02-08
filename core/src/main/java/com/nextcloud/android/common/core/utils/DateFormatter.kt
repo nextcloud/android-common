@@ -25,9 +25,6 @@ class DateFormatter(
     private val sdfMonths: SimpleDateFormat
     private val sdfYears: SimpleDateFormat
 
-    /**
-     * constructor.
-     */
     init {
         val locale =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -59,13 +56,18 @@ class DateFormatter(
         val span = System.currentTimeMillis() - calendar.getTimeInMillis()
         return when {
             // less than 1m
-            span < ONE_MINUTE_IN_MILLIS -> context.getString(R.string.date_formatting_now)
+            span < ONE_MINUTE_IN_MILLIS -> {
+                context.getString(R.string.date_formatting_now)
+            }
+
             // less than 1h
-            span < ONE_HOUR_IN_MILLIS ->
+            span < ONE_HOUR_IN_MILLIS -> {
                 context.getString(
                     R.string.date_formatting_relative_minutes,
                     span / ONE_MINUTE_IN_MILLIS
                 )
+            }
+
             // less than 1d
             span < ONE_DAY_IN_MILLIS -> {
                 val hours: Int = span.toInt() / ONE_HOUR_IN_MILLIS
@@ -73,12 +75,21 @@ class DateFormatter(
                     .resources
                     .getQuantityString(R.plurals.date_formatting_relative_hours, hours, hours)
             }
+
             // less than 1w
-            span <= SIX_DAYS_IN_MILLIS -> sdfDays.format(calendar.getTime())
+            span <= SIX_DAYS_IN_MILLIS -> {
+                sdfDays.format(calendar.getTime())
+            }
+
             // less than 1y -> up to 364 days
-            span <= YEAR_IN_MILLIS -> sdfMonths.format(calendar.getTime())
+            span <= YEAR_IN_MILLIS -> {
+                sdfMonths.format(calendar.getTime())
+            }
+
             // more than 1y -> more than 364 days
-            else -> sdfYears.format(calendar.getTime())
+            else -> {
+                sdfYears.format(calendar.getTime())
+            }
         }
     }
 
