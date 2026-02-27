@@ -135,7 +135,7 @@ class MaterialViewThemeUtils
                 cardView.setStrokeColor(
                     buildColorStateList(
                         android.R.attr.state_checked to dynamicColor.primary().getArgb(scheme),
-                        -android.R.attr.state_checked to dynamicColor.outline().getArgb(scheme)
+                        -android.R.attr.state_checked to dynamicColor.outlineVariant().getArgb(scheme)
                     )
                 )
             }
