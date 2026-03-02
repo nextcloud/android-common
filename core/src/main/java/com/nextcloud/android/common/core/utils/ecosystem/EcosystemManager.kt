@@ -40,11 +40,10 @@ class EcosystemManager(
         private const val EXTRA_KEY_ACCOUNT = "KEY_ACCOUNT"
 
         const val ACCOUNT_NAME_PATTERN_REGEX =
-            "^[A-Za-z0-9._%+-]+(?:" +
-                "@(?:[A-Za-z0-9-]+\\.)+[A-Za-z]{2,}(?:@(?:[A-Za-z0-9-]+\\.)+[A-Za-z]{2,})?" +
-                "|" +
-                "@(?:\\d{1,3}\\.){2,3}\\d{1,3}(?::\\d{1,5})?" +
-                ")$"
+            "^[A-Za-z0-9._%+-]+(?:@(?:[A-Za-z0-9-]+\\.)+[A-Za-z]{2,})?" +
+                "@(?:(?:[A-Za-z0-9-]+\\.)+[A-Za-z]{2,}|(?:\\d{1,3}\\.){3}\\d{1,3})" +
+                "(?::\\d{1,5})?" +
+                "(?:/[^\\s?#]*)?$"
     }
 
     private val accountNamePattern = Pattern.compile(ACCOUNT_NAME_PATTERN_REGEX)
