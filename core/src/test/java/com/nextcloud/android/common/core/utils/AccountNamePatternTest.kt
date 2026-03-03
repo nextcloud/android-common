@@ -52,4 +52,12 @@ class AccountNamePatternTest {
         assertFalse(pattern.matcher("").matches())
         assertFalse(pattern.matcher(" ").matches())
     }
+
+    @Test
+    fun `special account name formats`() {
+        assertTrue(pattern.matcher("abc@cloud.com@example.inst2.cloud.com").matches())
+        assertTrue(pattern.matcher("admin@10.0.2.2:55002").matches())
+        assertTrue(pattern.matcher("admin@10.0.2.2").matches())
+        assertTrue(pattern.matcher("test@example.tld@cloud.example.tld:443/subfolder/deep").matches())
+    }
 }
