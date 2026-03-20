@@ -14,7 +14,7 @@ buildscript {
         androidXEspressoTestVersion = "3.7.0"
         mockkVersion = "1.14.9"
         mockitoVersion = "5.23.0"
-        mockitoKotlinVersion = "6.2.3"
+        mockitoKotlinVersion = "6.3.0"
     }
 }
 
