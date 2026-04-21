@@ -29,7 +29,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.DropdownMenu
@@ -69,10 +68,10 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.nextcloud.android.common.ui.R
-import com.nextcloud.android.common.ui.share.model.UnifiedShareCategory
-import com.nextcloud.android.common.ui.share.model.UnifiedSharePermission
-import com.nextcloud.android.common.ui.share.model.UnifiedShares
-import com.nextcloud.android.common.ui.share.repository.MockUnifiedShareRepository
+import com.nextcloud.android.common.ui.share.model.ui.UnifiedShareCategory
+import com.nextcloud.android.common.ui.share.model.ui.UnifiedSharePermission
+import com.nextcloud.android.common.ui.share.model.ui.UnifiedShares
+import com.nextcloud.android.common.ui.share.repository.MockShareRepository
 
 
 // TODO: MOVE TO THE ANDROID: COMMON
@@ -80,7 +79,7 @@ import com.nextcloud.android.common.ui.share.repository.MockUnifiedShareReposito
 // TODO: EXPOSE ACTIONS, IMPLEMENT VIEWMODEL, REPOSITORY TO FETCH ACTUAL SHARE, INJECT NECESSARY PARAMETERS
 
 @Composable
-fun UnifiedShareView(viewModel: UnifiedShareViewModel) {
+fun UnifiedShareView(viewModel: ShareViewModel) {
     var showAddShare by remember { mutableStateOf(false) }
     val shares by viewModel.shares.collectAsState()
 
@@ -598,7 +597,7 @@ fun UnifiedSharesListItem(share: UnifiedShares, type: UnifiedSharesListItemType)
 
 fun ComposeView.setupUnifiedShare(colorScheme: ColorScheme) {
     // TODO: REPLACE
-    val viewModel = UnifiedShareViewModel(repository = MockUnifiedShareRepository())
+    val viewModel = ShareViewModel(repository = MockShareRepository())
 
     setContent {
         MaterialTheme(
