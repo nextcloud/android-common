@@ -20,7 +20,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.nextcloud.android.common.ui.share.AnyoneShareContent
 import com.nextcloud.android.common.ui.share.CollapsibleSettingsSection
@@ -32,15 +31,15 @@ import com.nextcloud.android.common.ui.share.ShareActionButtons
 import com.nextcloud.android.common.ui.share.ShareBottomSheetHeader
 import com.nextcloud.android.common.ui.share.ShareCategoryButtonGroup
 import com.nextcloud.android.common.ui.share.UnifiedShareView
-import com.nextcloud.android.common.ui.share.UnifiedShareViewModel
+import com.nextcloud.android.common.ui.share.ShareViewModel
 import com.nextcloud.android.common.ui.share.UnifiedSharesListItem
 import com.nextcloud.android.common.ui.share.UnifiedSharesListItemType
-import com.nextcloud.android.common.ui.share.model.UnifiedShareCategory
-import com.nextcloud.android.common.ui.share.model.UnifiedShareDownloadLimit
-import com.nextcloud.android.common.ui.share.model.UnifiedSharePermission
-import com.nextcloud.android.common.ui.share.model.UnifiedShareType
-import com.nextcloud.android.common.ui.share.model.UnifiedShares
-import com.nextcloud.android.common.ui.share.repository.MockUnifiedShareRepository
+import com.nextcloud.android.common.ui.share.model.ui.UnifiedShareCategory
+import com.nextcloud.android.common.ui.share.model.ui.UnifiedShareDownloadLimit
+import com.nextcloud.android.common.ui.share.model.ui.UnifiedSharePermission
+import com.nextcloud.android.common.ui.share.model.ui.UnifiedShareType
+import com.nextcloud.android.common.ui.share.model.ui.UnifiedShares
+import com.nextcloud.android.common.ui.share.repository.MockShareRepository
 
 @Composable
 private fun PreviewTheme(
@@ -56,7 +55,7 @@ private fun PreviewTheme(
 @Composable
 fun Preview_UnifiedShareView_Light() {
     PreviewTheme {
-        UnifiedShareView(viewModel = UnifiedShareViewModel(MockUnifiedShareRepository()))
+        UnifiedShareView(viewModel = ShareViewModel(MockShareRepository()))
     }
 }
 
@@ -64,7 +63,7 @@ fun Preview_UnifiedShareView_Light() {
 @Composable
 fun Preview_UnifiedShareView_Dark() {
     PreviewTheme(darkTheme = true) {
-        UnifiedShareView(viewModel = UnifiedShareViewModel(MockUnifiedShareRepository()))
+        UnifiedShareView(viewModel = ShareViewModel(MockShareRepository()))
     }
 }
 
@@ -597,7 +596,7 @@ fun Preview_ItemShapes_AllTypes() {
 @Composable
 fun Preview_UnifiedShareView_Tablet() {
     PreviewTheme {
-        UnifiedShareView(viewModel = UnifiedShareViewModel(MockUnifiedShareRepository()))
+        UnifiedShareView(viewModel = ShareViewModel(MockShareRepository()))
     }
 }
 

@@ -5,9 +5,8 @@
  * SPDX-License-Identifier: MIT
  */
 
-package com.nextcloud.android.common.ui.share.model
+package com.nextcloud.android.common.ui.share.model.ui
 
-data class UnifiedShareDownloadLimit(
-    val limit: Int,
-    val downloadCount: Int
-)
+enum class UnifiedShareCategory {
+    Invited, Anyone
+}

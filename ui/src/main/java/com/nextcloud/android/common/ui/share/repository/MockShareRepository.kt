@@ -7,13 +7,13 @@
 
 package com.nextcloud.android.common.ui.share.repository
 
-import com.nextcloud.android.common.ui.share.model.UnifiedShareCategory
-import com.nextcloud.android.common.ui.share.model.UnifiedShareDownloadLimit
-import com.nextcloud.android.common.ui.share.model.UnifiedSharePermission
-import com.nextcloud.android.common.ui.share.model.UnifiedShareType
-import com.nextcloud.android.common.ui.share.model.UnifiedShares
+import com.nextcloud.android.common.ui.share.model.ui.UnifiedShareCategory
+import com.nextcloud.android.common.ui.share.model.ui.UnifiedShareDownloadLimit
+import com.nextcloud.android.common.ui.share.model.ui.UnifiedSharePermission
+import com.nextcloud.android.common.ui.share.model.ui.UnifiedShareType
+import com.nextcloud.android.common.ui.share.model.ui.UnifiedShares
 
-class MockUnifiedShareRepository: UnifiedShareRepository {
+class MockShareRepository: ShareRepository {
     override suspend fun fetchShares(): List<UnifiedShares> {
         return listOf(
             UnifiedShares(

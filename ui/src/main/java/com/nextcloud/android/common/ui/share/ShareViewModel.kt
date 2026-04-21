@@ -9,15 +9,15 @@ package com.nextcloud.android.common.ui.share
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nextcloud.android.common.ui.share.model.UnifiedShares
-import com.nextcloud.android.common.ui.share.repository.UnifiedShareRepository
+import com.nextcloud.android.common.ui.share.model.ui.UnifiedShares
+import com.nextcloud.android.common.ui.share.repository.ShareRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class UnifiedShareViewModel(private val repository: UnifiedShareRepository): ViewModel() {
+class ShareViewModel(private val repository: ShareRepository): ViewModel() {
     private val _shares = MutableStateFlow<List<UnifiedShares>>(emptyList())
     val shares: StateFlow<List<UnifiedShares>> = _shares
 
