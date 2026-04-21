@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Nextcloud Android Common Library
+  ~
+  ~ SPDX-FileCopyrightText: 2026 Nextcloud GmbH and Nextcloud contributors
+  ~ SPDX-License-Identifier: MIT
+  -->
+
+<resources>
+    <string name="share_view_bottom_sheet_new_title">Create a new share</string>
+    <string name="share_view_bottom_sheet_edit_title">Share %s</string>
+
+    <string name="share_permission_file_drop">File drop</string>
+    <string name="share_permission_can_view">Can view</string>
+    <string name="share_permission_can_edit">Can edit</string>
+    <string name="share_permission_custom">Custom permissions</string>
+
+    <string name="share_view_view_files_switch">View files</string>
+    <string name="share_view_edit_files_switch">Edit files</string>
+    <string name="share_view_create_files_switch">Create files</string>
+    <string name="share_view_delete_files_switch">Delete files</string>
+
+    <string name="share_view_advanced_settings">Settings</string>
+    <string name="share_view_invited_category_label">Add people</string>
+    <string name="share_view_invited_category_placeholder">Name, team, email or federated ID</string>
+    <string name="share_view_invited_category_participants">Participants</string>
+
+    <string name="share_view_note_text_field_placeholder">Note to recipients</string>
+
+    <string name="share_view_permission_dropdown_label">Anyone with the link</string>
+
+    <string name="share_view_invited_category_share_with_others_switch">Share with others</string>
+    <string name="share_view_invited_category_edit_file_switch">Edit file</string>
+    <string name="share_view_invited_category_expiration_date_switch">Expiration date</string>
+    <string name="share_view_invited_category_hide_and_download_switch">Hide download and sync options</string>
+
+
+    <string name="share_view_anyone_category_label">Label</string>
+    <string name="share_view_anyone_category_label_placeholder">Optional name for this link</string>
+    <string name="share_view_anyone_category_expiration_date_switch">Expiration date</string>
+    <string name="share_view_anyone_category_password_switch">Password protection</string>
+    <string name="share_view_anyone_category_limit_downloads_switch">Limit downloads</string>
+    <string name="share_view_anyone_category_hide_downloads_switch">Hide downloads</string>
+    <string name="share_view_anyone_category_video_verification_switch">Video verification</string>
+
+    <string name="share_view_anyone_category_grid_view_switch">Show files in grid view</string>
+    <string name="share_view_copy_to_clipboard_label">Copied</string>
+    <string name="share_view_copy_action">Copy link</string>
+    <string name="share_view_send_action">Send</string>
+    <string name="share_view_create_public_link">Create public link</string>
+
+    <string name="share_view_list_item_edit">Edit</string>
+    <string name="share_view_list_item_send_email">Send email</string>
+    <string name="share_view_list_item_delete">Delete</string>
+
+    <string name="share_view_fetch_error_message">Failed to fetch shares</string>
+
+    <string name="share_view_delete_error_id_not_found_message">Share not found, cannot delete</string>
+    <string name="share_view_delete_error_message">Failed to delete share</string>
+
+</resources>

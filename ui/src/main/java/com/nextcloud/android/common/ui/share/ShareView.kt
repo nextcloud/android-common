@@ -7,6 +7,8 @@
 
 package com.nextcloud.android.common.ui.share
 
+import android.content.ClipData
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,6 +23,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -46,17 +50,23 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -64,14 +74,22 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.toClipEntry
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nextcloud.android.common.ui.R
+import com.nextcloud.android.common.ui.share.model.ui.ShareBottomSheetState
 import com.nextcloud.android.common.ui.share.model.ui.UnifiedShare
 import com.nextcloud.android.common.ui.share.model.ui.UnifiedShareCategory
 import com.nextcloud.android.common.ui.share.model.ui.UnifiedSharePermission
+import com.nextcloud.android.common.ui.share.model.ui.customPermissionFields
 import com.nextcloud.android.common.ui.share.repository.MockShareRepository
+import kotlinx.coroutines.launch
 
 
 // TODO: MOVE TO THE ANDROID: COMMON
@@ -79,77 +97,105 @@ import com.nextcloud.android.common.ui.share.repository.MockShareRepository
 // TODO: EXPOSE ACTIONS, IMPLEMENT VIEWMODEL, REPOSITORY TO FETCH ACTUAL SHARE, INJECT NECESSARY PARAMETERS
 
 @Composable
-fun UnifiedShareView(viewModel: ShareViewModel) {
-    var showAddShare by remember { mutableStateOf(false) }
+private fun ShareView(viewModel: ShareViewModel) {
+    val errorMessageId by viewModel.errorMessageId.collectAsState()
+    var bottomSheetState by remember { mutableStateOf<ShareBottomSheetState>(ShareBottomSheetState.Idle) }
     val shares by viewModel.shares.collectAsState()
+    val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(2.dp)
-    ) {
-        shares.forEachIndexed { index, share ->
-            val type = when (index) {
-                0 -> {
-                    UnifiedSharesListItemType.Top
-                }
-
-                shares.lastIndex -> {
-                    UnifiedSharesListItemType.Bottom
-                }
-
-                else -> {
-                    UnifiedSharesListItemType.Mid
-                }
-            }
-
-            UnifiedSharesListItem(share, type)
+    LaunchedEffect(errorMessageId) {
+        errorMessageId?.let {
+            snackbarHostState.showSnackbar(context.getString(it))
+            viewModel.updateErrorMessage(null)
         }
+    }
 
+    Scaffold(floatingActionButton = {
         FloatingActionButton(
-            onClick = { showAddShare = true },
-            modifier = Modifier
-                .align(Alignment.End)
-                .padding(top = 16.dp)
+            onClick = { bottomSheetState = ShareBottomSheetState.New(UnifiedShare.new()) },
         ) {
             Icon(painterResource(R.drawable.ic_person_add), contentDescription = "Add")
         }
+    }, snackbarHost = {
+        SnackbarHost(snackbarHostState)
+    }) {
+        LazyColumn(modifier = Modifier.padding(it)) {
+            itemsIndexed(shares) { index, share ->
+                val type = when (index) {
+                    0 -> {
+                        UnifiedSharesListItemType.Top
+                    }
 
-        if (showAddShare) {
-            AddShareBottomSheet("Abc.txt",onDismiss = { showAddShare = false })
+                    shares.lastIndex -> {
+                        UnifiedSharesListItemType.Bottom
+                    }
+
+                    else -> {
+                        UnifiedSharesListItemType.Mid
+                    }
+                }
+
+                UnifiedSharesListItem(share, type, onSelectShare = { share ->
+                    bottomSheetState = ShareBottomSheetState.Edit(share)
+                }, onDeleteShare = {
+                    viewModel.delete(share)
+                }, onSendEmail = {
+                    // TODO:
+                })
+            }
         }
+    }
+
+    when (bottomSheetState) {
+        is ShareBottomSheetState.Edit -> {
+            val state = (bottomSheetState as ShareBottomSheetState.Edit)
+            AddOrEditShareBottomSheet(
+                title = stringResource(R.string.share_view_bottom_sheet_edit_title, state.share.label),
+                share = state.share,
+                onDismiss = { bottomSheetState = ShareBottomSheetState.Idle }
+            )
+        }
+
+        is ShareBottomSheetState.New -> {
+            val state = (bottomSheetState as ShareBottomSheetState.New)
+            AddOrEditShareBottomSheet(
+                title = stringResource(R.string.share_view_bottom_sheet_new_title),
+                share = state.newShare,
+                onDismiss = { bottomSheetState = ShareBottomSheetState.Idle }
+            )
+        }
+
+        ShareBottomSheetState.Idle -> Unit
     }
 }
 
 // TODO: Use like inner tags whenever user add a new people to the search and it should look like User 1, Group 1 etc.
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddShareBottomSheet(filename: String, onDismiss: () -> Unit) {
+private fun AddOrEditShareBottomSheet(title: String, share: UnifiedShare, onDismiss: () -> Unit) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scrollState = rememberScrollState()
 
-    var category by remember { mutableStateOf(UnifiedShareCategory.Invited) }
-    var permission by remember { mutableStateOf<UnifiedSharePermission>(UnifiedSharePermission.CanView) }
+    var category by remember { mutableStateOf(share.category) }
+    var permission by remember { mutableStateOf(share.permission ?: UnifiedSharePermission.CanView) }
     var searchQuery by remember { mutableStateOf("") }
-    var note by remember { mutableStateOf("") }
+    var note by remember { mutableStateOf(share.note) }
 
     // Toggle states for collapse/expand
     var showInvitedSettings by remember { mutableStateOf(false) }
     var showAnyoneSettings by remember { mutableStateOf(false) }
 
-    var viewFiles by remember { mutableStateOf(false) }
-    var editFiles by remember { mutableStateOf(false) }
-    var createFiles by remember { mutableStateOf(false) }
-    var deleteFiles by remember { mutableStateOf(false) }
+    val clipboard = LocalClipboard.current
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     val availablePermissions = remember {
         listOf(
             UnifiedSharePermission.CanView,
             UnifiedSharePermission.CanEdit,
             UnifiedSharePermission.FileDrop,
-            UnifiedSharePermission.Custom(false, false, false, false)
+            UnifiedSharePermission.Custom.getFromPermission(share.permission)
         )
     }
 
@@ -166,7 +212,12 @@ fun AddShareBottomSheet(filename: String, onDismiss: () -> Unit) {
                 .verticalScroll(scrollState),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            ShareBottomSheetHeader(filename)
+            Text(
+                text = title,
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
 
             ShareCategoryButtonGroup(
                 selectedCategory = category,
@@ -186,7 +237,7 @@ fun AddShareBottomSheet(filename: String, onDismiss: () -> Unit) {
                     isExpanded = showInvitedSettings,
                     onToggle = { showInvitedSettings = !showInvitedSettings }
                 ) {
-                    InvitedInlineSettings()
+                    InvitedInlineSettings(share)
                 }
             } else {
                 AnyoneShareContent(
@@ -196,27 +247,39 @@ fun AddShareBottomSheet(filename: String, onDismiss: () -> Unit) {
                 )
 
                 if (permission is UnifiedSharePermission.Custom) {
-                    SettingsSwitchRow("View files", viewFiles) { viewFiles = it }
-                    SettingsSwitchRow("Edit files", editFiles) { editFiles = it }
-                    SettingsSwitchRow("Create files", createFiles) { createFiles = it }
-                    SettingsSwitchRow("Delete files", deleteFiles) { deleteFiles = it }
+                    val customPermissions = permission as UnifiedSharePermission.Custom
+
+                    customPermissionFields.forEach { field ->
+                        SettingsSwitchRow(
+                            label = stringResource(field.labelRes),
+                            checked = field.getValue(customPermissions),
+                            onCheckedChange = { permission = field.setValue(customPermissions, it) }
+                        )
+                    }
                 }
 
                 CollapsibleSettingsSection(
                     isExpanded = showAnyoneSettings,
                     onToggle = { showAnyoneSettings = !showAnyoneSettings }
                 ) {
-                    AnyoneInlineSettings()
+                    AnyoneInlineSettings(share)
                 }
             }
 
             NoteToRecipients(note = note, onNoteChange = { note = it })
 
-
             ShareActionButtons(
-                category = category,
+                share = share,
                 isSendEnabled = searchQuery.isNotBlank(),
-                onCopyClick = { /* TODO */ },
+                onCopyClick = {
+                    val label = context.getString(R.string.share_view_copy_to_clipboard_label)
+
+                    scope.launch {
+                        val clipData =
+                            ClipData.newPlainText(label, it)
+                        clipboard.setClipEntry(clipData.toClipEntry())
+                    }
+                },
                 onSendClick = { /* TODO */ }
             )
         }
@@ -224,7 +287,7 @@ fun AddShareBottomSheet(filename: String, onDismiss: () -> Unit) {
 }
 
 @Composable
-fun CollapsibleSettingsSection(
+private fun CollapsibleSettingsSection(
     isExpanded: Boolean,
     onToggle: () -> Unit,
     content: @Composable () -> Unit
@@ -239,7 +302,7 @@ fun CollapsibleSettingsSection(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "Settings",
+                text = stringResource(R.string.share_view_advanced_settings),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -258,19 +321,9 @@ fun CollapsibleSettingsSection(
     }
 }
 
-@Composable
-fun ShareBottomSheetHeader(filename: String) {
-    Text(
-        text = "Share $filename",
-        style = MaterialTheme.typography.headlineSmall,
-        color = MaterialTheme.colorScheme.onSurface,
-        modifier = Modifier.padding(bottom = 8.dp)
-    )
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ShareCategoryButtonGroup(
+private fun ShareCategoryButtonGroup(
     selectedCategory: UnifiedShareCategory,
     onCategoryChange: (UnifiedShareCategory) -> Unit
 ) {
@@ -293,7 +346,7 @@ fun ShareCategoryButtonGroup(
 }
 
 @Composable
-fun InvitedShareContent(
+private fun InvitedShareContent(
     searchQuery: String,
     onSearchChange: (String) -> Unit,
     permission: UnifiedSharePermission,
@@ -306,14 +359,14 @@ fun InvitedShareContent(
             value = searchQuery,
             onValueChange = onSearchChange,
             modifier = Modifier.fillMaxWidth(),
-            label = { Text("Add people") },
-            placeholder = { Text("Name, team, email or federated ID") },
+            label = { Text(stringResource(R.string.share_view_invited_category_label)) },
+            placeholder = { Text(stringResource(R.string.share_view_invited_category_placeholder)) },
             singleLine = true,
             shape = RoundedCornerShape(8.dp)
         )
 
         PermissionDropdown(
-            label = "Participants",
+            label = stringResource(R.string.share_view_invited_category_participants),
             selectedPermission = permission,
             availablePermissions = availablePermissions,
             onPermissionChange = onPermissionChange
@@ -322,7 +375,7 @@ fun InvitedShareContent(
 }
 
 @Composable
-fun NoteToRecipients(
+private fun NoteToRecipients(
     note: String,
     onNoteChange: (String) -> Unit
 ) {
@@ -330,20 +383,20 @@ fun NoteToRecipients(
         value = note,
         onValueChange = onNoteChange,
         modifier = Modifier.fillMaxWidth(),
-        placeholder = { Text("Note to recipients") },
+        placeholder = { Text(stringResource(R.string.share_view_note_text_field_placeholder)) },
         shape = RoundedCornerShape(8.dp)
     )
 }
 
 @Composable
-fun AnyoneShareContent(
+private fun AnyoneShareContent(
     permission: UnifiedSharePermission,
     availablePermissions: List<UnifiedSharePermission>,
     onPermissionChange: (UnifiedSharePermission) -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         PermissionDropdown(
-            label = "Anyone with the link",
+            label = stringResource(R.string.share_view_permission_dropdown_label),
             selectedPermission = permission,
             availablePermissions = availablePermissions,
             onPermissionChange = onPermissionChange
@@ -353,7 +406,7 @@ fun AnyoneShareContent(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PermissionDropdown(
+private fun PermissionDropdown(
     label: String,
     selectedPermission: UnifiedSharePermission,
     availablePermissions: List<UnifiedSharePermission>,
@@ -367,7 +420,7 @@ fun PermissionDropdown(
         modifier = Modifier.fillMaxWidth()
     ) {
         OutlinedTextField(
-            value = selectedPermission.getText(),
+            value = stringResource(selectedPermission.getTextId()),
             onValueChange = {},
             readOnly = true,
             label = { Text(label) },
@@ -383,7 +436,7 @@ fun PermissionDropdown(
         ) {
             availablePermissions.forEach { option ->
                 DropdownMenuItem(
-                    text = { Text(option.getText()) },
+                    text = { Text(stringResource(option.getTextId())) },
                     onClick = {
                         onPermissionChange(option)
                         expanded = false
@@ -395,55 +448,72 @@ fun PermissionDropdown(
 }
 
 @Composable
-private fun InvitedInlineSettings() {
-    var shareWithOthers by remember { mutableStateOf(false) }
-    var editFile by remember { mutableStateOf(false) }
-    var hasExpiration by remember { mutableStateOf(false) }
-    var hideDownload by remember { mutableStateOf(false) }
+private fun InvitedInlineSettings(share: UnifiedShare) {
+    var shareWithOthers by remember { mutableStateOf(share.recipients.isNotEmpty()) }
+    var editFile by remember { mutableStateOf((share.permission as? UnifiedSharePermission.CanEdit) != null) }
+    var hasExpiration by remember { mutableStateOf(false) } // TODO
+    var hideDownload by remember { mutableStateOf(false) } // TODO
 
-    Column {
-        SettingsSwitchRow("Share with others", shareWithOthers) { shareWithOthers = it }
-        SettingsSwitchRow("Edit file", editFile) { editFile = it }
-        SettingsSwitchRow("Expiration date", hasExpiration) { hasExpiration = it }
-        SettingsSwitchRow("Hide download and sync options", hideDownload) { hideDownload = it }
-    }
+    SettingsSwitchRow(stringResource(R.string.share_view_invited_category_share_with_others_switch), shareWithOthers) { shareWithOthers = it }
+    SettingsSwitchRow(stringResource(R.string.share_view_invited_category_edit_file_switch), editFile) { editFile = it }
+    SettingsSwitchRow(stringResource(R.string.share_view_invited_category_expiration_date_switch), hasExpiration) { hasExpiration = it }
+    SettingsSwitchRow(stringResource(R.string.share_view_invited_category_hide_and_download_switch), hideDownload) { hideDownload = it }
 }
 
 @Composable
-private fun AnyoneInlineSettings() {
-    var hasPassword by remember { mutableStateOf(false) }
+private fun AnyoneInlineSettings(share: UnifiedShare) {
+    var hasPassword by remember { mutableStateOf(share.password.isNotEmpty()) }
     var hasExpiration by remember { mutableStateOf(false) }
-    var limitDownloads by remember { mutableStateOf(false) }
+    var limitDownloads by remember { mutableStateOf(share.limit != null) }
 
     var hideDownloads by remember { mutableStateOf(false) }
     var videoVerification by remember { mutableStateOf(false) }
     var showFilesInGridView by remember { mutableStateOf(false) }
 
-    Column {
-        OutlinedTextField(
-            value = "",
-            onValueChange = {},
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp),
-            label = { Text("Label") },
-            placeholder = { Text("Optional name for this link") },
-            singleLine = true
-        )
+    OutlinedTextField(
+        value = "",
+        onValueChange = {},
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 8.dp),
+        label = { Text(stringResource(R.string.share_view_anyone_category_label)) },
+        placeholder = { Text(stringResource(R.string.share_view_anyone_category_label_placeholder)) },
+        singleLine = true
+    )
 
-        SettingsSwitchRow("Expiration date", hasExpiration) { hasExpiration = it }
-        SettingsSwitchRow("Password", hasPassword) { hasPassword = it }
-        SettingsSwitchRow("Limit downloads", limitDownloads) { limitDownloads = it }
+    SettingsSwitchRow(
+        stringResource(R.string.share_view_anyone_category_expiration_date_switch),
+        hasExpiration
+    ) { hasExpiration = it }
 
-        SettingsSwitchRow("Hide downloads", hideDownloads) { hideDownloads = it }
-        SettingsSwitchRow("Video verification", videoVerification) { videoVerification = it }
-        SettingsSwitchRow("Show files in grid view", showFilesInGridView) { showFilesInGridView = it }
+    SettingsSwitchRow(
+        stringResource(R.string.share_view_anyone_category_password_switch),
+        hasPassword
+    ) { hasPassword = it }
 
-    }
+    SettingsSwitchRow(
+        stringResource(R.string.share_view_anyone_category_limit_downloads_switch),
+        limitDownloads
+    ) { limitDownloads = it }
+
+    SettingsSwitchRow(
+        stringResource(R.string.share_view_anyone_category_hide_downloads_switch),
+        hideDownloads
+    ) { hideDownloads = it }
+
+    SettingsSwitchRow(
+        stringResource(R.string.share_view_anyone_category_video_verification_switch),
+        videoVerification
+    ) { videoVerification = it }
+
+    SettingsSwitchRow(
+        stringResource(R.string.share_view_anyone_category_grid_view_switch),
+        showFilesInGridView
+    ) { showFilesInGridView = it }
 }
 
 @Composable
-fun SettingsSwitchRow(label: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+private fun SettingsSwitchRow(label: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -457,37 +527,38 @@ fun SettingsSwitchRow(label: String, checked: Boolean, onCheckedChange: (Boolean
 }
 
 @Composable
-fun ShareActionButtons(
-    category: UnifiedShareCategory,
+private fun ShareActionButtons(
+    share: UnifiedShare,
     isSendEnabled: Boolean,
-    onCopyClick: () -> Unit,
+    onCopyClick: (String) -> Unit,
     onSendClick: () -> Unit
 ) {
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .padding(top = 16.dp)) {
-        if (category == UnifiedShareCategory.Invited) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 16.dp)
+    ) {
+        if (share.category == UnifiedShareCategory.Invited) {
             FilledTonalButton(
-                onClick = onCopyClick,
+                onClick = { onCopyClick("TODO") },
                 modifier = Modifier.weight(1f)
             ) {
-                Text("Copy link")
+                Text(stringResource(R.string.share_view_copy_action))
             }
             Spacer(modifier = Modifier.width(16.dp))
             Button(
                 onClick = onSendClick,
                 modifier = Modifier.weight(1f),
-                enabled = isSendEnabled // Disabled if search query is empty
+                enabled = isSendEnabled
             ) {
-                Text("Send")
+                Text(stringResource(R.string.share_view_send_action))
             }
         } else {
-            // For "Anyone" (Public link), usually just one big action to create/copy
             Button(
-                onClick = onCopyClick,
+                onClick = { onCopyClick("TODO") },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Create public link")
+                Text(stringResource(R.string.share_view_create_public_link))
             }
         }
     }
@@ -508,9 +579,14 @@ enum class UnifiedSharesListItemType {
 
 // NOTE: To just create a public link anyone tab + just send DOES SAME THING
 @Composable
-fun UnifiedSharesListItem(share: UnifiedShare, type: UnifiedSharesListItemType) {
+private fun UnifiedSharesListItem(
+    share: UnifiedShare,
+    type: UnifiedSharesListItemType,
+    onSelectShare: (UnifiedShare) -> Unit,
+    onDeleteShare: (UnifiedShare) -> Unit,
+    onSendEmail: (UnifiedShare) -> Unit
+) {
     var showContextMenu by remember { mutableStateOf(false) }
-    var showDetailSheet by remember { mutableStateOf(false) }
     val haptics = LocalHapticFeedback.current
 
     ListItem(
@@ -518,7 +594,7 @@ fun UnifiedSharesListItem(share: UnifiedShare, type: UnifiedSharesListItemType) 
             .fillMaxWidth()
             .clip(type.getShape())
             .combinedClickable(
-                onClick = { showDetailSheet = true },
+                onClick = { onSelectShare(share) },
                 onLongClick = {
                     haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                     showContextMenu = true
@@ -526,14 +602,16 @@ fun UnifiedSharesListItem(share: UnifiedShare, type: UnifiedSharesListItemType) 
             )
             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
         leadingContent = {
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primaryContainer),
-                contentAlignment = Alignment.Center
-            ) {
-                share.type.Icon()
+            share.type?.let {
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primaryContainer),
+                    contentAlignment = Alignment.Center
+                ) {
+                    it.Icon()
+                }
             }
         },
         headlineContent = {
@@ -543,11 +621,13 @@ fun UnifiedSharesListItem(share: UnifiedShare, type: UnifiedSharesListItemType) 
             )
         },
         supportingContent = {
-            Text(
-                text = share.permission.getText(),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            share.permission?.getTextId()?.let {
+                Text(
+                    text = stringResource(it),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         },
         trailingContent = {
             Box {
@@ -560,23 +640,29 @@ fun UnifiedSharesListItem(share: UnifiedShare, type: UnifiedSharesListItemType) 
                     onDismissRequest = { showContextMenu = false }
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Edit") },
+                        text = { Text(stringResource(R.string.share_view_list_item_edit)) },
                         onClick = {
                             showContextMenu = false
-                            showDetailSheet = true
+                            onSelectShare(share)
                         }
                     )
 
                     DropdownMenuItem(
-                        text = { Text("Send email") },
-                        onClick = { showContextMenu = false }
+                        text = { Text(stringResource(R.string.share_view_list_item_send_email)) },
+                        onClick = {
+                            onSendEmail(share)
+                            showContextMenu = false
+                        }
                     )
 
                     HorizontalDivider()
 
                     DropdownMenuItem(
-                        text = { Text("Delete", color = MaterialTheme.colorScheme.error) },
-                        onClick = { showContextMenu = false }
+                        text = { Text(stringResource(R.string.share_view_list_item_delete), color = MaterialTheme.colorScheme.error) },
+                        onClick = {
+                            onDeleteShare(share)
+                            showContextMenu = false
+                        }
                     )
                 }
             }
@@ -585,13 +671,31 @@ fun UnifiedSharesListItem(share: UnifiedShare, type: UnifiedSharesListItemType) 
             containerColor = Color.Transparent
         )
     )
+}
 
-    // TODO: USE EXISTING SHARE DETAILS
-    if (showDetailSheet) {
-        AddShareBottomSheet(
-            filename = share.label,
-            onDismiss = { showDetailSheet = false }
-        )
+@Preview(name = "UnifiedShareView – light", showBackground = true)
+@Composable
+private fun PreviewLight() {
+    PreviewTheme {
+        ShareView(viewModel = ShareViewModel(MockShareRepository()))
+    }
+}
+
+@Preview(name = "UnifiedShareView – dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun PreviewDark() {
+    PreviewTheme(darkTheme = true) {
+        ShareView(viewModel = ShareViewModel(MockShareRepository()))
+    }
+}
+
+@Composable
+private fun PreviewTheme(
+    darkTheme: Boolean = false,
+    content: @Composable () -> Unit
+) {
+    MaterialTheme {
+        Surface(content = content)
     }
 }
 
@@ -603,7 +707,7 @@ fun ComposeView.setupUnifiedShare(colorScheme: ColorScheme) {
         MaterialTheme(
             colorScheme = colorScheme,
             content = {
-                UnifiedShareView(viewModel)
+                ShareView(viewModel)
             }
         )
     }
