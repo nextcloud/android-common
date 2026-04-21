@@ -43,8 +43,8 @@ fun ShareDataResponse.toUnifiedShare(): UnifiedShare {
         category = UnifiedShareCategory.Invited, // TODO map from properties
         permission = UnifiedSharePermission.CanView, // TODO map from properties
         label = primarySource?.displayName ?: "Unknown",
-        note = "",
-        password = "",
-        limit = null
+        note = "", // TODO map from properties
+        password = "", // TODO map from properties
+        limit = null // TODO map from properties
     )
 }

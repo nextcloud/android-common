@@ -9,6 +9,7 @@ package com.nextcloud.android.common.ui.share
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.network.ApiResult
 import com.nextcloud.android.common.ui.share.model.ui.UnifiedShare
 import com.nextcloud.android.common.ui.share.repository.ShareRepository
@@ -28,17 +29,18 @@ class ShareViewModel(
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading
 
-    private val _error = MutableStateFlow<String?>(null)
-    val error: StateFlow<String?> = _error
+    private val _errorMessageId = MutableStateFlow<Int?>(null)
+    val errorMessageId: StateFlow<Int?> = _errorMessageId
 
     init {
         loadShares()
     }
 
+    // region private methods
     private fun loadShares() {
         viewModelScope.launch(Dispatchers.IO) {
             _loading.value = true
-            _error.value = null
+            _errorMessageId.value = null
 
             when (val result = repository.fetchShares()) {
                 is ApiResult.Success -> {
@@ -46,11 +48,40 @@ class ShareViewModel(
                 }
 
                 is ApiResult.Error -> {
-                    _error.value = result.error.ocs.meta.message
+                    _errorMessageId.value = R.string.share_view_fetch_error_message
                 }
             }
 
             _loading.value = false
         }
     }
+    // endregion
+
+    // region public methods
+    fun delete(share: UnifiedShare) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val id = share.id
+            if (id == null) {
+                _errorMessageId.update {
+                    R.string.share_view_delete_error_id_not_found_message
+                }
+                return@launch
+            }
+
+            val result = repository.deleteShare(share.id)
+            if (result is ApiResult.Error) {
+                _errorMessageId.update {
+                    R.string.share_view_delete_error_message
+                }
+                return@launch
+            }
+        }
+    }
+
+    fun updateErrorMessage(value: Int?) {
+        _errorMessageId.update {
+            value
+        }
+    }
+    // endregion
 }
