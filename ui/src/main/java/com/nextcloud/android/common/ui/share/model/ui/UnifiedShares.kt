@@ -7,15 +7,23 @@
 
 package com.nextcloud.android.common.ui.share.model.ui
 
-data class UnifiedShares(
-    val id: Int,
-    val password: String,
-    val note: String,
-    val limit: UnifiedShareDownloadLimit,
-    val expirationDate: Int,
+import com.nextcloud.android.common.ui.share.model.api.owner.Owner
+import com.nextcloud.android.common.ui.share.model.api.user.ShareUser
+
+data class UnifiedShare(
+    val id: String,
+    val sources: List<ShareUser>,
+    val recipients: List<ShareUser>,
+    val properties: Map<String, Map<String, List<String>>>,
+
+    val lastUpdated: Long,
+    val owner: Owner,
+
     val permission: UnifiedSharePermission,
-    val label: String,
-    val sharedTo: String,
     val type: UnifiedShareType,
     val category: UnifiedShareCategory,
+    val label: String,
+    val note: String = "",
+    val password: String = "",
+    val limit: UnifiedShareDownloadLimit? = null
 )
