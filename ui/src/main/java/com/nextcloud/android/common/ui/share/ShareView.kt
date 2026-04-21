@@ -92,10 +92,6 @@ import com.nextcloud.android.common.ui.share.repository.MockShareRepository
 import kotlinx.coroutines.launch
 
 
-// TODO: MOVE TO THE ANDROID: COMMON
-// TODO: MAKE LAZY COLUMN
-// TODO: EXPOSE ACTIONS, IMPLEMENT VIEWMODEL, REPOSITORY TO FETCH ACTUAL SHARE, INJECT NECESSARY PARAMETERS
-
 @Composable
 private fun ShareView(viewModel: ShareViewModel) {
     val errorMessageId by viewModel.errorMessageId.collectAsState()
@@ -170,7 +166,8 @@ private fun ShareView(viewModel: ShareViewModel) {
     }
 }
 
-// TODO: Use like inner tags whenever user add a new people to the search and it should look like User 1, Group 1 etc.
+// TODO: Use like inner tags whenever user add a new people to the search and it
+//  should look like User 1, Group 1 etc.
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AddOrEditShareBottomSheet(title: String, share: UnifiedShare, onDismiss: () -> Unit) {
