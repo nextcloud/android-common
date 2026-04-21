@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.network.ApiResult
+import com.nextcloud.android.common.ui.share.model.api.create.CreateShareRequest
 import com.nextcloud.android.common.ui.share.model.ui.UnifiedShare
 import com.nextcloud.android.common.ui.share.repository.ShareRepository
 import kotlinx.coroutines.Dispatchers
@@ -58,6 +59,16 @@ class ShareViewModel(
     // endregion
 
     // region public methods
+    fun create(share: UnifiedShare) {
+        viewModelScope.launch(Dispatchers.IO) {
+            /*
+              val request = CreateShareRequest()
+            repository.createShare()
+             */
+
+        }
+    }
+
     fun delete(share: UnifiedShare) {
         viewModelScope.launch(Dispatchers.IO) {
             val id = share.id

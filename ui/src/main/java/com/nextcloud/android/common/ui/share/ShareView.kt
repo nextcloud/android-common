@@ -149,6 +149,9 @@ private fun ShareView(viewModel: ShareViewModel) {
             AddOrEditShareBottomSheet(
                 title = stringResource(R.string.share_view_bottom_sheet_edit_title, state.share.label),
                 share = state.share,
+                onCreateOrEdit = {
+
+                },
                 onDismiss = { bottomSheetState = ShareBottomSheetState.Idle }
             )
         }
@@ -158,6 +161,9 @@ private fun ShareView(viewModel: ShareViewModel) {
             AddOrEditShareBottomSheet(
                 title = stringResource(R.string.share_view_bottom_sheet_new_title),
                 share = state.newShare,
+                onCreateOrEdit = {
+
+                },
                 onDismiss = { bottomSheetState = ShareBottomSheetState.Idle }
             )
         }
@@ -170,7 +176,12 @@ private fun ShareView(viewModel: ShareViewModel) {
 //  should look like User 1, Group 1 etc.
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AddOrEditShareBottomSheet(title: String, share: UnifiedShare, onDismiss: () -> Unit) {
+private fun AddOrEditShareBottomSheet(
+    title: String,
+    share: UnifiedShare,
+    onCreateOrEdit: () -> Unit,
+    onDismiss: () -> Unit
+) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scrollState = rememberScrollState()
 
@@ -277,7 +288,9 @@ private fun AddOrEditShareBottomSheet(title: String, share: UnifiedShare, onDism
                         clipboard.setClipEntry(clipData.toClipEntry())
                     }
                 },
-                onSendClick = { /* TODO */ }
+                onSendClick = {
+                    onCreateOrEdit()
+                }
             )
         }
     }
@@ -451,10 +464,19 @@ private fun InvitedInlineSettings(share: UnifiedShare) {
     var hasExpiration by remember { mutableStateOf(false) } // TODO
     var hideDownload by remember { mutableStateOf(false) } // TODO
 
-    SettingsSwitchRow(stringResource(R.string.share_view_invited_category_share_with_others_switch), shareWithOthers) { shareWithOthers = it }
+    SettingsSwitchRow(
+        stringResource(R.string.share_view_invited_category_share_with_others_switch),
+        shareWithOthers
+    ) { shareWithOthers = it }
     SettingsSwitchRow(stringResource(R.string.share_view_invited_category_edit_file_switch), editFile) { editFile = it }
-    SettingsSwitchRow(stringResource(R.string.share_view_invited_category_expiration_date_switch), hasExpiration) { hasExpiration = it }
-    SettingsSwitchRow(stringResource(R.string.share_view_invited_category_hide_and_download_switch), hideDownload) { hideDownload = it }
+    SettingsSwitchRow(
+        stringResource(R.string.share_view_invited_category_expiration_date_switch),
+        hasExpiration
+    ) { hasExpiration = it }
+    SettingsSwitchRow(
+        stringResource(R.string.share_view_invited_category_hide_and_download_switch),
+        hideDownload
+    ) { hideDownload = it }
 }
 
 @Composable
@@ -655,7 +677,12 @@ private fun UnifiedSharesListItem(
                     HorizontalDivider()
 
                     DropdownMenuItem(
-                        text = { Text(stringResource(R.string.share_view_list_item_delete), color = MaterialTheme.colorScheme.error) },
+                        text = {
+                            Text(
+                                stringResource(R.string.share_view_list_item_delete),
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        },
                         onClick = {
                             onDeleteShare(share)
                             showContextMenu = false
