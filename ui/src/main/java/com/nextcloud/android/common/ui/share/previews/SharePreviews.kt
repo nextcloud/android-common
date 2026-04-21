@@ -30,15 +30,17 @@ import com.nextcloud.android.common.ui.share.SettingsSwitchRow
 import com.nextcloud.android.common.ui.share.ShareActionButtons
 import com.nextcloud.android.common.ui.share.ShareBottomSheetHeader
 import com.nextcloud.android.common.ui.share.ShareCategoryButtonGroup
-import com.nextcloud.android.common.ui.share.UnifiedShareView
 import com.nextcloud.android.common.ui.share.ShareViewModel
+import com.nextcloud.android.common.ui.share.UnifiedShareView
 import com.nextcloud.android.common.ui.share.UnifiedSharesListItem
 import com.nextcloud.android.common.ui.share.UnifiedSharesListItemType
+import com.nextcloud.android.common.ui.share.model.api.owner.Owner
+import com.nextcloud.android.common.ui.share.model.api.user.ShareUser
+import com.nextcloud.android.common.ui.share.model.ui.UnifiedShare
 import com.nextcloud.android.common.ui.share.model.ui.UnifiedShareCategory
 import com.nextcloud.android.common.ui.share.model.ui.UnifiedShareDownloadLimit
 import com.nextcloud.android.common.ui.share.model.ui.UnifiedSharePermission
 import com.nextcloud.android.common.ui.share.model.ui.UnifiedShareType
-import com.nextcloud.android.common.ui.share.model.ui.UnifiedShares
 import com.nextcloud.android.common.ui.share.repository.MockShareRepository
 
 @Composable
@@ -119,7 +121,7 @@ fun Preview_UnifiedSharesListItem_AllTypes() {
 }
 
 @Composable
-private fun UnifiedSharesListItemPreviewHelper(share: UnifiedShares, type: UnifiedSharesListItemType) {
+private fun UnifiedSharesListItemPreviewHelper(share: UnifiedShare, type: UnifiedSharesListItemType) {
     UnifiedSharesListItem(share = share, type = type)
 }
 
@@ -708,45 +710,81 @@ private fun AnyoneInlineSettingsPreview() {
 
 private fun previewUserShare(
     permission: UnifiedSharePermission = UnifiedSharePermission.CanView
-) = UnifiedShares(
+) = UnifiedShare(
+    id = "1",
+    sources = listOf(
+        ShareUser(
+            type = "user",
+            value = "alice@company.com",
+            displayName = "Alice Smith"
+        )
+    ),
+    recipients = emptyList(),
+    properties = emptyMap(),
+    lastUpdated = 0,
+    owner = Owner(
+        userId = "alice",
+        displayName = "Alice Smith"
+    ),
     label = "Alice Smith",
     type = UnifiedShareType.InternalUser,
     permission = permission,
-    expirationDate = 0,
-    sharedTo = "",
     category = UnifiedShareCategory.Invited,
-    id = 1,
-    password = "",
     note = "",
-    limit = UnifiedShareDownloadLimit(0, 0),
+    password = "",
+    limit = UnifiedShareDownloadLimit(0, 0)
 )
 
 private fun previewGroupShare(
     permission: UnifiedSharePermission = UnifiedSharePermission.CanEdit
-) = UnifiedShares(
+) = UnifiedShare(
+    id = "2",
+    sources = listOf(
+        ShareUser(
+            type = "group",
+            value = "design",
+            displayName = "Design Team"
+        )
+    ),
+    recipients = emptyList(),
+    properties = emptyMap(),
+    lastUpdated = 0,
+    owner = Owner(
+        userId = "system",
+        displayName = "System"
+    ),
     label = "Design Team",
     type = UnifiedShareType.InternalGroup,
     permission = permission,
-    expirationDate = 0,
-    sharedTo = "",
     category = UnifiedShareCategory.Invited,
-    id = 1,
-    password = "",
     note = "",
-    limit = UnifiedShareDownloadLimit(0, 0),
+    password = "",
+    limit = UnifiedShareDownloadLimit(0, 0)
 )
 
 private fun previewPublicLinkShare(
     permission: UnifiedSharePermission = UnifiedSharePermission.FileDrop
-) = UnifiedShares(
+) = UnifiedShare(
+    id = "3",
+    sources = listOf(
+        ShareUser(
+            type = "link",
+            value = "https://nextcloud.com/s/abc123",
+            displayName = "Public Link"
+        )
+    ),
+    recipients = emptyList(),
+    properties = emptyMap(),
+    lastUpdated = 1710000000,
+    owner = Owner(
+        userId = "system",
+        displayName = "System"
+    ),
     label = "Public link",
     type = UnifiedShareType.ExternalLink,
     permission = permission,
-    expirationDate = 0,
-    sharedTo = "",
-    category = UnifiedShareCategory.Invited,
-    id = 1,
-    password = "",
+    category = UnifiedShareCategory.Anyone,
     note = "",
-    limit = UnifiedShareDownloadLimit(0, 0),
+    password = "1234",
+    limit = UnifiedShareDownloadLimit(50, 5)
 )
