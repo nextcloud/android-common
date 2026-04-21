@@ -68,9 +68,9 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.nextcloud.android.common.ui.R
+import com.nextcloud.android.common.ui.share.model.ui.UnifiedShare
 import com.nextcloud.android.common.ui.share.model.ui.UnifiedShareCategory
 import com.nextcloud.android.common.ui.share.model.ui.UnifiedSharePermission
-import com.nextcloud.android.common.ui.share.model.ui.UnifiedShares
 import com.nextcloud.android.common.ui.share.repository.MockShareRepository
 
 
@@ -508,7 +508,7 @@ enum class UnifiedSharesListItemType {
 
 // NOTE: To just create a public link anyone tab + just send DOES SAME THING
 @Composable
-fun UnifiedSharesListItem(share: UnifiedShares, type: UnifiedSharesListItemType) {
+fun UnifiedSharesListItem(share: UnifiedShare, type: UnifiedSharesListItemType) {
     var showContextMenu by remember { mutableStateOf(false) }
     var showDetailSheet by remember { mutableStateOf(false) }
     val haptics = LocalHapticFeedback.current
