@@ -28,4 +28,17 @@ enum class UnifiedShareType {
 
         Icon(painterResource(iconId), contentDescription = "share type icon")
     }
+
+    companion object {
+        fun toUnifiedShareType(value: String?): UnifiedShareType {
+            return when (value?.lowercase()) {
+                "user" -> InternalUser
+                "group" -> InternalGroup
+                "link" -> InternalLink
+                "federated" -> ExternalFederated
+                "mail" -> ExternalMail
+                else -> ExternalLink
+            }
+        }
+    }
 }
