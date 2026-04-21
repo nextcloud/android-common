@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-package com.nextcloud.android.common.ui.share.model
+package com.nextcloud.android.common.ui.share.model.ui
 
 sealed class UnifiedSharePermission {
     // file drop only for folder

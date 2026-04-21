@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-package com.nextcloud.android.common.ui.share.model
+package com.nextcloud.android.common.ui.share.model.ui
 
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
