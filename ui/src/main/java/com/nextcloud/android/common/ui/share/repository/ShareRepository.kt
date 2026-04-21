@@ -12,6 +12,7 @@ import com.nextcloud.android.common.ui.share.model.api.create.CreateShareRequest
 import com.nextcloud.android.common.ui.share.model.api.create.ShareDataResponse
 import com.nextcloud.android.common.ui.share.model.api.recipients.ShareRecipients
 import com.nextcloud.android.common.ui.share.model.api.update.UpdateShareRequest
+import com.nextcloud.android.common.ui.share.model.ui.UnifiedShare
 
 interface ShareRepository {
     suspend fun fetchRecipients(
@@ -33,5 +34,5 @@ interface ShareRepository {
         sourceType: String? = null,
         lastShareId: String? = null,
         limit: Int = 100
-    ): ApiResult<List<ShareDataResponse>>
+    ): ApiResult<List<UnifiedShare>>
 }

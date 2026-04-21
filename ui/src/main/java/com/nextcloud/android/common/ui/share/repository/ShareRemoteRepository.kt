@@ -12,6 +12,7 @@ import com.nextcloud.android.common.ui.share.model.api.create.CreateShareRequest
 import com.nextcloud.android.common.ui.share.model.api.create.ShareDataResponse
 import com.nextcloud.android.common.ui.share.model.api.recipients.ShareRecipients
 import com.nextcloud.android.common.ui.share.model.api.update.UpdateShareRequest
+import com.nextcloud.android.common.ui.share.model.ui.UnifiedShare
 
 class ShareRemoteRepository: ShareRepository {
 
@@ -81,7 +82,7 @@ class ShareRemoteRepository: ShareRepository {
         sourceType: String?,
         lastShareId: String?,
         limit: Int
-    ): ApiResult<List<ShareDataResponse>> {
+    ): ApiResult<List<UnifiedShare>> {
         /*
             GET
             /ocs/v2.php/apps/sharing/api/v1/shares
