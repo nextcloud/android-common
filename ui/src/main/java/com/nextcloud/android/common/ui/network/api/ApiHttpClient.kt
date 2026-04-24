@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-package com.nextcloud.android.common.ui.network
+package com.nextcloud.android.common.ui.network.api
 
 import okhttp3.Credentials
 import okhttp3.Interceptor
@@ -14,7 +14,7 @@ import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import java.util.concurrent.TimeUnit
 
-class NextcloudHttpClient private constructor(
+class ApiHttpClient private constructor(
     val okHttpClient: OkHttpClient,
     val credentials: ApiCredentials
 ) {
@@ -26,7 +26,7 @@ class NextcloudHttpClient private constructor(
         fun create(
             credentials: ApiCredentials,
             enableLogging: Boolean = false
-        ): NextcloudHttpClient {
+        ): ApiHttpClient {
             val authInterceptor = AuthInterceptor(credentials)
 
             val loggingInterceptor = HttpLoggingInterceptor().apply {
@@ -45,7 +45,7 @@ class NextcloudHttpClient private constructor(
                 .addInterceptor(loggingInterceptor)
                 .build()
 
-            return NextcloudHttpClient(okHttpClient, credentials)
+            return ApiHttpClient(okHttpClient, credentials)
         }
     }
 
