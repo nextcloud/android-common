@@ -7,7 +7,7 @@
 
 package com.nextcloud.android.common.ui.share.repository
 
-import com.nextcloud.android.common.ui.network.ApiResult
+import com.nextcloud.android.common.ui.network.model.ApiResult
 import com.nextcloud.android.common.ui.share.model.api.create.CreateShareRequest
 import com.nextcloud.android.common.ui.share.model.api.create.ShareDataResponse
 import com.nextcloud.android.common.ui.share.model.api.recipients.ShareRecipients

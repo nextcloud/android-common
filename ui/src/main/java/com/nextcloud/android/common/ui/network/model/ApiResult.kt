@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-package com.nextcloud.android.common.ui.network
+package com.nextcloud.android.common.ui.network.model
 
 sealed class ApiResult<out T> {
     data class Success<T>(val data: T) : ApiResult<T>()
