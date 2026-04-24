@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-package com.nextcloud.android.common.ui.network
+package com.nextcloud.android.common.ui.network.api
 
 data class ApiCredentials(
     val baseURL: String,

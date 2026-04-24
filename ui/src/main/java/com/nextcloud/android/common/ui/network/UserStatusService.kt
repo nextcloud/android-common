@@ -7,12 +7,17 @@
 
 package com.nextcloud.android.common.ui.network
 
+import com.nextcloud.android.common.ui.network.api.ApiHttpClient
+import com.nextcloud.android.common.ui.network.model.ApiResult
+import com.nextcloud.android.common.ui.network.model.Meta
+import com.nextcloud.android.common.ui.network.model.Ocs
+import com.nextcloud.android.common.ui.network.model.OcsResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import okhttp3.Request
 
-class UserStatusService(private val client: NextcloudHttpClient) {
+class UserStatusService(private val client: ApiHttpClient) {
 
     private val json = Json { ignoreUnknownKeys = true }
 
