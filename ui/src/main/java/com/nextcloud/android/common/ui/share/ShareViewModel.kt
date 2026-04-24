@@ -10,8 +10,7 @@ package com.nextcloud.android.common.ui.share
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nextcloud.android.common.ui.R
-import com.nextcloud.android.common.ui.network.ApiResult
-import com.nextcloud.android.common.ui.share.model.api.create.CreateShareRequest
+import com.nextcloud.android.common.ui.network.model.ApiResult
 import com.nextcloud.android.common.ui.share.model.ui.UnifiedShare
 import com.nextcloud.android.common.ui.share.repository.ShareRepository
 import kotlinx.coroutines.Dispatchers

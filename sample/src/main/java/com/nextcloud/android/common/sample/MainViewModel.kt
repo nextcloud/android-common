@@ -10,9 +10,9 @@ package com.nextcloud.android.common.sample
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nextcloud.android.common.ui.network.ApiCredentials
-import com.nextcloud.android.common.ui.network.ApiResult
-import com.nextcloud.android.common.ui.network.NextcloudHttpClient
+import com.nextcloud.android.common.ui.network.api.ApiCredentials
+import com.nextcloud.android.common.ui.network.model.ApiResult
+import com.nextcloud.android.common.ui.network.api.ApiHttpClient
 import com.nextcloud.android.common.ui.network.UserStatusService
 import kotlinx.coroutines.launch
 
@@ -27,7 +27,7 @@ class MainViewModel : ViewModel() {
     ) {
         viewModelScope.launch {
             val credentials = ApiCredentials(baseUrl, username, token)
-            val client = NextcloudHttpClient.create(credentials, enableLogging = true)
+            val client = ApiHttpClient.create(credentials, enableLogging = true)
             val service = UserStatusService(client)
 
             when (val result = service.fetchPredefinedStatuses()) {
