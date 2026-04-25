@@ -15,6 +15,8 @@
         <item quantity="other">%d小时</item>
     </plurals>
 
+    <string name="ecosystem_null_account">账号不存在。无法打开应用。</string>
+    <string name="ecosystem_wrong_intent">无法完成操作：收到意外数据</string>
     <string name="ecosystem_received_account_invalid">接收到的账号无效。</string>
     <string name="ecosystem_invalid_account">账号格式无效。必须是电子邮件。</string>
     <string name="ecosystem_app_not_found">应用未安装。重定向到应用商店...</string>
