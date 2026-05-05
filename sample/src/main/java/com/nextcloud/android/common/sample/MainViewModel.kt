@@ -9,7 +9,37 @@ package com.nextcloud.android.common.sample
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.nextcloud.android.common.ui.network.ApiCredentials
+import com.nextcloud.android.common.ui.network.ApiResult
+import com.nextcloud.android.common.ui.network.NextcloudHttpClient
+import com.nextcloud.android.common.ui.network.UserStatusService
+import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
     val color = MutableLiveData<Int>()
+    val apiTestResult = MutableLiveData<String>()
+
+    fun testPredefinedStatuses(
+        baseUrl: String,
+        username: String,
+        token: String
+    ) {
+        viewModelScope.launch {
+            val credentials = ApiCredentials(baseUrl, username, token)
+            val client = NextcloudHttpClient.create(credentials, enableLogging = true)
+            val service = UserStatusService(client)
+
+            when (val result = service.fetchPredefinedStatuses()) {
+                is ApiResult.Success ->
+                    apiTestResult.value =
+                        "✅ Success (${result.data.size} statuses):\n" +
+                            result.data.joinToString("\n") { "${it.icon} ${it.message}" }
+
+                is ApiResult.Error ->
+                    apiTestResult.value =
+                        "❌ Error ${result.error.ocs.meta.statusCode}: ${result.error.ocs.meta.message}"
+            }
+        }
+    }
 }
