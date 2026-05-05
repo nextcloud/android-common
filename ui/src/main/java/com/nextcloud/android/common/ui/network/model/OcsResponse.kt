@@ -31,8 +31,8 @@ data class Meta(
     val message: String,
 
     @SerialName("totalitems")
-    val totalItems: String,
+    val totalItems: String = "",
 
     @SerialName("itemsperpage")
-    val itemsPerPage: String
+    val itemsPerPage: String = ""
 )
