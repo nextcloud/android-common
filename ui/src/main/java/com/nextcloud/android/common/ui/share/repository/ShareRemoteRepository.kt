@@ -33,9 +33,14 @@ class ShareRemoteRepository(private val client: ApiHttpClient) : ShareRepository
     }
 
     private val json = Json { ignoreUnknownKeys = true }
+
+    // TODO - move from here?
     private val jsonMediaType = "application/json; charset=utf-8".toMediaType()
+
+    // TODO - trim end?
     private val baseUrl get() = client.credentials.baseURL.trimEnd('/')
 
+    // TODO - Move from here
     private fun errorResult(e: Exception): ApiResult.Error =
         ApiResult.Error(
             OcsResponse(
