@@ -85,6 +85,17 @@ class MainActivity : AppCompatActivity() {
             material.colorMaterialButtonPrimaryBorderless(negativeButton)
         }
 
+        binding.testApiBtn.setOnClickListener {
+            val baseUrl = binding.baseUrl.text?.toString().orEmpty()
+            val username = binding.username.text?.toString().orEmpty()
+            val token = binding.token.text?.toString().orEmpty()
+            mainViewModel.testPredefinedStatuses(baseUrl, username, token)
+        }
+
+        mainViewModel.apiTestResult.observe(this) { result ->
+            Toast.makeText(this, result, Toast.LENGTH_LONG).show()
+        }
+
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         mainViewModel.color.observe(this) { applyTheme(it) }
