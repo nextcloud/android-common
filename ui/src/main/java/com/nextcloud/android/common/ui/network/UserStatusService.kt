@@ -24,7 +24,7 @@ class UserStatusService(private val client: ApiHttpClient) {
     suspend fun fetchPredefinedStatuses(): ApiResult<List<PredefinedStatus>> =
         withContext(Dispatchers.IO) {
             val url =
-                "${client.credentials.baseURL.trimEnd('/')}" +
+                client.credentials.baseURL.trimEnd('/') +
                     "/ocs/v2.php/apps/user_status/api/v1/predefined_statuses"
 
             val request =
@@ -36,7 +36,7 @@ class UserStatusService(private val client: ApiHttpClient) {
 
             try {
                 val response = client.okHttpClient.newCall(request).execute()
-                val body = response.body?.string().orEmpty()
+                val body = response.body.string()
 
                 if (response.isSuccessful) {
                     val parsed = json.decodeFromString<OcsResponse<List<PredefinedStatus>>>(body)
