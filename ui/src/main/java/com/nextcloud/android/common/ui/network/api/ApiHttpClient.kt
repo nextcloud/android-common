@@ -86,6 +86,7 @@ class ApiHttpClient private constructor(
             return if (requestUrl.startsWith(HTTP_PREFIX) || requestUrl.startsWith(HTTPS_PREFIX)) {
                 requestUrl
             } else {
+                // TODO - remove hardcoded value?
                 "${baseUrl.trimEnd('/')}/${requestUrl.trimStart('/')}"
             }
         }
