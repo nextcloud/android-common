@@ -59,6 +59,8 @@ class ShareRemoteRepository(private val client: ApiHttpClient) : ShareRepository
         limit: Int,
         offset: Int
     ): ApiResult<List<ShareRecipients>> = withContext(Dispatchers.IO) {
+        // TODO: - CHECK URL  GET
+        // /ocs/v2.php/apps/sharing/api/v1/recipients
         val url = "$baseUrl/ocs/v2.php/apps/sharing/api/v1/recipients" +
             "?recipientType=$recipientType&query=$query&limit=$limit&offset=$offset"
 
@@ -80,6 +82,10 @@ class ShareRemoteRepository(private val client: ApiHttpClient) : ShareRepository
 
     override suspend fun createShare(request: CreateShareRequest): ApiResult<ShareDataResponse> =
         withContext(Dispatchers.IO) {
+            /*
+             POST
+             /ocs/v2.php/apps/sharing/api/v1/share
+            */
             val url = "$baseUrl$SHARE_ENDPOINT"
             val body = json.encodeToString(request).toRequestBody(jsonMediaType)
 
@@ -101,6 +107,10 @@ class ShareRemoteRepository(private val client: ApiHttpClient) : ShareRepository
 
     override suspend fun fetchShare(id: String): ApiResult<ShareDataResponse> =
         withContext(Dispatchers.IO) {
+            /*
+            POST
+            /ocs/v2.php/apps/sharing/api/v1/share/{id}
+            */
             val url = "$baseUrl$SHARE_ENDPOINT$id"
             val request = client.buildRequest(url, ApiMethod.GET)
 
@@ -120,6 +130,10 @@ class ShareRemoteRepository(private val client: ApiHttpClient) : ShareRepository
 
     override suspend fun updateShare(id: String, request: UpdateShareRequest): ApiResult<ShareDataResponse> =
         withContext(Dispatchers.IO) {
+            /*
+                  PUT
+                  /ocs/v2.php/apps/sharing/api/v1/share/{id}
+           */
             val url = "$baseUrl$SHARE_ENDPOINT$id"
             val body = json.encodeToString(request).toRequestBody(jsonMediaType)
 
@@ -141,6 +155,10 @@ class ShareRemoteRepository(private val client: ApiHttpClient) : ShareRepository
 
     override suspend fun deleteShare(id: String): ApiResult<Unit> =
         withContext(Dispatchers.IO) {
+            /*
+               DELETE
+               /ocs/v2.php/apps/sharing/api/v1/share/{id}
+            */
             val url = "$baseUrl$SHARE_ENDPOINT$id"
             val request = client.buildRequest(url, ApiMethod.DELETE)
 
@@ -172,6 +190,10 @@ class ShareRemoteRepository(private val client: ApiHttpClient) : ShareRepository
         lastShareId: String?,
         limit: Int
     ): ApiResult<List<UnifiedShare>> = withContext(Dispatchers.IO) {
+        /*
+            GET
+            /ocs/v2.php/apps/sharing/api/v1/shares
+         */
         val queryParams = buildString {
             append("?limit=$limit")
             sourceType?.let { append("&sourceType=$it") }
