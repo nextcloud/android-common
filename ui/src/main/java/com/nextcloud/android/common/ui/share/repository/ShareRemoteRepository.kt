@@ -7,6 +7,7 @@
 
 package com.nextcloud.android.common.ui.share.repository
 
+import com.nextcloud.android.common.ui.network.api.ApiHttpClient
 import com.nextcloud.android.common.ui.network.model.ApiResult
 import com.nextcloud.android.common.ui.share.model.api.create.CreateShareRequest
 import com.nextcloud.android.common.ui.share.model.api.create.ShareDataResponse
@@ -14,9 +15,7 @@ import com.nextcloud.android.common.ui.share.model.api.recipients.ShareRecipient
 import com.nextcloud.android.common.ui.share.model.api.update.UpdateShareRequest
 import com.nextcloud.android.common.ui.share.model.ui.UnifiedShare
 
-class ShareRemoteRepository: ShareRepository {
-
-    // TODO: ALL OCS-APIRequest //boolean header
+class ShareRemoteRepository(private val client: ApiHttpClient) : ShareRepository {
 
     /**
      *  Searches for recipients
