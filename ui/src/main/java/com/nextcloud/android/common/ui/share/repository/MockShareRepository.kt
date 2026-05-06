@@ -7,7 +7,7 @@
 
 package com.nextcloud.android.common.ui.share.repository
 
-import com.nextcloud.android.common.ui.network.model.ApiResult
+import com.nextcloud.android.common.ui.network.model.NetworkResult
 import com.nextcloud.android.common.ui.share.model.api.create.CreateShareRequest
 import com.nextcloud.android.common.ui.share.model.api.create.ShareDataResponse
 import com.nextcloud.android.common.ui.share.model.api.owner.Owner
@@ -22,7 +22,7 @@ class MockShareRepository : ShareRepository {
         query: String,
         limit: Int,
         offset: Int
-    ): ApiResult<List<ShareRecipients>> {
+    ): NetworkResult<List<ShareRecipients>> {
 
         val mock = listOf(
             ShareRecipients(
@@ -53,12 +53,12 @@ class MockShareRepository : ShareRepository {
             )
         )
 
-        return ApiResult.Success(mock)
+        return NetworkResult.Success(mock)
     }
 
     override suspend fun createShare(
         request: CreateShareRequest
-    ): ApiResult<ShareDataResponse> {
+    ): NetworkResult<ShareDataResponse> {
 
         val response = ShareDataResponse(
             sources = request.data.sources,
@@ -72,10 +72,10 @@ class MockShareRepository : ShareRepository {
             )
         )
 
-        return ApiResult.Success(response)
+        return NetworkResult.Success(response)
     }
 
-    override suspend fun fetchShare(id: String): ApiResult<ShareDataResponse> {
+    override suspend fun fetchShare(id: String): NetworkResult<ShareDataResponse> {
 
         val mock = ShareDataResponse(
             sources = emptyList(),
@@ -95,13 +95,13 @@ class MockShareRepository : ShareRepository {
             )
         )
 
-        return ApiResult.Success(mock)
+        return NetworkResult.Success(mock)
     }
 
     override suspend fun updateShare(
         id: String,
         request: UpdateShareRequest
-    ): ApiResult<ShareDataResponse> {
+    ): NetworkResult<ShareDataResponse> {
 
         val updated = ShareDataResponse(
             sources = request.data.sources,
@@ -112,18 +112,18 @@ class MockShareRepository : ShareRepository {
             owner = request.data.owner
         )
 
-        return ApiResult.Success(updated)
+        return NetworkResult.Success(updated)
     }
 
-    override suspend fun deleteShare(id: String): ApiResult<Unit> {
-        return ApiResult.Success(Unit)
+    override suspend fun deleteShare(id: String): NetworkResult<Unit> {
+        return NetworkResult.Success(Unit)
     }
 
     override suspend fun fetchShares(
         sourceType: String?,
         lastShareId: String?,
         limit: Int
-    ): ApiResult<List<UnifiedShare>> {
+    ): NetworkResult<List<UnifiedShare>> {
         val data = listOf(
             UnifiedShare(
                 id = "1",
@@ -276,6 +276,6 @@ class MockShareRepository : ShareRepository {
             )
         )
 
-        return ApiResult.Success(data)
+        return NetworkResult.Success(data)
     }
 }

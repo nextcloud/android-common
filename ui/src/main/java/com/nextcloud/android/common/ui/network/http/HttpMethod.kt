@@ -5,9 +5,9 @@
  * SPDX-License-Identifier: MIT
  */
 
-package com.nextcloud.android.common.ui.network.api
+package com.nextcloud.android.common.ui.network.http
 
-enum class ApiMethod(val type: String) {
+enum class HttpMethod(val type: String) {
     GET("GET"),
     POST("POST"),
     PUT("PUT"),
