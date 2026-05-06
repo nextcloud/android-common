@@ -42,12 +42,14 @@ class ShareViewModel(
             _loading.value = true
             _errorMessageId.value = null
 
-            when (val result = repository.fetchShares()) {
-                is NetworkResult.Success -> {
-                    _shares.update { result.data }
-                }
-
-                is NetworkResult.Error -> {
+            when (val result = repository.fetchShares(
+                sourceType = null,
+                lastShareId = null,
+                limit = 50
+            )) {
+                is NetworkResult.Success -> _shares.update { result.data }
+                is NetworkResult.ServerError,
+                is NetworkResult.NetworkException -> {
                     _errorMessageId.value = R.string.share_view_fetch_error_message
                 }
             }
@@ -70,20 +72,17 @@ class ShareViewModel(
 
     fun delete(share: UnifiedShare) {
         viewModelScope.launch(Dispatchers.IO) {
-            val id = share.id
-            if (id == null) {
-                _errorMessageId.update {
-                    R.string.share_view_delete_error_id_not_found_message
-                }
+            val id = share.id ?: run {
+                _errorMessageId.update { R.string.share_view_delete_error_id_not_found_message }
                 return@launch
             }
 
-            val result = repository.deleteShare(share.id)
-            if (result is NetworkResult.Error) {
-                _errorMessageId.update {
-                    R.string.share_view_delete_error_message
+            when (repository.deleteShare(id)) {
+                is NetworkResult.Success -> _shares.update { current -> current.filterNot { it.id == id } }
+                is NetworkResult.ServerError,
+                is NetworkResult.NetworkException -> {
+                    _errorMessageId.update { R.string.share_view_delete_error_message }
                 }
-                return@launch
             }
         }
     }
