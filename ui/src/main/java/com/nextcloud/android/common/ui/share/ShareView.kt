@@ -88,8 +88,8 @@ import com.nextcloud.android.common.ui.share.model.ui.UnifiedShare
 import com.nextcloud.android.common.ui.share.model.ui.UnifiedShareCategory
 import com.nextcloud.android.common.ui.share.model.ui.UnifiedSharePermission
 import com.nextcloud.android.common.ui.share.model.ui.customPermissionFields
-import com.nextcloud.android.common.ui.network.api.ApiCredentials
-import com.nextcloud.android.common.ui.network.api.ApiHttpClient
+import com.nextcloud.android.common.ui.network.auth.ServerCredentials
+import com.nextcloud.android.common.ui.network.http.NextcloudHttpClient
 import com.nextcloud.android.common.ui.share.repository.MockShareRepository
 import com.nextcloud.android.common.ui.share.repository.ShareRemoteRepository
 import kotlinx.coroutines.launch
@@ -726,9 +726,9 @@ private fun PreviewTheme(
     }
 }
 
-fun ComposeView.setupUnifiedShare(colorScheme: ColorScheme, credentials: ApiCredentials) {
-    val apiHttpClient = ApiHttpClient.create(credentials)
-    val viewModel = ShareViewModel(repository = ShareRemoteRepository(apiHttpClient))
+fun ComposeView.setupUnifiedShare(colorScheme: ColorScheme, credentials: ServerCredentials) {
+    val nextcloudHttpClient = NextcloudHttpClient.create(credentials)
+    val viewModel = ShareViewModel(repository = ShareRemoteRepository(nextcloudHttpClient))
 
     setContent {
         MaterialTheme(
