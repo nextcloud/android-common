@@ -10,7 +10,7 @@ package com.nextcloud.android.common.ui.share
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nextcloud.android.common.ui.R
-import com.nextcloud.android.common.ui.network.model.ApiResult
+import com.nextcloud.android.common.ui.network.model.NetworkResult
 import com.nextcloud.android.common.ui.share.model.ui.UnifiedShare
 import com.nextcloud.android.common.ui.share.repository.ShareRepository
 import kotlinx.coroutines.Dispatchers
@@ -43,11 +43,11 @@ class ShareViewModel(
             _errorMessageId.value = null
 
             when (val result = repository.fetchShares()) {
-                is ApiResult.Success -> {
+                is NetworkResult.Success -> {
                     _shares.update { result.data }
                 }
 
-                is ApiResult.Error -> {
+                is NetworkResult.Error -> {
                     _errorMessageId.value = R.string.share_view_fetch_error_message
                 }
             }
@@ -79,7 +79,7 @@ class ShareViewModel(
             }
 
             val result = repository.deleteShare(share.id)
-            if (result is ApiResult.Error) {
+            if (result is NetworkResult.Error) {
                 _errorMessageId.update {
                     R.string.share_view_delete_error_message
                 }
