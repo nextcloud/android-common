@@ -7,7 +7,7 @@
 
 package com.nextcloud.android.common.ui.share.repository
 
-import com.nextcloud.android.common.ui.network.model.ApiResult
+import com.nextcloud.android.common.ui.network.model.NetworkResult
 import com.nextcloud.android.common.ui.share.model.api.create.CreateShareRequest
 import com.nextcloud.android.common.ui.share.model.api.create.ShareDataResponse
 import com.nextcloud.android.common.ui.share.model.api.recipients.ShareRecipients
@@ -20,19 +20,19 @@ interface ShareRepository {
         query: String,
         limit: Int = 10,
         offset: Int = 0
-    ): ApiResult<List<ShareRecipients>>
+    ): NetworkResult<List<ShareRecipients>>
 
-    suspend fun createShare(request: CreateShareRequest): ApiResult<ShareDataResponse>
+    suspend fun createShare(request: CreateShareRequest): NetworkResult<ShareDataResponse>
 
-    suspend fun fetchShare(id: String): ApiResult<ShareDataResponse>
+    suspend fun fetchShare(id: String): NetworkResult<ShareDataResponse>
 
-    suspend fun updateShare(id: String, request: UpdateShareRequest): ApiResult<ShareDataResponse>
+    suspend fun updateShare(id: String, request: UpdateShareRequest): NetworkResult<ShareDataResponse>
 
-    suspend fun deleteShare(id: String): ApiResult<Unit>
+    suspend fun deleteShare(id: String): NetworkResult<Unit>
 
     suspend fun fetchShares(
         sourceType: String? = null,
         lastShareId: String? = null,
         limit: Int = 100
-    ): ApiResult<List<UnifiedShare>>
+    ): NetworkResult<List<UnifiedShare>>
 }
