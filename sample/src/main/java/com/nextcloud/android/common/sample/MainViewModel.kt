@@ -36,9 +36,13 @@ class MainViewModel : ViewModel() {
                         "✅ Success (${result.data.size} statuses):\n" +
                             result.data.joinToString("\n") { "${it.icon} ${it.message}" }
 
-                is NetworkResult.Error ->
+                is NetworkResult.ServerError ->
                     apiTestResult.value =
-                        "❌ Error ${result.error.ocs.meta.statusCode}: ${result.error.ocs.meta.message}"
+                        "❌ Error ${result.response.ocs.meta.statusCode}: ${result.response.ocs.meta.message}"
+
+                is NetworkResult.NetworkException ->
+                    apiTestResult.value =
+                        "❌ Exception: ${result.throwable.message}"
             }
         }
     }
