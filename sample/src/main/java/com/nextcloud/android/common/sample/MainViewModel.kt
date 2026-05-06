@@ -10,10 +10,10 @@ package com.nextcloud.android.common.sample
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nextcloud.android.common.ui.network.api.ApiCredentials
-import com.nextcloud.android.common.ui.network.model.ApiResult
-import com.nextcloud.android.common.ui.network.api.ApiHttpClient
-import com.nextcloud.android.common.ui.network.UserStatusService
+import com.nextcloud.android.common.ui.network.auth.ServerCredentials
+import com.nextcloud.android.common.ui.network.model.NetworkResult
+import com.nextcloud.android.common.ui.network.http.NextcloudHttpClient
+import com.nextcloud.android.common.ui.network.UserStatusRepository
 import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
@@ -26,17 +26,17 @@ class MainViewModel : ViewModel() {
         token: String
     ) {
         viewModelScope.launch {
-            val credentials = ApiCredentials(baseUrl, username, token)
-            val client = ApiHttpClient.create(credentials, enableLogging = true)
-            val service = UserStatusService(client)
+            val credentials = ServerCredentials(baseUrl, username, token)
+            val client = NextcloudHttpClient.create(credentials, enableLogging = true)
+            val service = UserStatusRepository(client)
 
             when (val result = service.fetchPredefinedStatuses()) {
-                is ApiResult.Success ->
+                is NetworkResult.Success ->
                     apiTestResult.value =
                         "✅ Success (${result.data.size} statuses):\n" +
                             result.data.joinToString("\n") { "${it.icon} ${it.message}" }
 
-                is ApiResult.Error ->
+                is NetworkResult.Error ->
                     apiTestResult.value =
                         "❌ Error ${result.error.ocs.meta.statusCode}: ${result.error.ocs.meta.message}"
             }
