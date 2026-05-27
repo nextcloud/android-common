@@ -25,6 +25,7 @@ data class Share(
     @SerialName("last_updated")
     val lastUpdated: Long,
 
+    @SerialName("state")
     val shareState: ShareState,
 
     val sources: List<Source>,
