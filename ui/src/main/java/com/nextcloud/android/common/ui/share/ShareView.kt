@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -126,12 +127,21 @@ private fun ShareView(viewModel: ShareViewModel) {
                 description = stringResource(R.string.share_view_empty_description)
             )
         } else {
-            LazyColumn(modifier = Modifier.padding(paddingValues)) {
+            LazyColumn(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 itemsIndexed(shares) { index, share ->
                     val type = when (index) {
                         0 -> UnifiedSharesListItemType.Top
                         shares.lastIndex -> UnifiedSharesListItemType.Bottom
                         else -> UnifiedSharesListItemType.Mid
+                    }
+
+                    if (index == 0) {
+                        Spacer(modifier = Modifier.height(16.dp))
                     }
 
                     UnifiedSharesListItem(
@@ -372,7 +382,7 @@ private fun UnifiedSharesListItem(
 
     ListItem(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxWidth(0.9f)
             .clip(type.getShape())
             .combinedClickable(
                 onClick = { onSelectShare(share) },
@@ -384,7 +394,7 @@ private fun UnifiedSharesListItem(
             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
         headlineContent = {
             Text(
-                text = "Share ${share.id}",
+                text = "Share ${share.id}", // TODO do not hardcode
                 style = MaterialTheme.typography.titleSmall
             )
         },
