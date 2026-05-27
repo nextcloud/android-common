@@ -17,6 +17,15 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 @Serializable
 sealed class Property
 
+val Property.priority: Int
+    get() = when (this) {
+        is PropertyBoolean -> priority
+        is PropertyDate -> priority
+        is PropertyEnum -> priority
+        is PropertyPassword -> priority
+        is PropertyString -> priority
+    }
+
 @Serializable
 @SerialName("boolean")
 data class PropertyBoolean(
