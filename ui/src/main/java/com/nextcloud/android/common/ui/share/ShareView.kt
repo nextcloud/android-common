@@ -90,6 +90,7 @@ import com.nextcloud.android.common.ui.share.model.ui.UnifiedSharePermission
 import com.nextcloud.android.common.ui.share.model.ui.customPermissionFields
 import com.nextcloud.android.common.ui.network.auth.ServerCredentials
 import com.nextcloud.android.common.ui.network.http.NextcloudHttpClient
+import com.nextcloud.android.common.ui.share.model.api.share.Share
 import com.nextcloud.android.common.ui.share.repository.MockShareRepository
 import com.nextcloud.android.common.ui.share.repository.ShareRemoteRepository
 import kotlinx.coroutines.launch
@@ -111,7 +112,7 @@ private fun ShareView(viewModel: ShareViewModel) {
 
     Scaffold(floatingActionButton = {
         FloatingActionButton(
-            onClick = { bottomSheetState = ShareBottomSheetState.New(UnifiedShare.new()) },
+            onClick = { bottomSheetState = ShareBottomSheetState.New(Share()) },
         ) {
             Icon(painterResource(R.drawable.ic_person_add), contentDescription = "Add")
         }
@@ -601,11 +602,11 @@ enum class UnifiedSharesListItemType {
 // NOTE: To just create a public link anyone tab + just send DOES SAME THING
 @Composable
 private fun UnifiedSharesListItem(
-    share: UnifiedShare,
+    share: Share,
     type: UnifiedSharesListItemType,
-    onSelectShare: (UnifiedShare) -> Unit,
-    onDeleteShare: (UnifiedShare) -> Unit,
-    onSendEmail: (UnifiedShare) -> Unit
+    onSelectShare: (Share) -> Unit,
+    onDeleteShare: (Share) -> Unit,
+    onSendEmail: (Share) -> Unit
 ) {
     var showContextMenu by remember { mutableStateOf(false) }
     val haptics = LocalHapticFeedback.current
