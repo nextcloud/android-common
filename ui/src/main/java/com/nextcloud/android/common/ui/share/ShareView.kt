@@ -72,6 +72,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nextcloud.android.common.ui.R
+import com.nextcloud.android.common.ui.component.ContentUnavailableView
 import com.nextcloud.android.common.ui.network.auth.ServerCredentials
 import com.nextcloud.android.common.ui.network.http.NextcloudHttpClient
 import com.nextcloud.android.common.ui.share.model.api.property.Property
@@ -85,7 +86,6 @@ import com.nextcloud.android.common.ui.share.model.api.share.Share
 import com.nextcloud.android.common.ui.share.model.ui.ShareBottomSheetState
 import com.nextcloud.android.common.ui.share.repository.MockShareRepository
 import com.nextcloud.android.common.ui.share.repository.ShareRemoteRepository
-
 
 @Composable
 private fun ShareView(viewModel: ShareViewModel) {
@@ -115,23 +115,33 @@ private fun ShareView(viewModel: ShareViewModel) {
                 Icon(painterResource(R.drawable.ic_person_add), contentDescription = "Add")
             }
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        containerColor = Color.Transparent
     ) { paddingValues ->
-        LazyColumn(modifier = Modifier.padding(paddingValues)) {
-            itemsIndexed(shares) { index, share ->
-                val type = when (index) {
-                    0 -> UnifiedSharesListItemType.Top
-                    shares.lastIndex -> UnifiedSharesListItemType.Bottom
-                    else -> UnifiedSharesListItemType.Mid
-                }
+        if (shares.isEmpty()) {
+            ContentUnavailableView(
+                iconId = R.drawable.ic_person_add,
+                title =
+                    stringResource(R.string.share_view_empty_title),
+                description = stringResource(R.string.share_view_empty_description)
+            )
+        } else {
+            LazyColumn(modifier = Modifier.padding(paddingValues)) {
+                itemsIndexed(shares) { index, share ->
+                    val type = when (index) {
+                        0 -> UnifiedSharesListItemType.Top
+                        shares.lastIndex -> UnifiedSharesListItemType.Bottom
+                        else -> UnifiedSharesListItemType.Mid
+                    }
 
-                UnifiedSharesListItem(
-                    share = share,
-                    type = type,
-                    onSelectShare = { selected -> bottomSheetState = ShareBottomSheetState.Edit(selected) },
-                    onDeleteShare = { viewModel.deleteShare(it.id) },
-                    onSendEmail = { /* TODO */ }
-                )
+                    UnifiedSharesListItem(
+                        share = share,
+                        type = type,
+                        onSelectShare = { selected -> bottomSheetState = ShareBottomSheetState.Edit(selected) },
+                        onDeleteShare = { viewModel.deleteShare(it.id) },
+                        onSendEmail = { /* TODO */ }
+                    )
+                }
             }
         }
     }
@@ -239,16 +249,20 @@ private fun DynamicPropertyField(shareId: String, property: Property, viewModel:
                 }
             )
         }
+
         is PropertyString -> {
             OutlinedTextField(
                 value = property.value ?: "",
                 onValueChange = { viewModel.updateProperty(shareId, property.clazz, it) },
                 label = { Text(property.displayName) },
                 placeholder = property.hint?.let { { Text(it) } },
-                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
                 singleLine = true
             )
         }
+
         is PropertyPassword -> {
             OutlinedTextField(
                 value = property.value ?: "",
@@ -256,20 +270,26 @@ private fun DynamicPropertyField(shareId: String, property: Property, viewModel:
                 label = { Text(property.displayName) },
                 placeholder = property.hint?.let { { Text(it) } },
                 visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
                 singleLine = true
             )
         }
+
         is PropertyDate -> {
             // TODO: Wrap with a DatePickerDialog. Falling back to string entry for now.
             OutlinedTextField(
                 value = property.value ?: "",
                 onValueChange = { viewModel.updateProperty(shareId, property.clazz, it) },
                 label = { Text(property.displayName + " (YYYY-MM-DD)") },
-                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
                 singleLine = true
             )
         }
+
         is PropertyEnum -> {
             // TODO: Implement ExposedDropdownMenuBox using property.validValues
             Text(text = "Enum Property: ${property.displayName} (Under Construction)", color = Color.Gray)
@@ -328,6 +348,7 @@ private fun SettingsSwitchRow(label: String, checked: Boolean, onCheckedChange: 
 
 enum class UnifiedSharesListItemType {
     Top, Mid, Bottom;
+
     @Composable
     fun getShape(): RoundedCornerShape {
         return when (this) {
@@ -397,7 +418,12 @@ private fun UnifiedSharesListItem(
                     )
                     HorizontalDivider()
                     DropdownMenuItem(
-                        text = { Text(stringResource(R.string.share_view_list_item_delete), color = MaterialTheme.colorScheme.error) },
+                        text = {
+                            Text(
+                                stringResource(R.string.share_view_list_item_delete),
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        },
                         onClick = {
                             onDeleteShare(share)
                             showContextMenu = false
