@@ -55,7 +55,8 @@ class ShareRemoteRepository(
     override suspend fun createShare(): NetworkResult<Share> =
         client.executeRequest(
             endpoint = SHARE_ENDPOINT,
-            method = HttpMethod.POST
+            method = HttpMethod.POST,
+            body = ByteArray(0).toRequestBody()
         ) { body ->
             json.decodeFromString<OcsResponse<Share>>(body).ocs.data
         }
