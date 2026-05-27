@@ -43,11 +43,11 @@ class ShareViewModel(
     val errorMessageId: StateFlow<Int?> = _errorMessageId
 
     init {
-        loadShares()
+        fetchShares()
     }
 
     // region shares list
-    fun loadShares(
+    fun fetchShares(
         sourceClass: String? = null,
         lastShareID: String? = null,
         limit: Int = 50
