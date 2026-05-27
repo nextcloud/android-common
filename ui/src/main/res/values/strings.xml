@@ -33,7 +33,6 @@
     <string name="share_view_invited_category_expiration_date_switch">Expiration date</string>
     <string name="share_view_invited_category_hide_and_download_switch">Hide download and sync options</string>
 
-
     <string name="share_view_anyone_category_label">Label</string>
     <string name="share_view_anyone_category_label_placeholder">Optional name for this link</string>
     <string name="share_view_anyone_category_expiration_date_switch">Expiration date</string>
@@ -52,9 +51,12 @@
     <string name="share_view_list_item_send_email">Send email</string>
     <string name="share_view_list_item_delete">Delete</string>
 
-    <string name="share_view_fetch_error_message">Failed to fetch shares</string>
+    <string name="share_view_fetch_error_message">Failed to fetch shares.</string>
 
-    <string name="share_view_delete_error_id_not_found_message">Share not found, cannot delete</string>
-    <string name="share_view_delete_error_message">Failed to delete share</string>
+    <string name="share_view_delete_error_id_not_found_message">Share not found, cannot delete.</string>
+    <string name="share_view_delete_error_message">Failed to delete share.</string>
+
+    <string name="share_view_create_error_message">Failed to create share.</string>
+    <string name="share_view_update_error_message">Failed to update share.</string>
 
 </resources>
