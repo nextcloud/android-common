@@ -5,21 +5,18 @@
  * SPDX-License-Identifier: MIT
  */
 
-package com.nextcloud.android.common.ui.share.model.api.owner
+package com.nextcloud.android.common.ui.share.model.api.source
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import com.nextcloud.android.common.ui.share.model.api.icon.Icon
 
 @Serializable
-data class Owner(
-    @SerialName("user_id")
-    val userId: String,
+data class Source(
+    @SerialName("class")
+    val clazz: String,
 
-    val instance: String? = null,
+    val value: String,
 
     @SerialName("display_name")
-    val displayName: String,
-
-    val icon: Icon
+    val displayName: String
 )
