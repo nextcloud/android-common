@@ -8,12 +8,13 @@
 package com.nextcloud.android.common.ui.share.model.ui
 
 import com.nextcloud.android.common.ui.share.model.api.owner.Owner
-import com.nextcloud.android.common.ui.share.model.api.user.ShareUser
+import com.nextcloud.android.common.ui.share.model.api.recipients.Recipient
+import com.nextcloud.android.common.ui.share.model.api.source.Source
 
 data class UnifiedShare(
     val id: String?,
-    val sources: List<ShareUser>,
-    val recipients: List<ShareUser>,
+    val sources: List<Source>,
+    val recipients: List<Recipient>,
     val properties: Map<String, Map<String, List<String>>>,
 
     val lastUpdated: Long,

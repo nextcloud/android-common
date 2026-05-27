@@ -94,7 +94,6 @@ import com.nextcloud.android.common.ui.share.repository.MockShareRepository
 import com.nextcloud.android.common.ui.share.repository.ShareRemoteRepository
 import kotlinx.coroutines.launch
 
-
 @Composable
 private fun ShareView(viewModel: ShareViewModel) {
     val errorMessageId by viewModel.errorMessageId.collectAsState()
@@ -138,7 +137,7 @@ private fun ShareView(viewModel: ShareViewModel) {
                 UnifiedSharesListItem(share, type, onSelectShare = { share ->
                     bottomSheetState = ShareBottomSheetState.Edit(share)
                 }, onDeleteShare = {
-                    viewModel.delete(share)
+                    viewModel.deleteShare(share.id)
                 }, onSendEmail = {
                     // TODO:
                 })

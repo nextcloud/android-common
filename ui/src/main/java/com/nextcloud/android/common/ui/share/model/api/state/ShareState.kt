@@ -5,16 +5,19 @@
  * SPDX-License-Identifier: MIT
  */
 
-package com.nextcloud.android.common.ui.share.model.api.user
+package com.nextcloud.android.common.ui.share.model.api.state
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ShareUser(
-    val type: String,
-    val value: String,
+enum class ShareState {
+    @SerialName("active")
+    ACTIVE,
 
-    @SerialName("display_name")
-    val displayName: String
-)
+    @SerialName("draft")
+    DRAFT,
+
+    @SerialName("deleted")
+    DELETED
+}

@@ -11,7 +11,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.network.model.NetworkResult
-import com.nextcloud.android.common.ui.share.model.ui.UnifiedShare
+import com.nextcloud.android.common.ui.share.model.api.request.AddRecipientRequest
+import com.nextcloud.android.common.ui.share.model.api.request.AddSourceRequest
+import com.nextcloud.android.common.ui.share.model.api.request.GetShareRequest
+import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePermissionRequest
+import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePropertyRequest
+import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareStateRequest
+import com.nextcloud.android.common.ui.share.model.api.share.Share
+import com.nextcloud.android.common.ui.share.model.api.state.ShareState
 import com.nextcloud.android.common.ui.share.repository.ShareRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,8 +30,11 @@ class ShareViewModel(
     private val repository: ShareRepository
 ) : ViewModel() {
 
-    private val _shares = MutableStateFlow<List<UnifiedShare>>(emptyList())
-    val shares: StateFlow<List<UnifiedShare>> = _shares
+    private val _shares = MutableStateFlow<List<Share>>(emptyList())
+    val shares: StateFlow<List<Share>> = _shares
+
+    private val _activeShare = MutableStateFlow<Share?>(null)
+    val activeShare: StateFlow<Share?> = _activeShare
 
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading
@@ -36,61 +46,201 @@ class ShareViewModel(
         loadShares()
     }
 
-    // region private methods
-    private fun loadShares() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _loading.value = true
-            _errorMessageId.value = null
+    // region shares list
+    fun loadShares(
+        sourceClass: String? = null,
+        lastShareID: String? = null,
+        limit: Int = 50
+    ) {
+        launchWithLoading {
+            handleResult(
+                result = repository.fetchShares(
+                    sourceClass = sourceClass,
+                    lastShareID = lastShareID,
+                    limit = limit
+                ),
+                errorId = R.string.share_view_fetch_error_message
+            ) { _shares.update { it } }
+        }
+    }
 
-            when (val result = repository.fetchShares(
-                sourceType = null,
-                lastShareId = null,
-                limit = 50
-            )) {
-                is NetworkResult.Success -> _shares.update { result.data }
-                is NetworkResult.ServerError,
-                is NetworkResult.NetworkException -> {
-                    _errorMessageId.value = R.string.share_view_fetch_error_message
-                }
+    fun fetchShare(id: String, request: GetShareRequest = GetShareRequest()) {
+        launchWithLoading {
+            handleResult(
+                result = repository.fetchShare(id, request),
+                errorId = R.string.share_view_fetch_error_message
+            ) { share ->
+                _activeShare.update { share }
+                replaceInList(share)
             }
-
-            _loading.value = false
         }
     }
     // endregion
 
-    // region public methods
-    fun create(share: UnifiedShare) {
-        viewModelScope.launch(Dispatchers.IO) {
-            /*
-              val request = CreateShareRequest()
-            repository.createShare()
-             */
+    // region create
 
-        }
-    }
-
-    fun delete(share: UnifiedShare) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val id = share.id ?: run {
-                _errorMessageId.update { R.string.share_view_delete_error_id_not_found_message }
-                return@launch
-            }
-
-            when (repository.deleteShare(id)) {
-                is NetworkResult.Success -> _shares.update { current -> current.filterNot { it.id == id } }
-                is NetworkResult.ServerError,
-                is NetworkResult.NetworkException -> {
-                    _errorMessageId.update { R.string.share_view_delete_error_message }
-                }
+    /**
+     * Creates an empty draft [Share] on the server and sets it as the [activeShare].
+     * Then sources can be added later.
+     *
+     */
+    fun createShare(onCreated: (Share) -> Unit = {}) {
+        launchWithLoading {
+            handleResult(
+                result = repository.createShare(),
+                errorId = R.string.share_view_create_error_message
+            ) { draft ->
+                _activeShare.update { draft }
+                _shares.update { current -> listOf(draft) + current }
+                onCreated(draft)
             }
         }
     }
+    // endregion
 
+    // region state
+    fun updateState(id: String, shareState: ShareState) {
+        viewModelScope.launch(Dispatchers.IO) {
+            handleResult(
+                result = repository.updateShareState(id, UpdateShareStateRequest(shareState)),
+                errorId = R.string.share_view_update_error_message
+            ) { updated ->
+                _activeShare.update { updated }
+                replaceInList(updated)
+            }
+        }
+    }
+    // endregion
+
+    // region sources
+    fun addSource(id: String, clazz: String, value: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            handleResult(
+                result = repository.addShareSource(id, AddSourceRequest(clazz, value)),
+                errorId = R.string.share_view_update_error_message
+            ) { updated ->
+                _activeShare.update { updated }
+                replaceInList(updated)
+            }
+        }
+    }
+
+    fun removeSource(id: String, clazz: String, value: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            handleResult(
+                result = repository.removeShareSource(id, clazz, value),
+                errorId = R.string.share_view_update_error_message
+            ) { updated ->
+                _activeShare.update { updated }
+                replaceInList(updated)
+            }
+        }
+    }
+    // endregion
+
+    // region recipients
+    fun addRecipient(id: String, clazz: String, value: String, instance: String? = null) {
+        viewModelScope.launch(Dispatchers.IO) {
+            handleResult(
+                result = repository.addShareRecipient(id, AddRecipientRequest(clazz, value, instance)),
+                errorId = R.string.share_view_update_error_message
+            ) { updated ->
+                _activeShare.update { updated }
+                replaceInList(updated)
+            }
+        }
+    }
+
+    fun removeRecipient(id: String, clazz: String, value: String, instance: String? = null) {
+        viewModelScope.launch(Dispatchers.IO) {
+            handleResult(
+                result = repository.removeShareRecipient(id, clazz, value, instance),
+                errorId = R.string.share_view_update_error_message
+            ) { updated ->
+                _activeShare.update { updated }
+                replaceInList(updated)
+            }
+        }
+    }
+    // endregion
+
+    // region properties
+    fun updateProperty(id: String, clazz: String, value: String?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            handleResult(
+                result = repository.updateShareProperty(id, UpdateSharePropertyRequest(clazz, value)),
+                errorId = R.string.share_view_update_error_message
+            ) { updated ->
+                _activeShare.update { updated }
+                replaceInList(updated)
+            }
+        }
+    }
+    // endregion
+
+    // region permissions
+    fun updatePermission(id: String, clazz: String, enabled: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            handleResult(
+                result = repository.updateSharePermission(id, UpdateSharePermissionRequest(clazz, enabled)),
+                errorId = R.string.share_view_update_error_message
+            ) { updated ->
+                _activeShare.update { updated }
+                replaceInList(updated)
+            }
+        }
+    }
+    // endregion
+
+    // region delete
+    fun deleteShare(id: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            handleResult(
+                result = repository.deleteShare(id),
+                errorId = R.string.share_view_delete_error_message
+            ) {
+                _shares.update { current -> current.filterNot { it.id == id } }
+                if (_activeShare.value?.id == id) _activeShare.update { null }
+            }
+        }
+    }
+    // endregion
+
+    // region ui helpers
     fun updateErrorMessage(value: Int?) {
-        _errorMessageId.update {
-            value
+        _errorMessageId.update { value }
+    }
+
+    fun clearActiveShare() {
+        _activeShare.update { null }
+    }
+    // endregion
+
+    // region private
+    private fun replaceInList(updated: Share) {
+        _shares.update { current -> current.map { if (it.id == updated.id) updated else it } }
+    }
+
+    private fun <T> handleResult(
+        result: NetworkResult<T>,
+        errorId: Int,
+        onSuccess: (T) -> Unit
+    ) {
+        when (result) {
+            is NetworkResult.Success -> onSuccess(result.data)
+            is NetworkResult.ServerError,
+            is NetworkResult.NetworkException -> _errorMessageId.update { errorId }
         }
     }
+
+    private fun launchWithLoading(block: suspend () -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _loading.update { true }
+            _errorMessageId.update { null }
+            block()
+            _loading.update { false }
+        }
+    }
+
     // endregion
 }
