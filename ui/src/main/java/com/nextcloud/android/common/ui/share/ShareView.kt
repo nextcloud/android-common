@@ -12,6 +12,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,12 +21,14 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoreVert
@@ -33,10 +36,13 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.InputChip
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -84,17 +90,19 @@ import com.nextcloud.android.common.ui.share.model.api.property.PropertyPassword
 import com.nextcloud.android.common.ui.share.model.api.property.PropertyString
 import com.nextcloud.android.common.ui.share.model.api.property.priority
 import com.nextcloud.android.common.ui.share.model.api.share.Share
-import com.nextcloud.android.common.ui.share.model.ui.ShareBottomSheetState
+import com.nextcloud.android.common.ui.share.model.api.state.ShareState
+import com.nextcloud.android.common.ui.share.model.ui.ShareCategory
 import com.nextcloud.android.common.ui.share.repository.MockShareRepository
 import com.nextcloud.android.common.ui.share.repository.ShareRemoteRepository
 
 @Composable
 private fun ShareView(viewModel: ShareViewModel) {
     val errorMessageId by viewModel.errorMessageId.collectAsState()
-    var bottomSheetState by remember { mutableStateOf<ShareBottomSheetState>(ShareBottomSheetState.Idle) }
     val shares by viewModel.shares.collectAsState()
+    val activeShare by viewModel.activeShare.collectAsState()
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
+    val filteredShares = shares.filter { it.shareState != ShareState.DRAFT }
 
     LaunchedEffect(errorMessageId) {
         errorMessageId?.let {
@@ -107,10 +115,7 @@ private fun ShareView(viewModel: ShareViewModel) {
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    // Create an empty draft share immediately on the server, then edit it
-                    viewModel.createShare { draft ->
-                        bottomSheetState = ShareBottomSheetState.Edit(draft)
-                    }
+                    viewModel.createShare()
                 },
             ) {
                 Icon(painterResource(R.drawable.ic_person_add), contentDescription = "Add")
@@ -119,12 +124,11 @@ private fun ShareView(viewModel: ShareViewModel) {
         snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = Color.Transparent
     ) { paddingValues ->
-        if (shares.isEmpty()) {
+        if (filteredShares.isEmpty()) {
             ContentUnavailableView(
                 iconId = R.drawable.ic_person_add,
                 title =
                     stringResource(R.string.share_view_empty_title),
-                description = stringResource(R.string.share_view_empty_description)
             )
         } else {
             LazyColumn(
@@ -133,7 +137,7 @@ private fun ShareView(viewModel: ShareViewModel) {
                     .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                itemsIndexed(shares) { index, share ->
+                itemsIndexed(filteredShares) { index, share ->
                     val type = when (index) {
                         0 -> UnifiedSharesListItemType.Top
                         shares.lastIndex -> UnifiedSharesListItemType.Bottom
@@ -147,21 +151,21 @@ private fun ShareView(viewModel: ShareViewModel) {
                     UnifiedSharesListItem(
                         share = share,
                         type = type,
-                        onSelectShare = { selected -> bottomSheetState = ShareBottomSheetState.Edit(selected) },
+                        onSelectShare = { selected ->
+                            viewModel.setActiveShare(selected)
+                        },
                         onDeleteShare = { viewModel.deleteShare(it.id) },
-                        onSendEmail = { /* TODO */ }
+                        onSendEmail = { }
                     )
                 }
             }
         }
     }
 
-    if (bottomSheetState is ShareBottomSheetState.Edit) {
-        val state = bottomSheetState as ShareBottomSheetState.Edit
+    activeShare?.let {
         AddOrEditShareBottomSheet(
-            share = state.share,
-            viewModel = viewModel,
-            onDismiss = { bottomSheetState = ShareBottomSheetState.Idle }
+            share = it,
+            viewModel = viewModel
         )
     }
 }
@@ -170,22 +174,19 @@ private fun ShareView(viewModel: ShareViewModel) {
 @Composable
 private fun AddOrEditShareBottomSheet(
     share: Share,
-    viewModel: ShareViewModel,
-    onDismiss: () -> Unit
+    viewModel: ShareViewModel
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scrollState = rememberScrollState()
-
-    // Group permissions dynamically by Category provided by the backend
-    val categories = remember(share.permissions) {
-        share.permissions.mapNotNull { it.category }.distinct()
-    }
-    var selectedCategory by remember { mutableStateOf(categories.firstOrNull() ?: "") }
-
+    val context = LocalContext.current
+    val categories = remember { ShareCategory.entries.toList() }
+    var selectedCategory by remember { mutableStateOf(categories.first()) }
     var showAdvancedSettings by remember { mutableStateOf(false) }
 
     ModalBottomSheet(
-        onDismissRequest = onDismiss,
+        onDismissRequest = {
+            viewModel.setActiveShare(null)
+        },
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.surface,
     ) {
@@ -198,30 +199,29 @@ private fun AddOrEditShareBottomSheet(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = stringResource(R.string.share_view_bottom_sheet_edit_title, share.id),
+                text = share.title(context),
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
-            // Dynamic Category Selector
-            if (categories.size > 1) {
-                SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-                    categories.forEachIndexed { index, category ->
-                        SegmentedButton(
-                            selected = selectedCategory == category,
-                            onClick = { selectedCategory = category },
-                            shape = SegmentedButtonDefaults.itemShape(index = index, count = categories.size)
-                        ) {
-                            Text(category)
-                        }
+            SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                categories.forEachIndexed { index, category ->
+                    SegmentedButton(
+                        selected = selectedCategory == category,
+                        onClick = { selectedCategory = category },
+                        shape = SegmentedButtonDefaults.itemShape(index = index, count = categories.size)
+                    ) {
+                        Text(category.name)
                     }
                 }
             }
 
-            // Render Permissions for Selected Category
-            val activePermissions = share.permissions.filter { it.category == selectedCategory }
-            activePermissions.forEach { permission ->
+            if (selectedCategory == ShareCategory.Invited) {
+                RecipientSearchField(share, viewModel)
+            }
+
+            share.permissions.forEach { permission ->
                 SettingsSwitchRow(
                     label = permission.displayName,
                     checked = permission.enabled,
@@ -231,7 +231,6 @@ private fun AddOrEditShareBottomSheet(
                 )
             }
 
-            // Render Dynamic Properties
             if (share.properties.isNotEmpty()) {
                 CollapsibleSettingsSection(
                     isExpanded = showAdvancedSettings,
@@ -240,6 +239,110 @@ private fun AddOrEditShareBottomSheet(
                     // Sort by server-defined priority
                     share.properties.sortedBy { it.priority }.forEach { property ->
                         DynamicPropertyField(share.id, property, viewModel)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun RecipientSearchField(
+    share: Share,
+    viewModel: ShareViewModel
+) {
+    var query by remember { mutableStateOf("") }
+    var expanded by remember { mutableStateOf(false) }
+    val results by viewModel.recipientSearchResults.collectAsState()
+    val chipScrollState = rememberScrollState()
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        if (share.recipients.isNotEmpty()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(chipScrollState),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                share.recipients.forEach { recipient ->
+                    InputChip(
+                        selected = true,
+                        onClick = {  },
+                        label = { Text(recipient.displayName) },
+                        trailingIcon = {
+                            IconButton(
+                                onClick = {
+                                    viewModel.removeRecipient(
+                                        id = share.id,
+                                        clazz = recipient.clazz,
+                                        value = recipient.value,
+                                        instance = recipient.instance
+                                    )
+                                },
+                                modifier = Modifier.size(16.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "remove recipient"
+                                )
+                            }
+                        }
+                    )
+                }
+            }
+        }
+
+        ExposedDropdownMenuBox(
+            expanded = expanded && query.isNotBlank(),
+            onExpandedChange = { expanded = it }
+        ) {
+            OutlinedTextField(
+                value = query,
+                onValueChange = {
+                    query = it
+                    expanded = true
+                    viewModel.onSearchQueryChanged(it)
+                },
+                label = { Text(stringResource(R.string.share_view_invited_category_label)) },
+                modifier = Modifier
+                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable, true)
+                    .fillMaxWidth(),
+                singleLine = true
+            )
+
+            if (query.isNotBlank()) {
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    if (results.isEmpty()) {
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = stringResource(R.string.share_view_recipient_search_field_empty_result),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            },
+                            onClick = {},
+                            enabled = false
+                        )
+                    } else {
+                        results.forEach { recipient ->
+                            DropdownMenuItem(
+                                text = { Text(recipient.displayName) },
+                                onClick = {
+                                    viewModel.addRecipient(share.id, recipient.clazz, recipient.value)
+                                    query = ""
+                                    expanded = false
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -393,8 +496,14 @@ private fun UnifiedSharesListItem(
             )
             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
         headlineContent = {
+            val headline = if (share.recipients.isNotEmpty()) {
+                share.recipients.first().displayName
+            } else {
+                ""
+            }
+
             Text(
-                text = "Share ${share.id}", // TODO do not hardcode
+                text = headline,
                 style = MaterialTheme.typography.titleSmall
             )
         },
