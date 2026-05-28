@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.network.model.NetworkResult
+import com.nextcloud.android.common.ui.share.model.api.recipients.Recipient
 import com.nextcloud.android.common.ui.share.model.api.request.AddRecipientRequest
 import com.nextcloud.android.common.ui.share.model.api.request.AddSourceRequest
 import com.nextcloud.android.common.ui.share.model.api.request.GetShareRequest
@@ -21,8 +22,12 @@ import com.nextcloud.android.common.ui.share.model.api.share.Share
 import com.nextcloud.android.common.ui.share.model.api.state.ShareState
 import com.nextcloud.android.common.ui.share.repository.ShareRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -36,6 +41,11 @@ class ShareViewModel(
     private val _activeShare = MutableStateFlow<Share?>(null)
     val activeShare: StateFlow<Share?> = _activeShare
 
+    private val _searchQuery = MutableStateFlow("")
+
+    private val _recipientSearchResults = MutableStateFlow<List<Recipient>>(emptyList())
+    val recipientSearchResults: StateFlow<List<Recipient>> = _recipientSearchResults
+
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading
 
@@ -44,7 +54,34 @@ class ShareViewModel(
 
     init {
         fetchShares()
+        initSearchQuery()
     }
+
+    // region search query
+    @OptIn(FlowPreview::class)
+    private fun initSearchQuery() {
+        viewModelScope.launch {
+            _searchQuery
+                .debounce(300L)
+                .distinctUntilChanged()
+                .filter { it.isNotBlank() }
+                .collect { query ->
+                    executeSearch(query)
+                }
+        }
+    }
+
+    fun onSearchQueryChanged(query: String) {
+        _searchQuery.value = query
+    }
+
+    private suspend fun executeSearch(query: String) {
+        val result = repository.fetchRecipients(null, query, 10, 0)
+        if (result is NetworkResult.Success) {
+            _recipientSearchResults.value = result.data
+        }
+    }
+    // endregion
 
     // region shares list
     fun fetchShares(
@@ -84,7 +121,7 @@ class ShareViewModel(
      * Then sources can be added later.
      *
      */
-    fun createShare(onCreated: (Share) -> Unit = {}) {
+    fun createShare() {
         launchWithLoading {
             handleResult(
                 result = repository.createShare(),
@@ -92,7 +129,6 @@ class ShareViewModel(
             ) { draft ->
                 _activeShare.update { draft }
                 _shares.update { current -> listOf(draft) + current }
-                onCreated(draft)
             }
         }
     }
@@ -211,8 +247,8 @@ class ShareViewModel(
         _errorMessageId.update { value }
     }
 
-    fun clearActiveShare() {
-        _activeShare.update { null }
+    fun setActiveShare(value: Share?) {
+        _activeShare.update { value }
     }
     // endregion
 
@@ -241,6 +277,5 @@ class ShareViewModel(
             _loading.update { false }
         }
     }
-
     // endregion
 }

@@ -24,9 +24,8 @@
     <string name="share_view_invited_category_placeholder">Name, team, email or federated ID</string>
     <string name="share_view_invited_category_participants">Participants</string>
 
-    <string name="share_view_empty_title">No shares yet</string>
-    <string name="share_view_empty_description">Start sharing to see them in this list.</string>
-
+    <string name="share_view_empty_title">Not shared</string>
+    <string name="share_view_recipient_search_field_empty_result">No result</string>
     <string name="share_view_note_text_field_placeholder">Note to recipients</string>
 
     <string name="share_view_permission_dropdown_label">Anyone with the link</string>
