@@ -64,6 +64,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -94,13 +95,15 @@ import com.nextcloud.android.common.ui.share.model.api.state.ShareState
 import com.nextcloud.android.common.ui.share.model.ui.ShareCategory
 import com.nextcloud.android.common.ui.share.repository.MockShareRepository
 import com.nextcloud.android.common.ui.share.repository.ShareRemoteRepository
+import kotlinx.coroutines.launch
 
 @Composable
-private fun ShareView(viewModel: ShareViewModel) {
+private fun ShareView(sourceId: String, viewModel: ShareViewModel) {
     val errorMessageId by viewModel.errorMessageId.collectAsState()
     val shares by viewModel.shares.collectAsState()
     val activeShare by viewModel.activeShare.collectAsState()
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val filteredShares = shares.filter { it.shareState != ShareState.DRAFT }
 
@@ -115,7 +118,11 @@ private fun ShareView(viewModel: ShareViewModel) {
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    viewModel.createShare()
+                    scope.launch {
+                        viewModel.createDraftShare()?.let {
+                            viewModel.addSource(it.id, sourceId)
+                        }
+                    }
                 },
             ) {
                 Icon(painterResource(R.drawable.ic_person_add), contentDescription = "Add")
@@ -272,7 +279,7 @@ private fun RecipientSearchField(
                 share.recipients.forEach { recipient ->
                     InputChip(
                         selected = true,
-                        onClick = {  },
+                        onClick = { },
                         label = { Text(recipient.displayName) },
                         trailingIcon = {
                             IconButton(
@@ -559,7 +566,7 @@ private fun UnifiedSharesListItem(
 @Composable
 private fun PreviewLight() {
     PreviewTheme {
-        ShareView(viewModel = ShareViewModel(MockShareRepository()))
+        ShareView(sourceId = "", viewModel = ShareViewModel(MockShareRepository()))
     }
 }
 
@@ -567,7 +574,7 @@ private fun PreviewLight() {
 @Composable
 private fun PreviewDark() {
     PreviewTheme(darkTheme = true) {
-        ShareView(viewModel = ShareViewModel(MockShareRepository()))
+        ShareView(sourceId = "", viewModel = ShareViewModel(MockShareRepository()))
     }
 }
 
@@ -581,7 +588,7 @@ private fun PreviewTheme(
     }
 }
 
-fun ComposeView.setupUnifiedShare(colorScheme: ColorScheme, credentials: ServerCredentials) {
+fun ComposeView.setupUnifiedShare(sourceId: String, credentials: ServerCredentials, colorScheme: ColorScheme) {
     val nextcloudHttpClient = NextcloudHttpClient.create(credentials)
     val viewModel = ShareViewModel(repository = ShareRemoteRepository(nextcloudHttpClient))
 
@@ -589,7 +596,7 @@ fun ComposeView.setupUnifiedShare(colorScheme: ColorScheme, credentials: ServerC
         MaterialTheme(
             colorScheme = colorScheme,
             content = {
-                ShareView(viewModel)
+                ShareView(sourceId, viewModel)
             }
         )
     }

@@ -25,7 +25,7 @@ interface ShareRepository {
         offset: Int
     ): NetworkResult<List<Recipient>>
 
-    suspend fun createShare(): NetworkResult<Share>
+    suspend fun createDraftShare(): NetworkResult<Share>
 
     suspend fun fetchShare(
         id: String,

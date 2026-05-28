@@ -276,7 +276,7 @@ class MockShareRepository : ShareRepository {
         return NetworkResult.Success(filtered)
     }
 
-    override suspend fun createShare(): NetworkResult<Share> {
+    override suspend fun createDraftShare(): NetworkResult<Share> {
         val share = buildShare(
             id = "mock-share-${System.currentTimeMillis()}",
             sources = emptyList(),
