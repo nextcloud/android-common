@@ -7,6 +7,8 @@
 
 package com.nextcloud.android.common.ui.share.model.api.share
 
+import android.content.Context
+import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.share.model.api.owner.Owner
 import com.nextcloud.android.common.ui.share.model.api.permission.Permission
 import com.nextcloud.android.common.ui.share.model.api.property.Property
@@ -35,4 +37,13 @@ data class Share(
     val properties: List<Property>,
 
     val permissions: List<Permission>
-)
+) {
+    fun title(context: Context): String {
+        return if (shareState == ShareState.DRAFT) {
+            context.getString(R.string.share_view_bottom_sheet_new_title)
+        } else {
+            // TODO do not hardcode
+            context.getString(R.string.share_view_bottom_sheet_edit_title, "")
+        }
+    }
+}
