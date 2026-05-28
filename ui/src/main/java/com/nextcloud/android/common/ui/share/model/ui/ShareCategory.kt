@@ -7,9 +7,6 @@
 
 package com.nextcloud.android.common.ui.share.model.ui
 
-import com.nextcloud.android.common.ui.share.model.api.share.Share
-
-sealed class ShareBottomSheetState {
-    object Idle : ShareBottomSheetState()
-    data class Edit(val share: Share) : ShareBottomSheetState()
+enum class ShareCategory {
+    Invited, Anyone
 }
