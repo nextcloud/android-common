@@ -52,7 +52,7 @@ class ShareRemoteRepository(
         }
     }
 
-    override suspend fun createShare(): NetworkResult<Share> =
+    override suspend fun createDraftShare(): NetworkResult<Share> =
         client.executeRequest(
             endpoint = SHARE_ENDPOINT,
             method = HttpMethod.POST,
