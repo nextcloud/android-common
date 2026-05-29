@@ -35,6 +35,8 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -56,9 +58,11 @@ import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.getSelectedDate
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -105,6 +109,7 @@ import com.nextcloud.android.common.ui.share.model.ui.ShareCategory
 import com.nextcloud.android.common.ui.share.repository.ShareRemoteRepository
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import java.time.format.DateTimeFormatter
 
 @Composable
 private fun ShareView(sourceId: String, sharingCapabilities: SharingCapabilities, viewModel: ShareViewModel) {
@@ -469,22 +474,74 @@ private fun DynamicPropertyField(shareId: String, property: Property, viewModel:
         }
 
         is PropertyDate -> {
-            // TODO: Wrap with a DatePickerDialog. Falling back to string entry for now.
+            var showDatePicker by remember { mutableStateOf(false) }
+            var dateValue by remember { mutableStateOf(property.value ?: "") }
+
             OutlinedTextField(
-                value = property.value ?: "",
-                onValueChange = { viewModel.updateProperty(shareId, property.clazz, it) },
-                label = { Text(property.displayName + " (YYYY-MM-DD)") },
+                value = dateValue,
+                onValueChange = { },
+                label = { Text(property.displayName + " (MM-dd-yyyy)") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 4.dp),
-                singleLine = true
+                    .padding(vertical = 4.dp)
+                    .clickable { showDatePicker = true },
+                trailingIcon = {
+                    IconButton(onClick = { showDatePicker = true }) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_calendar),
+                            contentDescription = "Pick date"
+                        )
+                    }
+                },
+                enabled = true,
+                readOnly = true
             )
+
+            if (showDatePicker) {
+                DatePickerModal(onDateSelected = {
+                    dateValue = it ?: ""
+                    viewModel.updateProperty(shareId, property.clazz, dateValue)
+                }, onDismiss = {
+                  showDatePicker = false
+                })
+            }
         }
 
         is PropertyEnum -> {
             // TODO: Implement ExposedDropdownMenuBox using property.validValues
             Text(text = "Enum Property: ${property.displayName} (Under Construction)", color = Color.Gray)
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DatePickerModal(
+    onDateSelected: (String?) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val datePickerState = rememberDatePickerState()
+
+    DatePickerDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = {
+                val date = datePickerState.getSelectedDate()
+                val formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy")
+                val formatted = date?.format(formatter)
+                onDateSelected(formatted)
+                onDismiss()
+            }) {
+                Text(stringResource(R.string.common_ok))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.common_cancel))
+            }
+        }
+    ) {
+        DatePicker(state = datePickerState)
     }
 }
 
@@ -646,16 +703,6 @@ private fun UnifiedSharesListItem(
     )
 }
 
-@Composable
-private fun PreviewTheme(
-    darkTheme: Boolean = false,
-    content: @Composable () -> Unit
-) {
-    MaterialTheme {
-        Surface(content = content)
-    }
-}
-
 private val json = Json { ignoreUnknownKeys = true }
 
 fun ComposeView.setupUnifiedShare(
@@ -664,7 +711,7 @@ fun ComposeView.setupUnifiedShare(
     credentials: ServerCredentials,
     colorScheme: ColorScheme
 ) {
-    val sharingCapabilities =  json.decodeFromString<SharingCapabilities>(sharingJson)
+    val sharingCapabilities = json.decodeFromString<SharingCapabilities>(sharingJson)
     val nextcloudHttpClient = NextcloudHttpClient.create(credentials)
     val viewModel = ShareViewModel(repository = ShareRemoteRepository(nextcloudHttpClient))
 
