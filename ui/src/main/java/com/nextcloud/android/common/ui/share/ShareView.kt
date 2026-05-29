@@ -414,7 +414,7 @@ private fun RecipientIcon(icon: Icon, modifier: Modifier = Modifier) {
                 .decoderFactory(SvgDecoder.Factory())
                 .build(),
             contentDescription = null,
-            modifier = modifier
+            modifier = modifier,
         )
     }
 }
