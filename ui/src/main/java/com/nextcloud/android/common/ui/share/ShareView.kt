@@ -64,6 +64,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -199,13 +200,7 @@ private fun AddOrEditShareBottomSheet(
     val categories = remember { ShareCategory.entries.toList() }
     var selectedCategory by remember { mutableStateOf(categories.first()) }
     var showAdvancedSettings by remember { mutableStateOf(false) }
-    var expandedCategories by remember { mutableStateOf(setOf<String?>()) }
-    val permissionsByCategory = share.permissions.groupBy { it.category }
-    val categoryLabelMap = remember(sharingCapabilities) {
-        sharingCapabilities.permissionCategories.associate {
-            it.class_field to it.displayName
-        }
-    }
+    var expandedCategories by remember { mutableStateOf(emptySet<String>()) }
 
     ModalBottomSheet(
         onDismissRequest = {
@@ -248,30 +243,38 @@ private fun AddOrEditShareBottomSheet(
                 RecipientSearchField(share, viewModel)
             }
 
-            permissionsByCategory.forEach { (category, permissions) ->
-                CollapsibleSettingsSection(
-                    label = category
-                        ?.let { categoryLabelMap[it] } ?: permissions.first().displayName,
-                        isExpanded = category in expandedCategories,
-                    onToggle = {
-                        expandedCategories = if (category in expandedCategories) {
-                            expandedCategories - category
-                        } else {
-                            expandedCategories + category
+            sharingCapabilities.permissionCategories
+                .sortedBy { it.priority }
+                .forEach { sharingCapability ->
+                    key(sharingCapability.class_field) {
+                        CollapsibleSettingsSection(
+                            label = sharingCapability.displayName,
+                            isExpanded = sharingCapability.displayName in expandedCategories,
+                            onToggle = {
+                                expandedCategories = if (expandedCategories.contains(sharingCapability.displayName)) {
+                                    expandedCategories - sharingCapability.displayName
+                                } else {
+                                    expandedCategories + sharingCapability.displayName
+                                }
+                            },
+                        ) {
+                            share.permissions
+                                .filter { permission -> permission.category == sharingCapability.class_field }
+                                .sortedBy { it.displayName }
+                                .forEach { permission ->
+                                    key(permission.clazz) {
+                                        SettingsSwitchRow(
+                                            label = permission.displayName,
+                                            checked = permission.enabled,
+                                            onCheckedChange = { isChecked ->
+                                                viewModel.updatePermission(share.id, permission.clazz, isChecked)
+                                            }
+                                        )
+                                    }
+                                }
                         }
-                    },
-                ) {
-                    permissions.forEach { permission ->
-                        SettingsSwitchRow(
-                            label = permission.displayName,
-                            checked = permission.enabled,
-                            onCheckedChange = { isChecked ->
-                                viewModel.updatePermission(share.id, permission.clazz, isChecked)
-                            }
-                        )
                     }
                 }
-            }
 
             if (share.properties.isNotEmpty()) {
                 CollapsibleSettingsSection(
