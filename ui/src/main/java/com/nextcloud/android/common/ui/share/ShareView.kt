@@ -191,6 +191,8 @@ private fun AddOrEditShareBottomSheet(
     val categories = remember { ShareCategory.entries.toList() }
     var selectedCategory by remember { mutableStateOf(categories.first()) }
     var showAdvancedSettings by remember { mutableStateOf(false) }
+    var expandedCategories by remember { mutableStateOf(setOf<String?>()) }
+    val permissionsByCategory = share.permissions.groupBy { it.category }
 
     ModalBottomSheet(
         onDismissRequest = {
@@ -233,22 +235,37 @@ private fun AddOrEditShareBottomSheet(
                 RecipientSearchField(share, viewModel)
             }
 
-            share.permissions.forEach { permission ->
-                SettingsSwitchRow(
-                    label = permission.displayName,
-                    checked = permission.enabled,
-                    onCheckedChange = { isChecked ->
-                        viewModel.updatePermission(share.id, permission.clazz, isChecked)
+            // TODO use more better category names
+            permissionsByCategory.forEach { (category, permissions) ->
+                CollapsibleSettingsSection(
+                    label = category ?: "",
+                    isExpanded = category in expandedCategories,
+                    onToggle = {
+                        expandedCategories = if (category in expandedCategories) {
+                            expandedCategories - category
+                        } else {
+                            expandedCategories + category
+                        }
+                    },
+                ) {
+                    permissions.forEach { permission ->
+                        SettingsSwitchRow(
+                            label = permission.displayName,
+                            checked = permission.enabled,
+                            onCheckedChange = { isChecked ->
+                                viewModel.updatePermission(share.id, permission.clazz, isChecked)
+                            }
+                        )
                     }
-                )
+                }
             }
 
             if (share.properties.isNotEmpty()) {
                 CollapsibleSettingsSection(
+                    label = stringResource(R.string.share_view_advanced_settings),
                     isExpanded = showAdvancedSettings,
                     onToggle = { showAdvancedSettings = !showAdvancedSettings }
                 ) {
-                    // Sort by server-defined priority
                     share.properties.sortedBy { it.priority }.forEach { property ->
                         DynamicPropertyField(share.id, property, viewModel)
                     }
@@ -424,6 +441,7 @@ private fun DynamicPropertyField(shareId: String, property: Property, viewModel:
 
 @Composable
 private fun CollapsibleSettingsSection(
+    label: String,
     isExpanded: Boolean,
     onToggle: () -> Unit,
     content: @Composable () -> Unit
@@ -438,7 +456,7 @@ private fun CollapsibleSettingsSection(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = stringResource(R.string.share_view_advanced_settings),
+                text = label,
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -450,9 +468,7 @@ private fun CollapsibleSettingsSection(
         }
 
         AnimatedVisibility(visible = isExpanded) {
-            Column {
-                content()
-            }
+            Column { content() }
         }
     }
 }
