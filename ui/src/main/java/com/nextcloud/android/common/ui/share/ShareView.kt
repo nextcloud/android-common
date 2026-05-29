@@ -7,7 +7,6 @@
 
 package com.nextcloud.android.common.ui.share
 
-import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -80,7 +79,6 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.ImageLoader
 import coil3.compose.AsyncImage
@@ -91,6 +89,7 @@ import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.component.ContentUnavailableView
 import com.nextcloud.android.common.ui.network.auth.ServerCredentials
 import com.nextcloud.android.common.ui.network.http.NextcloudHttpClient
+import com.nextcloud.android.common.ui.share.model.api.capabilities.SharingCapabilities
 import com.nextcloud.android.common.ui.share.model.api.icon.Icon
 import com.nextcloud.android.common.ui.share.model.api.property.Property
 import com.nextcloud.android.common.ui.share.model.api.property.PropertyBoolean
@@ -102,12 +101,12 @@ import com.nextcloud.android.common.ui.share.model.api.property.priority
 import com.nextcloud.android.common.ui.share.model.api.share.Share
 import com.nextcloud.android.common.ui.share.model.api.state.ShareState
 import com.nextcloud.android.common.ui.share.model.ui.ShareCategory
-import com.nextcloud.android.common.ui.share.repository.MockShareRepository
 import com.nextcloud.android.common.ui.share.repository.ShareRemoteRepository
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 
 @Composable
-private fun ShareView(sourceId: String, viewModel: ShareViewModel) {
+private fun ShareView(sourceId: String, sharingCapabilities: SharingCapabilities, viewModel: ShareViewModel) {
     val errorMessageId by viewModel.errorMessageId.collectAsState()
     val shares by viewModel.shares.collectAsState()
     val activeShare by viewModel.activeShare.collectAsState()
@@ -181,6 +180,7 @@ private fun ShareView(sourceId: String, viewModel: ShareViewModel) {
     activeShare?.let {
         AddOrEditShareBottomSheet(
             share = it,
+            sharingCapabilities = sharingCapabilities,
             viewModel = viewModel
         )
     }
@@ -190,6 +190,7 @@ private fun ShareView(sourceId: String, viewModel: ShareViewModel) {
 @Composable
 private fun AddOrEditShareBottomSheet(
     share: Share,
+    sharingCapabilities: SharingCapabilities,
     viewModel: ShareViewModel
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -200,6 +201,11 @@ private fun AddOrEditShareBottomSheet(
     var showAdvancedSettings by remember { mutableStateOf(false) }
     var expandedCategories by remember { mutableStateOf(setOf<String?>()) }
     val permissionsByCategory = share.permissions.groupBy { it.category }
+    val categoryLabelMap = remember(sharingCapabilities) {
+        sharingCapabilities.permissionCategories.associate {
+            it.class_field to it.displayName
+        }
+    }
 
     ModalBottomSheet(
         onDismissRequest = {
@@ -242,11 +248,11 @@ private fun AddOrEditShareBottomSheet(
                 RecipientSearchField(share, viewModel)
             }
 
-            // TODO use more better category names
             permissionsByCategory.forEach { (category, permissions) ->
                 CollapsibleSettingsSection(
-                    label = category ?: "",
-                    isExpanded = category in expandedCategories,
+                    label = category
+                        ?.let { categoryLabelMap[it] } ?: permissions.first().displayName,
+                        isExpanded = category in expandedCategories,
                     onToggle = {
                         expandedCategories = if (category in expandedCategories) {
                             expandedCategories - category
@@ -637,22 +643,6 @@ private fun UnifiedSharesListItem(
     )
 }
 
-@Preview(name = "UnifiedShareView – light", showBackground = true)
-@Composable
-private fun PreviewLight() {
-    PreviewTheme {
-        ShareView(sourceId = "", viewModel = ShareViewModel(MockShareRepository()))
-    }
-}
-
-@Preview(name = "UnifiedShareView – dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun PreviewDark() {
-    PreviewTheme(darkTheme = true) {
-        ShareView(sourceId = "", viewModel = ShareViewModel(MockShareRepository()))
-    }
-}
-
 @Composable
 private fun PreviewTheme(
     darkTheme: Boolean = false,
@@ -663,7 +653,15 @@ private fun PreviewTheme(
     }
 }
 
-fun ComposeView.setupUnifiedShare(sourceId: String, credentials: ServerCredentials, colorScheme: ColorScheme) {
+private val json = Json { ignoreUnknownKeys = true }
+
+fun ComposeView.setupUnifiedShare(
+    sourceId: String,
+    sharingJson: String,
+    credentials: ServerCredentials,
+    colorScheme: ColorScheme
+) {
+    val sharingCapabilities =  json.decodeFromString<SharingCapabilities>(sharingJson)
     val nextcloudHttpClient = NextcloudHttpClient.create(credentials)
     val viewModel = ShareViewModel(repository = ShareRemoteRepository(nextcloudHttpClient))
 
@@ -677,7 +675,7 @@ fun ComposeView.setupUnifiedShare(sourceId: String, credentials: ServerCredentia
         MaterialTheme(
             colorScheme = colorScheme,
             content = {
-                ShareView(sourceId, viewModel)
+                ShareView(sourceId, sharingCapabilities, viewModel)
             }
         )
     }
