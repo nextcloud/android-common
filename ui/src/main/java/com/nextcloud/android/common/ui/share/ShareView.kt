@@ -493,7 +493,7 @@ private fun DynamicPropertyField(shareId: String, property: Property, viewModel:
                         )
                     }
                 },
-                enabled = true,
+                enabled = false,
                 readOnly = true
             )
 
