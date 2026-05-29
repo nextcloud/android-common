@@ -13,6 +13,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -81,10 +82,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil3.ImageLoader
+import coil3.compose.AsyncImage
+import coil3.compose.setSingletonImageLoaderFactory
+import coil3.request.ImageRequest
+import coil3.svg.SvgDecoder
 import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.component.ContentUnavailableView
 import com.nextcloud.android.common.ui.network.auth.ServerCredentials
 import com.nextcloud.android.common.ui.network.http.NextcloudHttpClient
+import com.nextcloud.android.common.ui.share.model.api.icon.Icon
 import com.nextcloud.android.common.ui.share.model.api.property.Property
 import com.nextcloud.android.common.ui.share.model.api.property.PropertyBoolean
 import com.nextcloud.android.common.ui.share.model.api.property.PropertyDate
@@ -303,6 +310,14 @@ private fun RecipientSearchField(
                         selected = true,
                         onClick = { },
                         label = { Text(recipient.displayName) },
+                        leadingIcon = {
+                            recipient.icon?.let {
+                                RecipientIcon(
+                                    icon = it,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        },
                         trailingIcon = {
                             IconButton(
                                 onClick = {
@@ -364,6 +379,14 @@ private fun RecipientSearchField(
                     } else {
                         results.forEach { recipient ->
                             DropdownMenuItem(
+                                leadingIcon = {
+                                    recipient.icon?.let {
+                                        RecipientIcon(
+                                            icon = it,
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                    }
+                                },
                                 text = { Text(recipient.displayName) },
                                 onClick = {
                                     viewModel.addRecipient(share.id, recipient.clazz, recipient.value)
@@ -376,6 +399,23 @@ private fun RecipientSearchField(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun RecipientIcon(icon: Icon, modifier: Modifier = Modifier) {
+    val isDark = isSystemInDarkTheme()
+    val url = if (isDark) icon.dark ?: icon.light else icon.light ?: icon.dark
+
+    if (url != null) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(url)
+                .decoderFactory(SvgDecoder.Factory())
+                .build(),
+            contentDescription = null,
+            modifier = modifier
+        )
     }
 }
 
@@ -628,6 +668,12 @@ fun ComposeView.setupUnifiedShare(sourceId: String, credentials: ServerCredentia
     val viewModel = ShareViewModel(repository = ShareRemoteRepository(nextcloudHttpClient))
 
     setContent {
+        setSingletonImageLoaderFactory { context ->
+            ImageLoader.Builder(context)
+                .components { add(SvgDecoder.Factory()) }
+                .build()
+        }
+
         MaterialTheme(
             colorScheme = colorScheme,
             content = {
