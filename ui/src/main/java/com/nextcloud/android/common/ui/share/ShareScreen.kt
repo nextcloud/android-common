@@ -9,23 +9,18 @@ package com.nextcloud.android.common.ui.share
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -33,20 +28,14 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -69,15 +58,10 @@ import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.component.ContentUnavailableView
 import com.nextcloud.android.common.ui.network.auth.ServerCredentials
 import com.nextcloud.android.common.ui.network.http.NextcloudHttpClient
-import com.nextcloud.android.common.ui.share.component.CollapsibleShareSection
-import com.nextcloud.android.common.ui.share.component.PropertyView
-import com.nextcloud.android.common.ui.share.component.RecipientSearchField
-import com.nextcloud.android.common.ui.share.component.ShareSwitch
+import com.nextcloud.android.common.ui.share.component.AddOrEditShareBottomSheet
 import com.nextcloud.android.common.ui.share.model.api.capabilities.SharingCapabilities
-import com.nextcloud.android.common.ui.share.model.api.property.priority
 import com.nextcloud.android.common.ui.share.model.api.share.Share
 import com.nextcloud.android.common.ui.share.model.api.state.ShareState
-import com.nextcloud.android.common.ui.share.model.ui.ShareCategory
 import com.nextcloud.android.common.ui.share.model.ui.ShareItemType
 import com.nextcloud.android.common.ui.share.repository.ShareRemoteRepository
 import kotlinx.coroutines.launch
@@ -161,110 +145,6 @@ private fun ShareScreen(sourceId: String, sharingCapabilities: SharingCapabiliti
             sharingCapabilities = sharingCapabilities,
             viewModel = viewModel
         )
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun AddOrEditShareBottomSheet(
-    share: Share,
-    sharingCapabilities: SharingCapabilities,
-    viewModel: ShareViewModel
-) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val scrollState = rememberScrollState()
-    val context = LocalContext.current
-    val categories = remember { ShareCategory.entries.toList() }
-    var selectedCategory by remember { mutableStateOf(categories.first()) }
-    var showAdvancedSettings by remember { mutableStateOf(false) }
-    var expandedCategories by remember { mutableStateOf(emptySet<String>()) }
-
-    ModalBottomSheet(
-        onDismissRequest = {
-            if (share.shareState == ShareState.DRAFT) {
-                viewModel.deleteShare(share.id)
-            }
-            viewModel.setActiveShare(null)
-        },
-        sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.surface,
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .padding(bottom = 32.dp)
-                .verticalScroll(scrollState),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Text(
-                text = share.title(context),
-                style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-
-            SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-                categories.forEachIndexed { index, category ->
-                    SegmentedButton(
-                        selected = selectedCategory == category,
-                        onClick = { selectedCategory = category },
-                        shape = SegmentedButtonDefaults.itemShape(index = index, count = categories.size)
-                    ) {
-                        Text(category.name)
-                    }
-                }
-            }
-
-            if (selectedCategory == ShareCategory.Invited) {
-                RecipientSearchField(share, viewModel)
-            }
-
-            sharingCapabilities.permissionCategories
-                .sortedBy { it.priority }
-                .forEach { sharingCapability ->
-                    key(sharingCapability.class_field) {
-                        CollapsibleShareSection(
-                            label = sharingCapability.displayName,
-                            isExpanded = sharingCapability.displayName in expandedCategories,
-                            onToggle = {
-                                expandedCategories = if (expandedCategories.contains(sharingCapability.displayName)) {
-                                    expandedCategories - sharingCapability.displayName
-                                } else {
-                                    expandedCategories + sharingCapability.displayName
-                                }
-                            },
-                        ) {
-                            share.permissions
-                                .filter { permission -> permission.category == sharingCapability.class_field }
-                                .sortedBy { it.displayName }
-                                .forEach { permission ->
-                                    key(permission.clazz) {
-                                        ShareSwitch(
-                                            label = permission.displayName,
-                                            checked = permission.enabled,
-                                            onCheckedChange = { isChecked ->
-                                                viewModel.updatePermission(share.id, permission.clazz, isChecked)
-                                            }
-                                        )
-                                    }
-                                }
-                        }
-                    }
-                }
-
-            if (share.properties.isNotEmpty()) {
-                CollapsibleShareSection(
-                    label = stringResource(R.string.share_view_advanced_settings),
-                    isExpanded = showAdvancedSettings,
-                    onToggle = { showAdvancedSettings = !showAdvancedSettings }
-                ) {
-                    share.properties.sortedBy { it.priority }.forEach { property ->
-                        PropertyView(share.id, property, viewModel)
-                    }
-                }
-            }
-        }
     }
 }
 

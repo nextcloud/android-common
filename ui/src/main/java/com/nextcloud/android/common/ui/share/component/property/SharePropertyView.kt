@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-package com.nextcloud.android.common.ui.share.component
+package com.nextcloud.android.common.ui.share.component.property
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -17,6 +17,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.nextcloud.android.common.ui.share.ShareViewModel
+import com.nextcloud.android.common.ui.share.component.property.datepicker.ShareDatePicker
+import com.nextcloud.android.common.ui.share.component.ShareSwitch
 import com.nextcloud.android.common.ui.share.model.api.property.Property
 import com.nextcloud.android.common.ui.share.model.api.property.PropertyBoolean
 import com.nextcloud.android.common.ui.share.model.api.property.PropertyDate
@@ -25,7 +27,7 @@ import com.nextcloud.android.common.ui.share.model.api.property.PropertyPassword
 import com.nextcloud.android.common.ui.share.model.api.property.PropertyString
 
 @Composable
-fun PropertyView(shareId: String, property: Property, viewModel: ShareViewModel) {
+fun SharePropertyView(shareId: String, property: Property, viewModel: ShareViewModel) {
     when (property) {
         is PropertyBoolean -> {
             ShareSwitch(
