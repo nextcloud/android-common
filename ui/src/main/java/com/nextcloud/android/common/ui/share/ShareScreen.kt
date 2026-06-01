@@ -353,7 +353,7 @@ private fun ShareItem(
 
 private val json = Json { ignoreUnknownKeys = true }
 
-fun ComposeView.setupUnifiedShare(
+fun ComposeView.initShareScreen(
     sourceId: String,
     sharingJson: String,
     credentials: ServerCredentials,
