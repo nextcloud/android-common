@@ -27,13 +27,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
 import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.share.ShareViewModel
 import com.nextcloud.android.common.ui.share.component.property.SharePropertyView
@@ -49,33 +47,20 @@ import com.nextcloud.android.common.ui.share.model.ui.ShareCategory
 fun AddOrEditShareBottomSheet(
     share: Share,
     sharingCapabilities: SharingCapabilities,
-    viewModel: ShareViewModel
+    viewModel: ShareViewModel,
+    onDismissDraft: () -> Unit = {}
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scrollState = rememberScrollState()
-    val scope = rememberCoroutineScope()
     val categories = remember { ShareCategory.entries.toList() }
     var selectedCategory by remember { mutableStateOf(categories.first()) }
     var showAdvancedSettings by remember { mutableStateOf(false) }
     var expandedCategories by remember { mutableStateOf(emptySet<String>()) }
-    var showDiscardDialog by remember { mutableStateOf(false) }
-
-    if (showDiscardDialog) {
-        DiscardDraftShareDialog(
-            onKeep = { showDiscardDialog = false },
-            onDiscard = {
-                showDiscardDialog = false
-                viewModel.deleteShare(share.id)
-                viewModel.setActiveShare(null)
-            }
-        )
-    }
 
     ModalBottomSheet(
         onDismissRequest = {
             if (share.shareState == ShareState.DRAFT) {
-                showDiscardDialog = true
-                scope.launch { sheetState.expand() }
+                onDismissDraft()
             } else {
                 viewModel.commitPendingProperties(share.id)
                 viewModel.setActiveShare(null)

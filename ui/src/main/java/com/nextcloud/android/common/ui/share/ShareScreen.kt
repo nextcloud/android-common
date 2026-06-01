@@ -62,8 +62,10 @@ import com.nextcloud.android.common.ui.network.auth.ServerCredentials
 import com.nextcloud.android.common.ui.network.http.NextcloudHttpClient
 import com.nextcloud.android.common.ui.share.component.AddOrEditShareBottomSheet
 import com.nextcloud.android.common.ui.share.component.DeleteShareConfirmationDialog
+import com.nextcloud.android.common.ui.share.component.DiscardDraftShareDialog
 import com.nextcloud.android.common.ui.share.model.api.capabilities.SharingCapabilities
 import com.nextcloud.android.common.ui.share.model.api.share.Share
+import com.nextcloud.android.common.ui.share.model.ui.ShareItemOverlayState
 import com.nextcloud.android.common.ui.share.model.ui.ShareItemType
 import com.nextcloud.android.common.ui.share.model.ui.ShareScreenState
 import com.nextcloud.android.common.ui.share.repository.ShareRemoteRepository
@@ -78,6 +80,18 @@ private fun ShareScreen(sourceId: String, sharingCapabilities: SharingCapabiliti
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+    var showDiscardDraftDialog by remember { mutableStateOf(false) }
+
+    if (showDiscardDraftDialog) {
+        DiscardDraftShareDialog(
+            onKeep = { showDiscardDraftDialog = false },
+            onDiscard = {
+                showDiscardDraftDialog = false
+                activeShare?.let { viewModel.deleteShare(it.id) }
+                viewModel.setActiveShare(null)
+            }
+        )
+    }
 
     LaunchedEffect(errorMessageId) {
         errorMessageId?.let {
@@ -153,7 +167,8 @@ private fun ShareScreen(sourceId: String, sharingCapabilities: SharingCapabiliti
         AddOrEditShareBottomSheet(
             share = it,
             sharingCapabilities = sharingCapabilities,
-            viewModel = viewModel
+            viewModel = viewModel,
+            onDismissDraft = { showDiscardDraftDialog = true }
         )
     }
 }
@@ -166,17 +181,16 @@ private fun ShareItem(
     onDeleteShare: (Share) -> Unit,
     onSendEmail: (Share) -> Unit
 ) {
-    var showContextMenu by remember { mutableStateOf(false) }
-    var showDeleteDialog by remember { mutableStateOf(false) }
+    var overlayState by remember { mutableStateOf<ShareItemOverlayState>(ShareItemOverlayState.None) }
     val haptics = LocalHapticFeedback.current
 
-    if (showDeleteDialog) {
+    if (overlayState == ShareItemOverlayState.DeleteConfirmation) {
         DeleteShareConfirmationDialog(
             onConfirm = {
-                showDeleteDialog = false
+                overlayState = ShareItemOverlayState.None
                 onDeleteShare(share)
             },
-            onDismiss = { showDeleteDialog = false }
+            onDismiss = { overlayState = ShareItemOverlayState.None }
         )
     }
 
@@ -188,7 +202,7 @@ private fun ShareItem(
                 onClick = { onSelectShare(share) },
                 onLongClick = {
                     haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                    showContextMenu = true
+                    overlayState = ShareItemOverlayState.ContextMenu
                 },
             )
             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
@@ -213,15 +227,18 @@ private fun ShareItem(
         },
         trailingContent = {
             Box {
-                IconButton(onClick = { showContextMenu = true }) {
+                IconButton(onClick = { overlayState = ShareItemOverlayState.ContextMenu }) {
                     Icon(Icons.Default.MoreVert, contentDescription = "More options")
                 }
 
-                DropdownMenu(expanded = showContextMenu, onDismissRequest = { showContextMenu = false }) {
+                DropdownMenu(
+                    expanded = overlayState == ShareItemOverlayState.ContextMenu,
+                    onDismissRequest = { overlayState = ShareItemOverlayState.None }
+                ) {
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.share_view_list_item_edit)) },
                         onClick = {
-                            showContextMenu = false
+                            overlayState = ShareItemOverlayState.None
                             onSelectShare(share)
                         }
                     )
@@ -229,7 +246,7 @@ private fun ShareItem(
                         text = { Text(stringResource(R.string.share_view_list_item_send_email)) },
                         onClick = {
                             onSendEmail(share)
-                            showContextMenu = false
+                            overlayState = ShareItemOverlayState.None
                         }
                     )
                     HorizontalDivider()
@@ -241,8 +258,7 @@ private fun ShareItem(
                             )
                         },
                         onClick = {
-                            showContextMenu = false
-                            showDeleteDialog = true
+                            overlayState = ShareItemOverlayState.DeleteConfirmation
                         }
                     )
                 }
