@@ -1,0 +1,184 @@
+/*
+ * Nextcloud - Android Client
+ *
+ * SPDX-FileCopyrightText: 2026 Alper Ozturk <alper.ozturk@nextcloud.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
+package com.nextcloud.android.common.ui.share.component
+
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.InputChip
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.svg.SvgDecoder
+import com.nextcloud.android.common.ui.R
+import com.nextcloud.android.common.ui.share.ShareViewModel
+import com.nextcloud.android.common.ui.share.model.api.icon.Icon
+import com.nextcloud.android.common.ui.share.model.api.share.Share
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun RecipientSearchField(
+    share: Share,
+    viewModel: ShareViewModel
+) {
+    var query by remember { mutableStateOf("") }
+    var expanded by remember { mutableStateOf(false) }
+    val results by viewModel.recipientSearchResults.collectAsState()
+    val chipScrollState = rememberScrollState()
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        if (share.recipients.isNotEmpty()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(chipScrollState),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                share.recipients.forEach { recipient ->
+                    InputChip(
+                        selected = true,
+                        onClick = { },
+                        label = { Text(recipient.displayName) },
+                        leadingIcon = {
+                            recipient.icon?.let {
+                                RecipientIcon(
+                                    icon = it,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        },
+                        trailingIcon = {
+                            IconButton(
+                                onClick = {
+                                    viewModel.removeRecipient(
+                                        id = share.id,
+                                        clazz = recipient.clazz,
+                                        value = recipient.value,
+                                        instance = recipient.instance
+                                    )
+                                },
+                                modifier = Modifier.size(16.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "remove recipient"
+                                )
+                            }
+                        }
+                    )
+                }
+            }
+        }
+
+        ExposedDropdownMenuBox(
+            expanded = expanded && query.isNotBlank(),
+            onExpandedChange = { expanded = it }
+        ) {
+            OutlinedTextField(
+                value = query,
+                onValueChange = {
+                    query = it
+                    expanded = true
+                    viewModel.onSearchQueryChanged(it)
+                },
+                label = { Text(stringResource(R.string.share_view_invited_category_label)) },
+                modifier = Modifier
+                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable, true)
+                    .fillMaxWidth(),
+                singleLine = true
+            )
+
+            if (query.isNotBlank()) {
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    if (results.isEmpty()) {
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = stringResource(R.string.share_view_recipient_search_field_empty_result),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            },
+                            onClick = {},
+                            enabled = false
+                        )
+                    } else {
+                        results.forEach { recipient ->
+                            DropdownMenuItem(
+                                leadingIcon = {
+                                    recipient.icon?.let {
+                                        RecipientIcon(
+                                            icon = it,
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                    }
+                                },
+                                text = { Text(recipient.displayName) },
+                                onClick = {
+                                    viewModel.addRecipient(share.id, recipient.clazz, recipient.value)
+                                    query = ""
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun RecipientIcon(icon: Icon, modifier: Modifier = Modifier) {
+    val isDark = isSystemInDarkTheme()
+    val url = if (isDark) icon.dark ?: icon.light else icon.light ?: icon.dark
+
+    if (url != null) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(url)
+                .decoderFactory(SvgDecoder.Factory())
+                .build(),
+            contentDescription = null,
+            modifier = modifier,
+        )
+    }
+}
