@@ -11,6 +11,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -18,6 +19,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -62,6 +64,7 @@ import com.nextcloud.android.common.ui.share.component.AddOrEditShareBottomSheet
 import com.nextcloud.android.common.ui.share.model.api.capabilities.SharingCapabilities
 import com.nextcloud.android.common.ui.share.model.api.share.Share
 import com.nextcloud.android.common.ui.share.model.ui.ShareItemType
+import com.nextcloud.android.common.ui.share.model.ui.ShareScreenState
 import com.nextcloud.android.common.ui.share.repository.ShareRemoteRepository
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
@@ -69,7 +72,7 @@ import kotlinx.serialization.json.Json
 @Composable
 private fun ShareScreen(sourceId: String, sharingCapabilities: SharingCapabilities, viewModel: ShareViewModel) {
     val errorMessageId by viewModel.errorMessageId.collectAsState()
-    val shares by viewModel.shares.collectAsState()
+    val screenState by viewModel.state.collectAsState()
     val activeShare by viewModel.activeShare.collectAsState()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -99,35 +102,47 @@ private fun ShareScreen(sourceId: String, sharingCapabilities: SharingCapabiliti
         snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = Color.Transparent
     ) { paddingValues ->
-        if (shares.isEmpty()) {
-            ContentUnavailableView(
-                iconId = R.drawable.ic_person_add,
-                title =
-                    stringResource(R.string.share_view_empty_title),
-            )
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                itemsIndexed(shares, key  = { _, share -> share.id }) { index, share ->
-                    val type = ShareItemType.type(index, shares.lastIndex)
+        when (val state = screenState) {
+            is ShareScreenState.Loading -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+            is ShareScreenState.Empty -> {
+                ContentUnavailableView(
+                    iconId = R.drawable.ic_person_add,
+                    title = stringResource(R.string.share_view_empty_title),
+                )
+            }
+            is ShareScreenState.Loaded -> {
+                LazyColumn(
+                    modifier = Modifier
+                        .padding(paddingValues)
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    itemsIndexed(state.shares, key = { _, share -> share.id }) { index, share ->
+                        val type = ShareItemType.type(index, state.shares.lastIndex)
 
-                    if (index == 0) {
-                        Spacer(modifier = Modifier.height(16.dp))
+                        if (index == 0) {
+                            Spacer(modifier = Modifier.height(16.dp))
+                        } else {
+                            Spacer(modifier = Modifier.height(2.dp))
+                        }
+
+                        ShareItem(
+                            share = share,
+                            type = type,
+                            onSelectShare = { selected -> viewModel.setActiveShare(selected) },
+                            onDeleteShare = { viewModel.deleteShare(it.id) },
+                            onSendEmail = { }
+                        )
                     }
-
-                    ShareItem(
-                        share = share,
-                        type = type,
-                        onSelectShare = { selected ->
-                            viewModel.setActiveShare(selected)
-                        },
-                        onDeleteShare = { viewModel.deleteShare(it.id) },
-                        onSendEmail = { }
-                    )
                 }
             }
         }

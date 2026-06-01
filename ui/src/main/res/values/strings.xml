@@ -58,6 +58,11 @@
 
     <string name="share_view_fetch_error_message">Failed to fetch shares.</string>
 
+    <string name="share_view_discard_draft_title">Discard new share?</string>
+    <string name="share_view_discard_draft_message">This share hasn\'t been saved yet. Do you want to discard it?</string>
+    <string name="share_view_discard_draft_keep">Keep</string>
+    <string name="share_view_discard_draft_delete">Discard</string>
+
     <string name="share_view_delete_error_id_not_found_message">Share not found, cannot delete.</string>
     <string name="share_view_delete_error_message">Failed to delete share.</string>
 

@@ -1,9 +1,10 @@
 /*
- * Nextcloud - Android Client
+ * Nextcloud Android Common Library
  *
- * SPDX-FileCopyrightText: 2026 Alper Ozturk <alper.ozturk@nextcloud.com>
- * SPDX-License-Identifier: AGPL-3.0-or-later
+ * SPDX-FileCopyrightText: 2026 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-License-Identifier: MIT
  */
+
 
 package com.nextcloud.android.common.ui.share.component
 
@@ -26,11 +27,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.share.ShareViewModel
 import com.nextcloud.android.common.ui.share.component.property.SharePropertyView
@@ -50,18 +53,33 @@ fun AddOrEditShareBottomSheet(
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scrollState = rememberScrollState()
+    val scope = rememberCoroutineScope()
     val categories = remember { ShareCategory.entries.toList() }
     var selectedCategory by remember { mutableStateOf(categories.first()) }
     var showAdvancedSettings by remember { mutableStateOf(false) }
     var expandedCategories by remember { mutableStateOf(emptySet<String>()) }
+    var showDiscardDialog by remember { mutableStateOf(false) }
+
+    if (showDiscardDialog) {
+        DiscardDraftShareDialog(
+            onKeep = { showDiscardDialog = false },
+            onDiscard = {
+                showDiscardDialog = false
+                viewModel.deleteShare(share.id)
+                viewModel.setActiveShare(null)
+            }
+        )
+    }
 
     ModalBottomSheet(
         onDismissRequest = {
-            viewModel.commitPendingProperties(share.id)
             if (share.shareState == ShareState.DRAFT) {
-                viewModel.deleteShare(share.id)
+                showDiscardDialog = true
+                scope.launch { sheetState.expand() }
+            } else {
+                viewModel.commitPendingProperties(share.id)
+                viewModel.setActiveShare(null)
             }
-            viewModel.setActiveShare(null)
         },
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.surface,
