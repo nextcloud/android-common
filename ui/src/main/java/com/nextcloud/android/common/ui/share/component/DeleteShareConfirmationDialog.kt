@@ -2,12 +2,14 @@
  * Nextcloud Android Common Library
  *
  * SPDX-FileCopyrightText: 2026 Nextcloud GmbH and Nextcloud contributors
- * SPDX-License-Identifier: MIT
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
 package com.nextcloud.android.common.ui.share.component
 
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -25,11 +27,14 @@ fun DeleteShareConfirmationDialog(
         title = { Text(stringResource(R.string.share_view_delete_confirm_title)) },
         text = { Text(stringResource(R.string.share_view_delete_confirm_message)) },
         confirmButton = {
-            TextButton(onClick = onConfirm) {
-                Text(
-                    text = stringResource(R.string.common_ok),
-                    color = MaterialTheme.colorScheme.error
+            FilledTonalButton(
+                onClick = onConfirm,
+                colors = ButtonDefaults.filledTonalButtonColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer
                 )
+            ) {
+                Text(stringResource(R.string.common_ok))
             }
         },
         dismissButton = {
