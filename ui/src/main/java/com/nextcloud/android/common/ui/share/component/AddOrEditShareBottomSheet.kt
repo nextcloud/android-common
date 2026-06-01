@@ -35,6 +35,7 @@ import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.share.ShareViewModel
 import com.nextcloud.android.common.ui.share.component.property.SharePropertyView
 import com.nextcloud.android.common.ui.share.model.api.capabilities.SharingCapabilities
+import com.nextcloud.android.common.ui.share.model.api.property.clazz
 import com.nextcloud.android.common.ui.share.model.api.property.priority
 import com.nextcloud.android.common.ui.share.model.api.share.Share
 import com.nextcloud.android.common.ui.share.model.api.state.ShareState
@@ -56,6 +57,7 @@ fun AddOrEditShareBottomSheet(
 
     ModalBottomSheet(
         onDismissRequest = {
+            viewModel.commitPendingProperties(share.id)
             if (share.shareState == ShareState.DRAFT) {
                 viewModel.deleteShare(share.id)
             }
@@ -189,7 +191,13 @@ private fun AdvancedSettingsSection(
         onToggle = onToggle
     ) {
         share.properties.sortedBy { it.priority }.forEach { property ->
-            SharePropertyView(share.id, property, viewModel)
+            key(property.clazz) {
+                SharePropertyView(
+                    shareId = share.id,
+                    property = property,
+                    viewModel = viewModel
+                )
+            }
         }
     }
 }
