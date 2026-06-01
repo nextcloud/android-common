@@ -44,6 +44,7 @@ import coil3.svg.SvgDecoder
 import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.share.ShareViewModel
 import com.nextcloud.android.common.ui.share.model.api.icon.Icon
+import com.nextcloud.android.common.ui.share.model.api.recipients.Recipient
 import com.nextcloud.android.common.ui.share.model.api.share.Share
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,106 +63,151 @@ fun RecipientSearchField(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         if (share.recipients.isNotEmpty()) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(chipScrollState),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                share.recipients.forEach { recipient ->
-                    InputChip(
-                        selected = true,
-                        onClick = { },
-                        label = { Text(recipient.displayName) },
-                        leadingIcon = {
-                            recipient.icon?.let {
-                                RecipientIcon(
-                                    icon = it,
-                                    modifier = Modifier.size(18.dp)
-                                )
-                            }
-                        },
-                        trailingIcon = {
-                            IconButton(
-                                onClick = {
-                                    viewModel.removeRecipient(
-                                        id = share.id,
-                                        clazz = recipient.clazz,
-                                        value = recipient.value,
-                                        instance = recipient.instance
-                                    )
-                                },
-                                modifier = Modifier.size(16.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Close,
-                                    contentDescription = "remove recipient"
-                                )
-                            }
-                        }
+            RecipientChipRow(
+                recipients = share.recipients,
+                chipScrollState = chipScrollState,
+                onRemove = { recipient ->
+                    viewModel.removeRecipient(
+                        id = share.id,
+                        clazz = recipient.clazz,
+                        value = recipient.value,
+                        instance = recipient.instance
                     )
                 }
-            }
+            )
         }
 
-        ExposedDropdownMenuBox(
-            expanded = expanded && query.isNotBlank(),
-            onExpandedChange = { expanded = it }
+        RecipientSearchDropdown(
+            query = query,
+            expanded = expanded,
+            onQueryChange = {
+                query = it
+                expanded = true
+                viewModel.onSearchQueryChanged(it)
+            },
+            onExpandedChange = { expanded = it },
+            onDismiss = { expanded = false }
         ) {
-            OutlinedTextField(
-                value = query,
-                onValueChange = {
-                    query = it
-                    expanded = true
-                    viewModel.onSearchQueryChanged(it)
-                },
-                label = { Text(stringResource(R.string.share_view_invited_category_label)) },
-                modifier = Modifier
-                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable, true)
-                    .fillMaxWidth(),
-                singleLine = true
+            RecipientDropdownContent(
+                results = results,
+                onSelect = { recipient ->
+                    viewModel.addRecipient(share.id, recipient.clazz, recipient.value)
+                    query = ""
+                    expanded = false
+                }
             )
+        }
+    }
+}
 
-            if (query.isNotBlank()) {
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    if (results.isEmpty()) {
-                        DropdownMenuItem(
-                            text = {
-                                Text(
-                                    text = stringResource(R.string.share_view_recipient_search_field_empty_result),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            },
-                            onClick = {},
-                            enabled = false
+@Composable
+private fun RecipientChipRow(
+    recipients: List<Recipient>,
+    chipScrollState: androidx.compose.foundation.ScrollState,
+    onRemove: (Recipient) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .horizontalScroll(chipScrollState),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        recipients.forEach { recipient ->
+            InputChip(
+                selected = true,
+                onClick = { },
+                label = { Text(recipient.displayName) },
+                leadingIcon = {
+                    recipient.icon?.let {
+                        RecipientIcon(
+                            icon = it,
+                            modifier = Modifier.size(18.dp)
                         )
-                    } else {
-                        results.forEach { recipient ->
-                            DropdownMenuItem(
-                                leadingIcon = {
-                                    recipient.icon?.let {
-                                        RecipientIcon(
-                                            icon = it,
-                                            modifier = Modifier.size(20.dp)
-                                        )
-                                    }
-                                },
-                                text = { Text(recipient.displayName) },
-                                onClick = {
-                                    viewModel.addRecipient(share.id, recipient.clazz, recipient.value)
-                                    query = ""
-                                    expanded = false
-                                }
-                            )
-                        }
+                    }
+                },
+                trailingIcon = {
+                    IconButton(
+                        onClick = { onRemove(recipient) },
+                        modifier = Modifier.size(16.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "remove recipient"
+                        )
                     }
                 }
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun RecipientSearchDropdown(
+    query: String,
+    expanded: Boolean,
+    onQueryChange: (String) -> Unit,
+    onExpandedChange: (Boolean) -> Unit,
+    onDismiss: () -> Unit,
+    content: @Composable () -> Unit
+) {
+    ExposedDropdownMenuBox(
+        expanded = expanded && query.isNotBlank(),
+        onExpandedChange = onExpandedChange
+    ) {
+        OutlinedTextField(
+            value = query,
+            onValueChange = onQueryChange,
+            label = { Text(stringResource(R.string.share_view_invited_category_label)) },
+            modifier = Modifier
+                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable, true)
+                .fillMaxWidth(),
+            singleLine = true
+        )
+
+        if (query.isNotBlank()) {
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = onDismiss
+            ) {
+                content()
             }
+        }
+    }
+}
+
+@Composable
+private fun RecipientDropdownContent(
+    results: List<Recipient>,
+    onSelect: (Recipient) -> Unit
+) {
+    if (results.isEmpty()) {
+        DropdownMenuItem(
+            text = {
+                Text(
+                    text = stringResource(R.string.share_view_recipient_search_field_empty_result),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            },
+            onClick = {},
+            enabled = false
+        )
+    } else {
+        results.forEach { recipient ->
+            DropdownMenuItem(
+                leadingIcon = {
+                    recipient.icon?.let {
+                        RecipientIcon(
+                            icon = it,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                },
+                text = { Text(recipient.displayName) },
+                onClick = { onSelect(recipient) }
+            )
         }
     }
 }
