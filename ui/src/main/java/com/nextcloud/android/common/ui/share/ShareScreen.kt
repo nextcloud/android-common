@@ -1,68 +1,46 @@
 /*
- * Nextcloud Android Common Library
+ * Nextcloud - Android Client
  *
- * SPDX-FileCopyrightText: 2026 Nextcloud GmbH and Nextcloud contributors
- * SPDX-License-Identifier: MIT
+ * SPDX-FileCopyrightText: 2026 Alper Ozturk <alper.ozturk@nextcloud.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
 package com.nextcloud.android.common.ui.share
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.ColorScheme
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuAnchorType
-import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.InputChip
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.getSelectedDate
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -83,36 +61,30 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import coil3.ImageLoader
-import coil3.compose.AsyncImage
 import coil3.compose.setSingletonImageLoaderFactory
-import coil3.request.ImageRequest
 import coil3.svg.SvgDecoder
 import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.component.ContentUnavailableView
 import com.nextcloud.android.common.ui.network.auth.ServerCredentials
 import com.nextcloud.android.common.ui.network.http.NextcloudHttpClient
+import com.nextcloud.android.common.ui.share.component.CollapsibleShareSection
+import com.nextcloud.android.common.ui.share.component.PropertyView
+import com.nextcloud.android.common.ui.share.component.RecipientSearchField
+import com.nextcloud.android.common.ui.share.component.ShareSwitch
 import com.nextcloud.android.common.ui.share.model.api.capabilities.SharingCapabilities
-import com.nextcloud.android.common.ui.share.model.api.icon.Icon
-import com.nextcloud.android.common.ui.share.model.api.property.Property
-import com.nextcloud.android.common.ui.share.model.api.property.PropertyBoolean
-import com.nextcloud.android.common.ui.share.model.api.property.PropertyDate
-import com.nextcloud.android.common.ui.share.model.api.property.PropertyEnum
-import com.nextcloud.android.common.ui.share.model.api.property.PropertyPassword
-import com.nextcloud.android.common.ui.share.model.api.property.PropertyString
 import com.nextcloud.android.common.ui.share.model.api.property.priority
 import com.nextcloud.android.common.ui.share.model.api.share.Share
 import com.nextcloud.android.common.ui.share.model.api.state.ShareState
 import com.nextcloud.android.common.ui.share.model.ui.ShareCategory
+import com.nextcloud.android.common.ui.share.model.ui.ShareItemType
 import com.nextcloud.android.common.ui.share.repository.ShareRemoteRepository
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
-import java.time.format.DateTimeFormatter
 
 @Composable
-private fun ShareView(sourceId: String, sharingCapabilities: SharingCapabilities, viewModel: ShareViewModel) {
+private fun ShareScreen(sourceId: String, sharingCapabilities: SharingCapabilities, viewModel: ShareViewModel) {
     val errorMessageId by viewModel.errorMessageId.collectAsState()
     val shares by viewModel.shares.collectAsState()
     val activeShare by viewModel.activeShare.collectAsState()
@@ -160,16 +132,16 @@ private fun ShareView(sourceId: String, sharingCapabilities: SharingCapabilities
             ) {
                 itemsIndexed(filteredShares) { index, share ->
                     val type = when (index) {
-                        0 -> UnifiedSharesListItemType.Top
-                        shares.lastIndex -> UnifiedSharesListItemType.Bottom
-                        else -> UnifiedSharesListItemType.Mid
+                        0 -> ShareItemType.Top
+                        shares.lastIndex -> ShareItemType.Bottom
+                        else -> ShareItemType.Mid
                     }
 
                     if (index == 0) {
                         Spacer(modifier = Modifier.height(16.dp))
                     }
 
-                    UnifiedSharesListItem(
+                    ShareItem(
                         share = share,
                         type = type,
                         onSelectShare = { selected ->
@@ -252,7 +224,7 @@ private fun AddOrEditShareBottomSheet(
                 .sortedBy { it.priority }
                 .forEach { sharingCapability ->
                     key(sharingCapability.class_field) {
-                        CollapsibleSettingsSection(
+                        CollapsibleShareSection(
                             label = sharingCapability.displayName,
                             isExpanded = sharingCapability.displayName in expandedCategories,
                             onToggle = {
@@ -268,7 +240,7 @@ private fun AddOrEditShareBottomSheet(
                                 .sortedBy { it.displayName }
                                 .forEach { permission ->
                                     key(permission.clazz) {
-                                        SettingsSwitchRow(
+                                        ShareSwitch(
                                             label = permission.displayName,
                                             checked = permission.enabled,
                                             onCheckedChange = { isChecked ->
@@ -282,13 +254,13 @@ private fun AddOrEditShareBottomSheet(
                 }
 
             if (share.properties.isNotEmpty()) {
-                CollapsibleSettingsSection(
+                CollapsibleShareSection(
                     label = stringResource(R.string.share_view_advanced_settings),
                     isExpanded = showAdvancedSettings,
                     onToggle = { showAdvancedSettings = !showAdvancedSettings }
                 ) {
                     share.properties.sortedBy { it.priority }.forEach { property ->
-                        DynamicPropertyField(share.id, property, viewModel)
+                        PropertyView(share.id, property, viewModel)
                     }
                 }
             }
@@ -296,334 +268,10 @@ private fun AddOrEditShareBottomSheet(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun RecipientSearchField(
+private fun ShareItem(
     share: Share,
-    viewModel: ShareViewModel
-) {
-    var query by remember { mutableStateOf("") }
-    var expanded by remember { mutableStateOf(false) }
-    val results by viewModel.recipientSearchResults.collectAsState()
-    val chipScrollState = rememberScrollState()
-
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        if (share.recipients.isNotEmpty()) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(chipScrollState),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                share.recipients.forEach { recipient ->
-                    InputChip(
-                        selected = true,
-                        onClick = { },
-                        label = { Text(recipient.displayName) },
-                        leadingIcon = {
-                            recipient.icon?.let {
-                                RecipientIcon(
-                                    icon = it,
-                                    modifier = Modifier.size(18.dp)
-                                )
-                            }
-                        },
-                        trailingIcon = {
-                            IconButton(
-                                onClick = {
-                                    viewModel.removeRecipient(
-                                        id = share.id,
-                                        clazz = recipient.clazz,
-                                        value = recipient.value,
-                                        instance = recipient.instance
-                                    )
-                                },
-                                modifier = Modifier.size(16.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Close,
-                                    contentDescription = "remove recipient"
-                                )
-                            }
-                        }
-                    )
-                }
-            }
-        }
-
-        ExposedDropdownMenuBox(
-            expanded = expanded && query.isNotBlank(),
-            onExpandedChange = { expanded = it }
-        ) {
-            OutlinedTextField(
-                value = query,
-                onValueChange = {
-                    query = it
-                    expanded = true
-                    viewModel.onSearchQueryChanged(it)
-                },
-                label = { Text(stringResource(R.string.share_view_invited_category_label)) },
-                modifier = Modifier
-                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable, true)
-                    .fillMaxWidth(),
-                singleLine = true
-            )
-
-            if (query.isNotBlank()) {
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    if (results.isEmpty()) {
-                        DropdownMenuItem(
-                            text = {
-                                Text(
-                                    text = stringResource(R.string.share_view_recipient_search_field_empty_result),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            },
-                            onClick = {},
-                            enabled = false
-                        )
-                    } else {
-                        results.forEach { recipient ->
-                            DropdownMenuItem(
-                                leadingIcon = {
-                                    recipient.icon?.let {
-                                        RecipientIcon(
-                                            icon = it,
-                                            modifier = Modifier.size(20.dp)
-                                        )
-                                    }
-                                },
-                                text = { Text(recipient.displayName) },
-                                onClick = {
-                                    viewModel.addRecipient(share.id, recipient.clazz, recipient.value)
-                                    query = ""
-                                    expanded = false
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun RecipientIcon(icon: Icon, modifier: Modifier = Modifier) {
-    val isDark = isSystemInDarkTheme()
-    val url = if (isDark) icon.dark ?: icon.light else icon.light ?: icon.dark
-
-    if (url != null) {
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(url)
-                .decoderFactory(SvgDecoder.Factory())
-                .build(),
-            contentDescription = null,
-            modifier = modifier,
-        )
-    }
-}
-
-@Composable
-private fun DynamicPropertyField(shareId: String, property: Property, viewModel: ShareViewModel) {
-    when (property) {
-        is PropertyBoolean -> {
-            SettingsSwitchRow(
-                label = property.displayName,
-                checked = property.value == "true",
-                onCheckedChange = { isChecked ->
-                    viewModel.updateProperty(shareId, property.clazz, isChecked.toString())
-                }
-            )
-        }
-
-        is PropertyString -> {
-            OutlinedTextField(
-                value = property.value ?: "",
-                onValueChange = { viewModel.updateProperty(shareId, property.clazz, it) },
-                label = { Text(property.displayName) },
-                placeholder = property.hint?.let { { Text(it) } },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp),
-                singleLine = true
-            )
-        }
-
-        is PropertyPassword -> {
-            OutlinedTextField(
-                value = property.value ?: "",
-                onValueChange = { viewModel.updateProperty(shareId, property.clazz, it) },
-                label = { Text(property.displayName) },
-                placeholder = property.hint?.let { { Text(it) } },
-                visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp),
-                singleLine = true
-            )
-        }
-
-        is PropertyDate -> {
-            var showDatePicker by remember { mutableStateOf(false) }
-            var dateValue by remember { mutableStateOf(property.value ?: "") }
-
-            OutlinedTextField(
-                value = dateValue,
-                onValueChange = { },
-                label = { Text(property.displayName + " (MM-dd-yyyy)") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp)
-                    .clickable { showDatePicker = true },
-                trailingIcon = {
-                    IconButton(onClick = { showDatePicker = true }) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_calendar),
-                            contentDescription = "Pick date"
-                        )
-                    }
-                },
-                enabled = false,
-                readOnly = true
-            )
-
-            if (showDatePicker) {
-                DatePickerModal(onDateSelected = {
-                    dateValue = it ?: ""
-                    viewModel.updateProperty(shareId, property.clazz, dateValue)
-                }, onDismiss = {
-                  showDatePicker = false
-                })
-            }
-        }
-
-        is PropertyEnum -> {
-            // TODO: Implement ExposedDropdownMenuBox using property.validValues
-            Text(text = "Enum Property: ${property.displayName} (Under Construction)", color = Color.Gray)
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun DatePickerModal(
-    onDateSelected: (String?) -> Unit,
-    onDismiss: () -> Unit
-) {
-    val datePickerState = rememberDatePickerState()
-
-    DatePickerDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(onClick = {
-                val date = datePickerState.getSelectedDate()
-                val formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy")
-                val formatted = date?.format(formatter)
-                onDateSelected(formatted)
-                onDismiss()
-            }) {
-                Text(stringResource(R.string.common_ok))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.common_cancel))
-            }
-        }
-    ) {
-        DatePicker(state = datePickerState)
-    }
-}
-
-@Composable
-private fun CollapsibleSettingsSection(
-    label: String,
-    isExpanded: Boolean,
-    onToggle: () -> Unit,
-    content: @Composable () -> Unit
-) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { onToggle() }
-                .padding(vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary
-            )
-            Icon(
-                imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary
-            )
-        }
-
-        AnimatedVisibility(visible = isExpanded) {
-            Column { content() }
-        }
-    }
-}
-
-@Composable
-private fun SettingsSwitchRow(
-    label: String,
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 48.dp)
-            .padding(vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.weight(1f)
-        )
-
-        Spacer(modifier = Modifier.width(16.dp))
-
-        Switch(
-            checked = checked,
-            onCheckedChange = onCheckedChange
-        )
-    }
-}
-
-enum class UnifiedSharesListItemType {
-    Top, Mid, Bottom;
-
-    @Composable
-    fun getShape(): RoundedCornerShape {
-        return when (this) {
-            Top -> RoundedCornerShape(12.dp, 12.dp, 4.dp, 4.dp)
-            Mid -> RoundedCornerShape(4.dp, 4.dp, 4.dp, 4.dp)
-            Bottom -> RoundedCornerShape(4.dp, 4.dp, 12.dp, 12.dp)
-        }
-    }
-}
-
-@Composable
-private fun UnifiedSharesListItem(
-    share: Share,
-    type: UnifiedSharesListItemType,
+    type: ShareItemType,
     onSelectShare: (Share) -> Unit,
     onDeleteShare: (Share) -> Unit,
     onSendEmail: (Share) -> Unit
@@ -725,7 +373,7 @@ fun ComposeView.setupUnifiedShare(
         MaterialTheme(
             colorScheme = colorScheme,
             content = {
-                ShareView(sourceId, sharingCapabilities, viewModel)
+                ShareScreen(sourceId, sharingCapabilities, viewModel)
             }
         )
     }
