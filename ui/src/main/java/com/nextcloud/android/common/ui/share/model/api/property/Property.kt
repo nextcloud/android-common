@@ -26,6 +26,15 @@ val Property.priority: Int
         is PropertyString -> priority
     }
 
+val Property.clazz: String
+    get() = when (this) {
+        is PropertyBoolean -> clazz
+        is PropertyDate -> clazz
+        is PropertyEnum -> clazz
+        is PropertyPassword -> clazz
+        is PropertyString -> clazz
+    }
+
 @Serializable
 @SerialName("boolean")
 data class PropertyBoolean(
@@ -42,7 +51,9 @@ data class PropertyBoolean(
     val required: Boolean,
 
     val value: String? = null
-) : Property()
+) : Property() {
+    fun isTrue(): Boolean = (value == "true")
+}
 
 @Serializable
 @SerialName("date")
