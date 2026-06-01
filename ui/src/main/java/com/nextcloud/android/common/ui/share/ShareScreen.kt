@@ -1,8 +1,8 @@
 /*
- * Nextcloud - Android Client
+ * Nextcloud Android Common Library
  *
- * SPDX-FileCopyrightText: 2026 Alper Ozturk <alper.ozturk@nextcloud.com>
- * SPDX-License-Identifier: AGPL-3.0-or-later
+ * SPDX-FileCopyrightText: 2026 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-License-Identifier: MIT
  */
 
 package com.nextcloud.android.common.ui.share
@@ -61,7 +61,6 @@ import com.nextcloud.android.common.ui.network.http.NextcloudHttpClient
 import com.nextcloud.android.common.ui.share.component.AddOrEditShareBottomSheet
 import com.nextcloud.android.common.ui.share.model.api.capabilities.SharingCapabilities
 import com.nextcloud.android.common.ui.share.model.api.share.Share
-import com.nextcloud.android.common.ui.share.model.api.state.ShareState
 import com.nextcloud.android.common.ui.share.model.ui.ShareItemType
 import com.nextcloud.android.common.ui.share.repository.ShareRemoteRepository
 import kotlinx.coroutines.launch
@@ -75,7 +74,6 @@ private fun ShareScreen(sourceId: String, sharingCapabilities: SharingCapabiliti
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-    val filteredShares = shares.filter { it.shareState != ShareState.DRAFT }
 
     LaunchedEffect(errorMessageId) {
         errorMessageId?.let {
@@ -101,7 +99,7 @@ private fun ShareScreen(sourceId: String, sharingCapabilities: SharingCapabiliti
         snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = Color.Transparent
     ) { paddingValues ->
-        if (filteredShares.isEmpty()) {
+        if (shares.isEmpty()) {
             ContentUnavailableView(
                 iconId = R.drawable.ic_person_add,
                 title =
@@ -114,12 +112,8 @@ private fun ShareScreen(sourceId: String, sharingCapabilities: SharingCapabiliti
                     .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                itemsIndexed(filteredShares) { index, share ->
-                    val type = when (index) {
-                        0 -> ShareItemType.Top
-                        shares.lastIndex -> ShareItemType.Bottom
-                        else -> ShareItemType.Mid
-                    }
+                itemsIndexed(shares, key  = { _, share -> share.id }) { index, share ->
+                    val type = ShareItemType.type(index, shares.lastIndex)
 
                     if (index == 0) {
                         Spacer(modifier = Modifier.height(16.dp))

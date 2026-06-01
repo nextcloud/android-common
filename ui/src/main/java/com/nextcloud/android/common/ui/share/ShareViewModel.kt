@@ -53,6 +53,8 @@ class ShareViewModel(
     private val _errorMessageId = MutableStateFlow<Int?>(null)
     val errorMessageId: StateFlow<Int?> = _errorMessageId
 
+    private val pendingProperties = mutableMapOf<String, String>()
+
     init {
         fetchShares()
         initSearchQuery()
@@ -209,6 +211,21 @@ class ShareViewModel(
                 _activeShare.update { updated }
                 replaceInList(updated)
             }
+        }
+    }
+
+    fun updatePropertyLocally(clazz: String, value: String) {
+        pendingProperties[clazz] = value
+    }
+
+    fun commitPendingProperties(shareId: String) {
+        if (pendingProperties.isEmpty()) return
+
+        viewModelScope.launch(Dispatchers.IO) {
+            pendingProperties.forEach { (clazz, value) ->
+                repository.updateShareProperty(shareId, UpdateSharePropertyRequest(clazz, value))
+            }
+            pendingProperties.clear()
         }
     }
     // endregion
