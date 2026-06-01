@@ -61,6 +61,7 @@ import com.nextcloud.android.common.ui.component.ContentUnavailableView
 import com.nextcloud.android.common.ui.network.auth.ServerCredentials
 import com.nextcloud.android.common.ui.network.http.NextcloudHttpClient
 import com.nextcloud.android.common.ui.share.component.AddOrEditShareBottomSheet
+import com.nextcloud.android.common.ui.share.component.DeleteShareConfirmationDialog
 import com.nextcloud.android.common.ui.share.model.api.capabilities.SharingCapabilities
 import com.nextcloud.android.common.ui.share.model.api.share.Share
 import com.nextcloud.android.common.ui.share.model.ui.ShareItemType
@@ -166,7 +167,18 @@ private fun ShareItem(
     onSendEmail: (Share) -> Unit
 ) {
     var showContextMenu by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
     val haptics = LocalHapticFeedback.current
+
+    if (showDeleteDialog) {
+        DeleteShareConfirmationDialog(
+            onConfirm = {
+                showDeleteDialog = false
+                onDeleteShare(share)
+            },
+            onDismiss = { showDeleteDialog = false }
+        )
+    }
 
     ListItem(
         modifier = Modifier
@@ -229,8 +241,8 @@ private fun ShareItem(
                             )
                         },
                         onClick = {
-                            onDeleteShare(share)
                             showContextMenu = false
+                            showDeleteDialog = true
                         }
                     )
                 }
