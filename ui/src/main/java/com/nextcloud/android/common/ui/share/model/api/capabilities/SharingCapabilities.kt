@@ -1,8 +1,8 @@
 /*
- * Nextcloud - Android Client
+ * Nextcloud Android Common Library
  *
- * SPDX-FileCopyrightText: 2026 Alper Ozturk <alper.ozturk@nextcloud.com>
- * SPDX-License-Identifier: AGPL-3.0-or-later
+ * SPDX-FileCopyrightText: 2026 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-License-Identifier: MIT
  */
 
 package com.nextcloud.android.common.ui.share.model.api.capabilities
