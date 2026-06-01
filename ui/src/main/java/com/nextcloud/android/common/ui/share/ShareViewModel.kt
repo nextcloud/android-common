@@ -20,6 +20,7 @@ import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareProper
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareStateRequest
 import com.nextcloud.android.common.ui.share.model.api.share.Share
 import com.nextcloud.android.common.ui.share.model.api.state.ShareState
+import com.nextcloud.android.common.ui.share.model.ui.ShareScreenState
 import com.nextcloud.android.common.ui.share.repository.ShareRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
@@ -36,8 +37,8 @@ class ShareViewModel(
     private val repository: ShareRepository
 ) : ViewModel() {
 
-    private val _shares = MutableStateFlow<List<Share>>(emptyList())
-    val shares: StateFlow<List<Share>> = _shares
+    private val _state = MutableStateFlow<ShareScreenState>(ShareScreenState.Loading)
+    val state: StateFlow<ShareScreenState> = _state
 
     private val _activeShare = MutableStateFlow<Share?>(null)
     val activeShare: StateFlow<Share?> = _activeShare
@@ -47,13 +48,13 @@ class ShareViewModel(
     private val _recipientSearchResults = MutableStateFlow<List<Recipient>>(emptyList())
     val recipientSearchResults: StateFlow<List<Recipient>> = _recipientSearchResults
 
-    private val _loading = MutableStateFlow(false)
-    val loading: StateFlow<Boolean> = _loading
-
     private val _errorMessageId = MutableStateFlow<Int?>(null)
     val errorMessageId: StateFlow<Int?> = _errorMessageId
 
     private val pendingProperties = mutableMapOf<String, String>()
+
+    private val currentShares: List<Share>
+        get() = (_state.value as? ShareScreenState.Loaded)?.shares ?: emptyList()
 
     init {
         fetchShares()
@@ -68,9 +69,7 @@ class ShareViewModel(
                 .debounce(300L)
                 .distinctUntilChanged()
                 .filter { it.isNotBlank() }
-                .collect { query ->
-                    executeSearch(query)
-                }
+                .collect { query -> executeSearch(query) }
         }
     }
 
@@ -93,21 +92,21 @@ class ShareViewModel(
         limit: Int = 50
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            _loading.update { true }
+            _state.update { ShareScreenState.Loading }
             _errorMessageId.update { null }
 
             val result = repository.fetchShares(sourceClass, lastShareID, limit)
-            handleResult(result, R.string.share_view_fetch_error_message)?.let { fetchedShares ->
-                _shares.update { fetchedShares }
+            handleResult(result, R.string.share_view_fetch_error_message)?.let { fetched ->
+                _state.update {
+                    if (fetched.isEmpty()) ShareScreenState.Empty
+                    else ShareScreenState.Loaded(fetched)
+                }
             }
-
-            _loading.update { false }
         }
     }
 
     fun fetchShare(id: String, request: GetShareRequest = GetShareRequest()) {
         viewModelScope.launch(Dispatchers.IO) {
-            _loading.update { true }
             _errorMessageId.update { null }
 
             val result = repository.fetchShare(id, request)
@@ -115,20 +114,12 @@ class ShareViewModel(
                 _activeShare.update { share }
                 replaceInList(share)
             }
-
-            _loading.update { false }
         }
     }
     // endregion
 
     // region create
-    /**
-     * Creates an empty draft [Share] on the server and sets it as the [activeShare].
-     * Then sources can be added later.
-     *
-     */
     suspend fun createDraftShare(): Share? = withContext(Dispatchers.IO) {
-        _loading.update { true }
         _errorMessageId.update { null }
 
         val result = repository.createDraftShare()
@@ -136,13 +127,10 @@ class ShareViewModel(
 
         if (draft != null) {
             _activeShare.update { draft }
-            _shares.update { current -> listOf(draft) + current }
-            _loading.update { false }
-            draft
-        } else {
-            _loading.update { false }
-            null
+            _state.update { ShareScreenState.Loaded(listOf(draft) + currentShares) }
         }
+
+        draft
     }
     // endregion
 
@@ -247,7 +235,11 @@ class ShareViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             val result = repository.deleteShare(id)
             handleResult(result, R.string.share_view_delete_error_message)?.let {
-                _shares.update { current -> current.filterNot { it.id == id } }
+                val remaining = currentShares.filterNot { it.id == id }
+                _state.update {
+                    if (remaining.isEmpty()) ShareScreenState.Empty
+                    else ShareScreenState.Loaded(remaining)
+                }
                 if (_activeShare.value?.id == id) _activeShare.update { null }
             }
         }
@@ -266,13 +258,11 @@ class ShareViewModel(
 
     // region private
     private fun replaceInList(updated: Share) {
-        _shares.update { current -> current.map { if (it.id == updated.id) updated else it } }
+        val shares = currentShares.ifEmpty { return }
+        _state.update { ShareScreenState.Loaded(shares.map { if (it.id == updated.id) updated else it }) }
     }
 
-    private fun <T> handleResult(
-        result: NetworkResult<T>,
-        errorId: Int
-    ): T? {
+    private fun <T> handleResult(result: NetworkResult<T>, errorId: Int): T? {
         return when (result) {
             is NetworkResult.Success -> result.data
             is NetworkResult.ServerError,
