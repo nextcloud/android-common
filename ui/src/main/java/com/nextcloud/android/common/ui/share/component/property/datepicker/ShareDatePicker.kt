@@ -5,20 +5,18 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-package com.nextcloud.android.common.ui.share.component
+package com.nextcloud.android.common.ui.share.component.property.datepicker
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.getSelectedDate
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,8 +28,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.nextcloud.android.common.ui.R
+import com.nextcloud.android.common.ui.share.component.property.datepicker.util.ShareDateFormatter
 import com.nextcloud.android.common.ui.share.model.api.property.PropertyDate
-import java.time.format.DateTimeFormatter
 
 @Composable
 fun ShareDatePicker(property: PropertyDate, onDateSelected: (String) -> Unit) {
@@ -69,7 +67,6 @@ fun ShareDatePicker(property: PropertyDate, onDateSelected: (String) -> Unit) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DatePickerModal(
     formatter: ShareDateFormatter,
