@@ -8,12 +8,12 @@
 package com.nextcloud.android.common.ui.share.component.property.datepicker
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -26,7 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.share.component.property.datepicker.util.ShareDateFormatter
 import com.nextcloud.android.common.ui.share.model.api.property.PropertyDate
@@ -37,25 +37,29 @@ fun ShareDatePicker(property: PropertyDate, onDateSelected: (String) -> Unit) {
     var showDatePicker by remember { mutableStateOf(false) }
     var dateValue by remember { mutableStateOf(property.value ?: "") }
 
-    OutlinedTextField(
-        value = dateValue,
-        onValueChange = { },
-        label = { Text(formatter.getDisplayName(property)) },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
-            .clickable { showDatePicker = true },
-        trailingIcon = {
-            IconButton(onClick = { showDatePicker = true }) {
+
+    Box(modifier = Modifier.fillMaxWidth()) {
+        OutlinedTextField(
+            value = dateValue,
+            onValueChange = {},
+            readOnly = true,
+            enabled = true,
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text(formatter.getDisplayName(property)) },
+            trailingIcon = {
                 Icon(
                     painter = painterResource(R.drawable.ic_calendar),
-                    contentDescription = "Pick date"
+                    contentDescription = null
                 )
             }
-        },
-        enabled = false,
-        readOnly = true
-    )
+        )
+
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .clickable { showDatePicker = true }
+        )
+    }
 
     if (showDatePicker) {
         DatePickerModal(formatter, onDateSelected = {
@@ -92,5 +96,24 @@ private fun DatePickerModal(
         }
     ) {
         DatePicker(state = datePickerState)
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ShareDatePickerPreview() {
+    MaterialTheme {
+        ShareDatePicker(
+            property = PropertyDate(
+                clazz = "expiry",
+                displayName = "Expiration Date",
+                priority = 1,
+                required = false,
+                value = "2026-12-31",
+                minDate = "2026-01-01",
+                maxDate = "2027-12-31"
+            ),
+            onDateSelected = {}
+        )
     }
 }
