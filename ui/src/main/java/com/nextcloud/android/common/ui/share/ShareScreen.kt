@@ -60,9 +60,9 @@ import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.component.ContentUnavailableView
 import com.nextcloud.android.common.ui.network.auth.ServerCredentials
 import com.nextcloud.android.common.ui.network.http.NextcloudHttpClient
-import com.nextcloud.android.common.ui.share.component.AddOrEditShareBottomSheet
-import com.nextcloud.android.common.ui.share.component.DeleteShareConfirmationDialog
-import com.nextcloud.android.common.ui.share.component.DiscardDraftShareDialog
+import com.nextcloud.android.common.ui.share.component.bottomsheet.AddOrEditShareBottomSheet
+import com.nextcloud.android.common.ui.share.component.dialog.DeleteShareConfirmationDialog
+import com.nextcloud.android.common.ui.share.component.dialog.DiscardDraftShareDialog
 import com.nextcloud.android.common.ui.share.model.api.capabilities.SharingCapabilities
 import com.nextcloud.android.common.ui.share.model.api.share.Share
 import com.nextcloud.android.common.ui.share.model.ui.ShareItemOverlayState

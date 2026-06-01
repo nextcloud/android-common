@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-package com.nextcloud.android.common.ui.share.component
+package com.nextcloud.android.common.ui.share.component.dialog
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
