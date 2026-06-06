@@ -8,8 +8,14 @@ SPDX-PackageDownloadLocation = "https://github.com/nextcloud/android-common"
 [[annotations]]
 path = [".idea/icon.svg"]
 precedence = "aggregate"
-SPDX-FileCopyrightText = "2025 Nextcloud Gmbh and Nextcloud contributors, Google LLC"
+SPDX-FileCopyrightText = "2025 Nextcloud GmbH and Nextcloud contributors, Google LLC"
 SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = ["CLAUDE.md"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Nextcloud GmbH and Nextcloud contributors"
+SPDX-License-Identifier = "MIT"
 
 [[annotations]]
 path = ["material-color-utilities/src/main/java/**"]
