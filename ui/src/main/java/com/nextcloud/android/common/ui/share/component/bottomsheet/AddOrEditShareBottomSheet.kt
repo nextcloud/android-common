@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -148,6 +150,21 @@ private fun CategorySelector(
     }
 }
 
+// TODO ADD send button
+// TODO disable multi receipients
+// TODO implement Anyone -->  /ocs/v2.php/apps/sharing/api/v1/share/{id}/recipient
+//  --> Add a recipient to a share use correspongind class value --> doesnt matter use uuid string : "value": "string",   "instance": "string"
+
+// TODO discuss with laura for note to recepipent expiraitaion date proeprties etc should be collabls
+
+// TODO send ISO 8601 as string to backend for expiration date
+
+// TODO for COPY link use Recepient.Secret.URL side note: if value is updatable user can edit the TOKEN directly which is value
+
+
+
+// TODO: Backend will change and provide us bundled permissions or list of custom permissions.
+// USE THIS FOR BOTH OPTION
 @Composable
 private fun PermissionCategories(
     share: Share,
@@ -156,6 +173,27 @@ private fun PermissionCategories(
     onToggleCategory: (String) -> Unit,
     viewModel: ShareViewModel
 ) {
+    var expanded by remember { mutableStateOf(false) }
+
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = { expanded = false }
+    ) {
+        share.permissions.forEach {
+            key(it.displayName) {
+                DropdownMenuItem(
+                    text = { Text(it.displayName) },
+                    onClick = { /* Do something... */ }
+                )
+            }
+        }
+
+        DropdownMenuItem(
+            text = { Text("Option 2") },
+            onClick = { /* Do something... */ }
+        )
+    }
+
     sharingCapabilities.permissionCategoryTypes
         .sortedBy { it.priority }
         .forEach { sharingCapability ->
