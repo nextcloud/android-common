@@ -77,6 +77,7 @@
             <trusting group="androidx.customview" name="customview" version="1.2.0"/>
             <trusting group="androidx.databinding"/>
             <trusting group="androidx.dynamicanimation" name="dynamicanimation" version="1.1.0"/>
+            <trusting group="androidx.exifinterface" name="exifinterface" version="1.4.2"/>
             <trusting group="androidx.lifecycle"/>
             <trusting group="androidx.savedstate"/>
             <trusting group="androidx.swiperefreshlayout" name="swiperefreshlayout" version="1.2.0"/>
@@ -105,6 +106,11 @@
             <trusting group="dev.equo.ide" name="solstice" version="1.8.2"/>
          </trusted-key>
          <trusted-key id="1D85469D8559C2E1DF5F925131D2D79DF7E85DD3" group="org.jcommander" name="jcommander" version="1.85"/>
+         <trusted-key id="20723A6399BC060154283B37CFAE163B64AC9189">
+            <trusting group="org.jetbrains.androidx.lifecycle"/>
+            <trusting group="org.jetbrains.androidx.savedstate"/>
+            <trusting group="^org[.]jetbrains[.]compose($|([.].*))" regex="true"/>
+         </trusted-key>
          <trusted-key id="24D04176586361FDA94EE0315F7786DF73E61F56">
             <trusting group="com.google.devtools.ksp" name="symbol-processing-api" version="1.9.20-1.0.14"/>
             <trusting group="com.google.devtools.ksp" name="symbol-processing-api" version="1.9.24-1.0.20"/>
@@ -174,6 +180,7 @@
             <trusting group="org.slf4j"/>
          </trusted-key>
          <trusted-key id="635EE627345F3C1DD422B2E207D3516820BCF6B1" group="com.github.ben-manes.caffeine" name="caffeine" version="2.9.3"/>
+         <trusted-key id="64B9B09F164AA0BF88742EB61188B69F6D6259CA" group="com.google.accompanist" name="accompanist-drawablepainter" version="0.37.3"/>
          <trusted-key id="694621A7227D8D5289699830ABE9F3126BB741C1" group="^com[.]google($|([.].*))" regex="true"/>
          <trusted-key id="696B6199A2A9D8C29CE78CC0D041CAD2E452550F" group="com.google.protobuf"/>
          <trusted-key id="6DD3B8C64EF75253BEB2C53AD908A43FB7EC07AC">
@@ -281,6 +288,7 @@
          <trusted-key id="D6F1BC78607808EC8E9F69437A8860944FAD5F62" group="org.apache.commons" name="commons-parent"/>
          <trusted-key id="DB0597E3144342256BC81E3EC727D053C4481CF5" group="org.tensorflow" name="tensorflow-lite-metadata" version="0.1.0-rc2"/>
          <trusted-key id="DBD744ACE7ADE6AA50DD591F66B50994442D2D40" group="^com[.]squareup($|([.].*))" regex="true"/>
+         <trusted-key id="DF25D3C4868FEC177182FAD64D176DC503FB4267" group="io.coil-kt.coil3"/>
          <trusted-key id="E52F07877A5805F9AF4AB0ACD46C5610D06E7001" group="com.ibm.icu" name="icu4j" version="77.1"/>
          <trusted-key id="E77417AC194160A3FABD04969A259C7EE636C5ED" group="^com[.]google($|([.].*))" regex="true"/>
          <trusted-key id="E7DC75FC24FB3C8DFE8086AD3D5839A2262CBBFB" group="org.jetbrains.kotlinx"/>
@@ -296,6 +304,7 @@
             <trusting group="org.apache" name="apache" version="13"/>
             <trusting group="org.codehaus.mojo"/>
          </trusted-key>
+         <trusted-key id="F3BD845679DD6A30F3F50F91597852B0B140F0BC" group="com.caverock" name="androidsvg-aar" version="1.4"/>
          <trusted-key id="F4DD59C90148BDC52BEB90A4530AA5F25C25011F" group="commons-codec"/>
          <trusted-key id="FA77DCFEF2EE6EB2DEBEDD2C012579464D01C06A" group="org.apache" name="apache"/>
          <trusted-key id="FA7929F83AD44C4590F6CC6815C71C0A4E0B8EDD" group="net.java.dev.jna"/>
