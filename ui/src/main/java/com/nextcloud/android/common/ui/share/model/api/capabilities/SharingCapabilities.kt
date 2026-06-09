@@ -15,25 +15,8 @@ data class SharingCapabilities(
     @SerialName("api_versions")
     val apiVersions: List<String>,
     val legacy: Legacy,
-    @SerialName("permission_categories")
-    val permissionCategories: List<PermissionCategory>,
-)
-
-@Serializable
-data class Legacy(
-    @SerialName("max_sources")
-    val maxSources: Long,
-    @SerialName("max_recipients")
-    val maxRecipients: Long,
-)
-
-@Serializable
-data class PermissionCategory(
-    @SerialName("class")
-    val class_field: String,
-    @SerialName("display_name")
-    val displayName: String,
-    val hint: String?,
-    val icon: String?,
-    val priority: Long,
+    @SerialName("source_types")
+    val sourceTypes: List<SourceType>,
+    @SerialName("permission_category_types")
+    val permissionCategoryTypes: List<PermissionCategoryType>,
 )
