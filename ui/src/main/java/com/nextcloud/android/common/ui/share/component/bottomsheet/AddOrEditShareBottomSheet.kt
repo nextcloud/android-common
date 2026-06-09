@@ -51,7 +51,7 @@ fun AddOrEditShareBottomSheet(
     share: Share,
     sharingCapabilities: SharingCapabilities,
     viewModel: ShareViewModel,
-    onDismissDraft: () -> Unit = {}
+    onDismissDraft: (Share) -> Unit = {}
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scrollState = rememberScrollState()
@@ -63,7 +63,7 @@ fun AddOrEditShareBottomSheet(
     ModalBottomSheet(
         onDismissRequest = {
             if (share.shareState == ShareState.DRAFT) {
-                onDismissDraft()
+                onDismissDraft(share)
             } else {
                 viewModel.commitPendingProperties(share.id)
                 viewModel.setActiveShare(null)
@@ -156,17 +156,17 @@ private fun PermissionCategories(
     onToggleCategory: (String) -> Unit,
     viewModel: ShareViewModel
 ) {
-    sharingCapabilities.permissionCategories
+    sharingCapabilities.permissionCategoryTypes
         .sortedBy { it.priority }
         .forEach { sharingCapability ->
-            key(sharingCapability.class_field) {
+            key(sharingCapability.classField) {
                 CollapsibleShareSection(
                     label = sharingCapability.displayName,
                     isExpanded = sharingCapability.displayName in expandedCategories,
                     onToggle = { onToggleCategory(sharingCapability.displayName) },
                 ) {
                     share.permissions
-                        .filter { permission -> permission.category == sharingCapability.class_field }
+                        .filter { permission -> permission.category == sharingCapability.classField }
                         .sortedBy { it.displayName }
                         .forEach { permission ->
                             key(permission.clazz) {

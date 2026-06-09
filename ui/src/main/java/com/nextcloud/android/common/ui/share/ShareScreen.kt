@@ -62,12 +62,12 @@ import com.nextcloud.android.common.ui.network.auth.ServerCredentials
 import com.nextcloud.android.common.ui.network.http.NextcloudHttpClient
 import com.nextcloud.android.common.ui.share.component.bottomsheet.AddOrEditShareBottomSheet
 import com.nextcloud.android.common.ui.share.component.dialog.DeleteShareConfirmationDialog
-import com.nextcloud.android.common.ui.share.component.dialog.DiscardDraftShareDialog
 import com.nextcloud.android.common.ui.share.model.api.capabilities.SharingCapabilities
 import com.nextcloud.android.common.ui.share.model.api.share.Share
 import com.nextcloud.android.common.ui.share.model.ui.ShareItemOverlayState
 import com.nextcloud.android.common.ui.share.model.ui.ShareItemType
 import com.nextcloud.android.common.ui.share.model.ui.ShareScreenState
+import com.nextcloud.android.common.ui.share.model.ui.filtered
 import com.nextcloud.android.common.ui.share.repository.ShareRemoteRepository
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
@@ -80,18 +80,6 @@ private fun ShareScreen(sourceId: String, sharingCapabilities: SharingCapabiliti
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-    var showDiscardDraftDialog by remember { mutableStateOf(false) }
-
-    if (showDiscardDraftDialog) {
-        DiscardDraftShareDialog(
-            onKeep = { showDiscardDraftDialog = false },
-            onDiscard = {
-                showDiscardDraftDialog = false
-                activeShare?.let { viewModel.deleteShare(it.id) }
-                viewModel.setActiveShare(null)
-            }
-        )
-    }
 
     LaunchedEffect(errorMessageId) {
         errorMessageId?.let {
@@ -141,7 +129,7 @@ private fun ShareScreen(sourceId: String, sharingCapabilities: SharingCapabiliti
                         .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    itemsIndexed(state.shares, key = { _, share -> share.id }) { index, share ->
+                    itemsIndexed(state.shares.filtered(), key = { _, share -> share.id }) { index, share ->
                         val type = ShareItemType.type(index, state.shares.lastIndex)
 
                         if (index == 0) {
@@ -168,7 +156,10 @@ private fun ShareScreen(sourceId: String, sharingCapabilities: SharingCapabiliti
             share = it,
             sharingCapabilities = sharingCapabilities,
             viewModel = viewModel,
-            onDismissDraft = { showDiscardDraftDialog = true }
+            onDismissDraft = { draftShare ->
+                activeShare?.let { viewModel.deleteShare(draftShare.id) }
+                viewModel.setActiveShare(null)
+            }
         )
     }
 }
