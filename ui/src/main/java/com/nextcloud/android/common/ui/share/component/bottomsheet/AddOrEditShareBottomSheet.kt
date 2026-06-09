@@ -161,7 +161,11 @@ private fun CategorySelector(
 
 // TODO for COPY link use Recepient.Secret.URL side note: if value is updatable user can edit the TOKEN directly which is value
 
+// TODO display error messages and handle them via debounce mechanism
 
+// TODO fetch shares currently returns all shares SOURCE ID will be implemented so that u can only show related shares
+
+// TODO show share icon from first recipient but check with laura
 
 // TODO: Backend will change and provide us bundled permissions or list of custom permissions.
 // USE THIS FOR BOTH OPTION
