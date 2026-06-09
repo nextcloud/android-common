@@ -177,7 +177,8 @@ private fun PermissionCategories(
     onToggleCategory: (String) -> Unit,
     viewModel: ShareViewModel
 ) {
-    var expanded by remember { mutableStateOf(false) }
+    /*
+     var expanded by remember { mutableStateOf(false) }
 
     DropdownMenu(
         expanded = expanded,
@@ -197,6 +198,8 @@ private fun PermissionCategories(
             onClick = { /* Do something... */ }
         )
     }
+     */
+
 
     sharingCapabilities.permissionCategoryTypes
         .sortedBy { it.priority }
