@@ -21,6 +21,7 @@ import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareStateR
 import com.nextcloud.android.common.ui.share.model.api.share.Share
 import com.nextcloud.android.common.ui.share.model.api.state.ShareState
 import com.nextcloud.android.common.ui.share.model.ui.ShareScreenState
+import com.nextcloud.android.common.ui.share.model.ui.filtered
 import com.nextcloud.android.common.ui.share.repository.ShareRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
@@ -98,7 +99,7 @@ class ShareViewModel(
             val result = repository.fetchShares(sourceClass, lastShareID, limit)
             handleResult(result, R.string.share_view_fetch_error_message)?.let { fetched ->
                 _state.update {
-                    if (fetched.isEmpty()) ShareScreenState.Empty
+                    if (fetched.filtered().isEmpty()) ShareScreenState.Empty
                     else ShareScreenState.Loaded(fetched)
                 }
             }
@@ -237,7 +238,7 @@ class ShareViewModel(
             handleResult(result, R.string.share_view_delete_error_message)?.let {
                 val remaining = currentShares.filterNot { it.id == id }
                 _state.update {
-                    if (remaining.isEmpty()) ShareScreenState.Empty
+                    if (remaining.filtered().isEmpty()) ShareScreenState.Empty
                     else ShareScreenState.Loaded(remaining)
                 }
                 if (_activeShare.value?.id == id) _activeShare.update { null }
