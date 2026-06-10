@@ -21,6 +21,7 @@ import com.nextcloud.android.common.ui.share.model.api.request.AddSourceRequest
 import com.nextcloud.android.common.ui.share.model.api.request.GetShareRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePermissionRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePropertyRequest
+import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareRecipientSecretRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareStateRequest
 import com.nextcloud.android.common.ui.share.model.api.secret.Secret
 import com.nextcloud.android.common.ui.share.model.api.share.Share
@@ -227,7 +228,7 @@ class MockShareRepository : ShareRepository {
     )
 
     override suspend fun fetchRecipients(
-        recipientTypeClass: String?,
+        recipientTypeClasses: List<String>?,
         query: String,
         limit: Int,
         offset: Int
@@ -277,7 +278,7 @@ class MockShareRepository : ShareRepository {
         )
 
         val filtered = all
-            .filter { recipientTypeClass == null || it.clazz == recipientTypeClass }
+            .filter { recipientTypeClasses.isNullOrEmpty() || it.clazz in recipientTypeClasses }
             .filter { it.displayName.contains(query, ignoreCase = true) || it.value.contains(query, ignoreCase = true) }
             .drop(offset)
             .take(limit)
@@ -420,6 +421,15 @@ class MockShareRepository : ShareRepository {
         val updated = current.copy(lastUpdated = System.currentTimeMillis())
         if (index >= 0) mockShares[index] = updated
         return NetworkResult.Success(updated)
+    }
+
+    override suspend fun updateShareRecipientSecret(
+        id: String,
+        request: UpdateShareRecipientSecretRequest
+    ): NetworkResult<Share> {
+        val index = mockShares.indexOfFirst { it.id == id }
+        val current = if (index >= 0) mockShares[index] else buildShare(id = id, sources = emptyList(), recipients = emptyList())
+        return NetworkResult.Success(current)
     }
 
     override suspend fun updateSharePermission(

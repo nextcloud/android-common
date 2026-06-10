@@ -7,6 +7,7 @@
 
 package com.nextcloud.android.common.ui.share.model.api.source
 
+import com.nextcloud.android.common.ui.share.model.api.icon.Icon
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -18,5 +19,7 @@ data class Source(
     val value: String,
 
     @SerialName("display_name")
-    val displayName: String
+    val displayName: String,
+
+    val icon: Icon? = null
 )

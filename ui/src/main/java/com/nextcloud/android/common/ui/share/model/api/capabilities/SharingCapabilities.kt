@@ -14,7 +14,7 @@ import kotlinx.serialization.Serializable
 data class SharingCapabilities(
     @SerialName("api_versions")
     val apiVersions: List<String>,
-    val legacy: Legacy,
+    val legacy: Legacy? = null,
     @SerialName("source_types")
     val sourceTypes: List<SourceType>,
     @SerialName("permission_category_types")
