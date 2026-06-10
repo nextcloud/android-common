@@ -96,7 +96,10 @@ fun AddOrEditShareBottomSheet(
             CategorySelector(
                 categories = categories,
                 selectedCategory = selectedCategory,
-                onCategorySelected = { selectedCategory = it }
+                onCategorySelected = { category ->
+                    selectedCategory = category
+                    viewModel.addAnyoneRecipient(category, share)
+                }
             )
 
             if (selectedCategory == ShareCategory.Invited) {
@@ -227,14 +230,10 @@ private fun CategorySelector(
     }
 }
 
-// TODO implement Anyone -->  /ocs/v2.php/apps/sharing/api/v1/share/{id}/recipient
-//  --> Add a recipient to a share use correspongind class value --> doesnt matter use uuid string : "value": "string",   "instance": "string"
 
 // TODO discuss with laura for note to recepipent expiraitaion date proeprties etc should be collabls
 
 // TODO for COPY link use Recepient.Secret.URL side note: if value is updatable user can edit the TOKEN directly which is value
-
-// TODO display error messages and handle them via debounce mechanism
 
 // TODO fetch shares currently returns all shares SOURCE ID will be implemented so that u can only show related shares
 
