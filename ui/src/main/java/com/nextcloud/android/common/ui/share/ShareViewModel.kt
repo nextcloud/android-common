@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.network.model.NetworkResult
+import com.nextcloud.android.common.ui.network.model.dataOrElse
 import com.nextcloud.android.common.ui.share.model.api.recipients.Recipient
 import com.nextcloud.android.common.ui.share.model.api.request.AddRecipientRequest
 import com.nextcloud.android.common.ui.share.model.api.request.AddSourceRequest
@@ -40,10 +41,16 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.UUID
+import kotlin.time.Duration.Companion.milliseconds
 
 class ShareViewModel(
     private val repository: ShareRepository
 ) : ViewModel() {
+
+    companion object {
+        private const val SEARCH_DEBOUNCE_DELAY_MS = 300L
+        private const val PROPERTY_DEBOUNCE_DELAY_MS = 1000L
+    }
 
     private val _state = MutableStateFlow<ShareScreenState>(ShareScreenState.Loading)
     val state: StateFlow<ShareScreenState> = _state
@@ -79,7 +86,7 @@ class ShareViewModel(
     private fun initSearchQuery() {
         viewModelScope.launch {
             _searchQuery
-                .debounce(300L)
+                .debounce(SEARCH_DEBOUNCE_DELAY_MS.milliseconds)
                 .distinctUntilChanged()
                 .filter { it.isNotBlank() }
                 .collect { query -> executeSearch(query) }
@@ -109,7 +116,8 @@ class ShareViewModel(
             _errorMessageId.update { null }
 
             val result = repository.fetchShares(sourceClass, lastShareID, limit)
-            val fetched = handleResult(result, R.string.share_view_fetch_error_message) ?: return@launch
+            val fetched = result.dataOrElse { _errorMessageId.update { R.string.share_view_fetch_error_message } }
+                ?: return@launch
             _state.update {
                 if (fetched.filtered().isEmpty()) ShareScreenState.Empty
                 else ShareScreenState.Loaded(fetched)
@@ -122,7 +130,8 @@ class ShareViewModel(
             _errorMessageId.update { null }
 
             val result = repository.fetchShare(id, request)
-            val share = handleResult(result, R.string.share_view_fetch_error_message) ?: return@launch
+            val share = result.dataOrElse { _errorMessageId.update { R.string.share_view_fetch_error_message } }
+                ?: return@launch
 
             _activeShare.update { share }
             replaceInList(share)
@@ -135,7 +144,8 @@ class ShareViewModel(
         _errorMessageId.update { null }
 
         val result = repository.createDraftShare()
-        val draft = handleResult(result, R.string.share_view_create_error_message)
+
+        val draft = result.dataOrElse { _errorMessageId.update { R.string.share_view_create_error_message } }
 
         if (draft != null) {
             _activeShare.update { draft }
@@ -153,7 +163,8 @@ class ShareViewModel(
             val result = withContext(Dispatchers.IO) {
                 repository.updateShareState(id, UpdateShareStateRequest(shareState))
             }
-            val updated = handleResult(result, R.string.share_view_update_error_message) ?: return@launch
+            val updated = result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
+                ?: return@launch
             if (shareState == ShareState.ACTIVE) {
                 _activeShare.update { null }
             } else {
@@ -169,7 +180,8 @@ class ShareViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             val clazz = "OCA\\Files\\Sharing\\Source\\NodeShareSourceType"
             val result = repository.addShareSource(id, AddSourceRequest(clazz, value))
-            val updated = handleResult(result, R.string.share_view_update_error_message) ?: return@launch
+            val updated = result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
+                ?: return@launch
             _activeShare.update { updated }
             replaceInList(updated)
         }
@@ -178,7 +190,8 @@ class ShareViewModel(
     fun removeSource(id: String, clazz: String, value: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val result = repository.removeShareSource(id, clazz, value)
-            val updated = handleResult(result, R.string.share_view_update_error_message) ?: return@launch
+            val updated = result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
+                ?: return@launch
             _activeShare.update { updated }
             replaceInList(updated)
         }
@@ -189,7 +202,8 @@ class ShareViewModel(
     fun addRecipient(id: String, clazz: String, value: String, instance: String? = null) {
         viewModelScope.launch(Dispatchers.IO) {
             val result = repository.addShareRecipient(id, AddRecipientRequest(clazz, value, instance))
-            val updated = handleResult(result, R.string.share_view_update_error_message) ?: return@launch
+            val updated = result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
+                ?: return@launch
             _activeShare.update { updated }
             replaceInList(updated)
         }
@@ -216,7 +230,8 @@ class ShareViewModel(
     fun removeRecipient(id: String, clazz: String, value: String, instance: String? = null) {
         viewModelScope.launch(Dispatchers.IO) {
             val result = repository.removeShareRecipient(id, clazz, value, instance)
-            val updated =  handleResult(result, R.string.share_view_update_error_message) ?: return@launch
+            val updated = result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
+                ?: return@launch
             _activeShare.update { updated }
             replaceInList(updated)
         }
@@ -227,7 +242,8 @@ class ShareViewModel(
     fun updateProperty(id: String, clazz: String, value: String?) {
         viewModelScope.launch(Dispatchers.IO) {
             val result = repository.updateShareProperty(id, UpdateSharePropertyRequest(clazz, value))
-            val updated =  handleResult(result, R.string.share_view_update_error_message) ?: return@launch
+            val updated = result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
+                ?: return@launch
             _activeShare.update { updated }
             replaceInList(updated)
         }
@@ -236,7 +252,7 @@ class ShareViewModel(
     fun updatePropertyDebounced(shareId: String, clazz: String, value: String) {
         pendingPropertyJobs[clazz]?.job?.cancel()
         val job = viewModelScope.launch {
-            delay(PROPERTY_DEBOUNCE_DELAY_MS)
+            delay(PROPERTY_DEBOUNCE_DELAY_MS.milliseconds)
             pendingPropertyJobs.remove(clazz)
             withContext(Dispatchers.IO) { executePropertyUpdate(shareId, clazz, value) }
         }
@@ -264,6 +280,7 @@ class ShareViewModel(
                 _activeShare.update { result.data }
                 replaceInList(result.data)
             }
+
             is NetworkResult.ServerError,
             is NetworkResult.NetworkException -> {
                 _propertyErrors.update { it + (clazz to R.string.share_view_update_error_message) }
@@ -276,7 +293,8 @@ class ShareViewModel(
     fun updatePermission(id: String, clazz: String, enabled: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             val result = repository.updateSharePermission(id, UpdateSharePermissionRequest(clazz, enabled))
-            val updated = handleResult(result, R.string.share_view_update_error_message) ?: return@launch
+            val updated = result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
+                ?: return@launch
             _activeShare.update { updated }
             replaceInList(updated)
         }
@@ -287,7 +305,7 @@ class ShareViewModel(
     fun deleteShare(id: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val result = repository.deleteShare(id)
-            handleResult(result, R.string.share_view_delete_error_message) ?: return@launch
+            result.dataOrElse { _errorMessageId.update { R.string.share_view_delete_error_message } } ?: return@launch
 
             val remaining = currentShares.filterNot { it.id == id }
             _state.update {
@@ -311,24 +329,9 @@ class ShareViewModel(
     // endregion
 
     // region private
-    companion object {
-        private const val PROPERTY_DEBOUNCE_DELAY_MS = 1000L
-    }
-
     private fun replaceInList(updated: Share) {
         val shares = currentShares.ifEmpty { return }
         _state.update { ShareScreenState.Loaded(shares.map { if (it.id == updated.id) updated else it }) }
-    }
-
-    private fun <T> handleResult(result: NetworkResult<T>, errorId: Int): T? {
-        return when (result) {
-            is NetworkResult.Success -> result.data
-            is NetworkResult.ServerError,
-            is NetworkResult.NetworkException -> {
-                _errorMessageId.update { errorId }
-                null
-            }
-        }
     }
     // endregion
 }
