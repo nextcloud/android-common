@@ -178,6 +178,7 @@ class ShareViewModel(
     // region sources
     fun addSource(id: String, value: String) {
         viewModelScope.launch(Dispatchers.IO) {
+            // TODO pass from the clients this may vary depends on the client so notes and files for now uses this
             val clazz = "OCA\\Files\\Sharing\\Source\\NodeShareSourceType"
             val result = repository.addShareSource(id, AddSourceRequest(clazz, value))
             val updated = result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }

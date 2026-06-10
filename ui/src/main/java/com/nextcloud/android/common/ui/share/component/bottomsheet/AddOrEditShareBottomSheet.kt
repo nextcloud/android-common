@@ -50,8 +50,6 @@ import com.nextcloud.android.common.ui.share.component.RecipientSearchField
 import com.nextcloud.android.common.ui.share.component.ShareSwitch
 import com.nextcloud.android.common.ui.share.component.property.SharePropertyView
 import com.nextcloud.android.common.ui.share.model.api.capabilities.SharingCapabilities
-import com.nextcloud.android.common.ui.share.model.api.property.clazz
-import com.nextcloud.android.common.ui.share.model.api.property.priority
 import com.nextcloud.android.common.ui.share.model.api.share.Share
 import com.nextcloud.android.common.ui.share.model.api.state.ShareState
 import com.nextcloud.android.common.ui.share.model.ui.ShareCategory
@@ -130,16 +128,7 @@ fun AddOrEditShareBottomSheet(
             }
 
             if (share.readyToSend()) {
-                val localClipboard = LocalClipboard.current
-                val scope = rememberCoroutineScope()
-
-                Buttons(onCopyLink = {
-                    scope.launch {
-                        share.getClipEntry()?.let { clipEntry ->
-                            localClipboard.setClipEntry(clipEntry)
-                        }
-                    }
-                }, onSend = {
+                Buttons(share, selectedCategory, onSend = {
                     viewModel.updateState(share.id, ShareState.ACTIVE)
                 })
             }
@@ -149,7 +138,8 @@ fun AddOrEditShareBottomSheet(
 
 @Composable
 private fun Buttons(
-    onCopyLink: () -> Unit = {},
+    share: Share,
+    category: ShareCategory,
     onSend: () -> Unit = {},
 ) {
     Row(
@@ -158,25 +148,36 @@ private fun Buttons(
             .padding(16.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Button(
-            onClick = onCopyLink,
-            modifier = Modifier.weight(1f),
-            shape = RoundedCornerShape(10.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.onSurface,
-            ),
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_link),
-                contentDescription = null,
-                modifier = Modifier.size(20.dp),
-            )
-            Text(
-                text = stringResource(R.string.share_view_copy_action),
-                modifier = Modifier.padding(start = 8.dp),
-            )
+        val clipEntry = share.getClipEntry()
+        if (category == ShareCategory.Anyone && clipEntry != null) {
+            val localClipboard = LocalClipboard.current
+            val scope = rememberCoroutineScope()
+
+            Button(
+                onClick = {
+                    scope.launch {
+                        localClipboard.setClipEntry(clipEntry)
+                    }
+                },
+                modifier = Modifier.weight(1f),
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onSurface,
+                ),
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_link),
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp),
+                )
+                Text(
+                    text = stringResource(R.string.share_view_copy_action),
+                    modifier = Modifier.padding(start = 8.dp),
+                )
+            }
         }
+
 
         Button(
             onClick = onSend,
@@ -230,6 +231,7 @@ private fun CategorySelector(
     }
 }
 
+// TODO copy link must be only for ANYONE
 
 // TODO discuss with laura for note to recepipent expiraitaion date proeprties etc should be collabls
 
