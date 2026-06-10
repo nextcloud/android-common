@@ -77,7 +77,6 @@ fun AddOrEditShareBottomSheet(
             if (share.shareState == ShareState.DRAFT) {
                 onDismissDraft(share)
             } else {
-                viewModel.commitPendingProperties(share.id)
                 viewModel.setActiveShare(null)
             }
         },
