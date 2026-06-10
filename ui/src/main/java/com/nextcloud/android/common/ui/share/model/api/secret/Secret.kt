@@ -12,6 +12,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Secret(
     val updatable: Boolean,
-    val value: String?,
-    val url: String?
+    val value: String? = null,
+    val url: String? = null
 )
