@@ -10,10 +10,12 @@ package com.nextcloud.android.common.ui.network.http
 import com.nextcloud.android.common.ui.network.auth.AuthInterceptor
 import com.nextcloud.android.common.ui.network.auth.ServerCredentials
 import com.nextcloud.android.common.ui.network.model.NetworkResult
+import com.nextcloud.android.common.ui.network.model.Ocs
 import com.nextcloud.android.common.ui.network.model.OcsResponse
 import com.nextcloud.android.common.ui.network.serialization.OCSSerializer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.JsonElement
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
 import okhttp3.logging.HttpLoggingInterceptor
@@ -65,7 +67,12 @@ class NextcloudHttpClient private constructor(
             val response = okHttpClient.newCall(request).execute()
             val responseBody = response.body.string()
             if (response.isSuccessful) {
-                NetworkResult.Success(parse(responseBody))
+                val envelope = OCSSerializer.json.decodeFromString<OcsResponse<JsonElement>>(responseBody)
+                if (envelope.ocs.meta.status != "ok") {
+                    NetworkResult.ServerError(OcsResponse(Ocs(envelope.ocs.meta, envelope.ocs.meta.message)))
+                } else {
+                    NetworkResult.Success(parse(responseBody))
+                }
             } else {
                 NetworkResult.ServerError(OCSSerializer.json.decodeFromString<OcsResponse<String>>(responseBody))
             }

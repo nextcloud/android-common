@@ -20,3 +20,13 @@ sealed class NetworkResult<out T> {
         fun fromException(e: Throwable): NetworkException = NetworkException(e)
     }
 }
+
+inline fun <T> NetworkResult<T>.dataOrElse(onError: () -> Unit): T? =
+    when (this) {
+        is NetworkResult.Success -> data
+        is NetworkResult.ServerError,
+        is NetworkResult.NetworkException -> {
+            onError()
+            null
+        }
+    }
