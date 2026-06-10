@@ -7,7 +7,10 @@
 
 package com.nextcloud.android.common.ui.share.model.api.share
 
+import android.content.ClipData
 import android.content.Context
+import androidx.compose.ui.platform.ClipEntry
+import androidx.compose.ui.platform.toClipEntry
 import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.share.model.api.owner.Owner
 import com.nextcloud.android.common.ui.share.model.api.permission.Permission
@@ -38,6 +41,21 @@ data class Share(
 
     val permissions: List<Permission>
 ) {
+    fun getClipEntry(): ClipEntry? {
+        val label = recipients.first().displayName
+        val link = recipients.first().secret.url
+
+        return if (link != null) {
+            ClipData.newPlainText(label, link).toClipEntry()
+        } else {
+            null
+        }
+    }
+
+    fun readyToSend(): Boolean {
+        return sources.isNotEmpty() && recipients.isNotEmpty() && permissions.isNotEmpty()
+    }
+
     fun title(context: Context): String {
         return if (shareState == ShareState.DRAFT) {
             context.getString(R.string.share_view_bottom_sheet_new_title)

@@ -8,6 +8,7 @@
 package com.nextcloud.android.common.ui.share.model.api.recipients
 
 import com.nextcloud.android.common.ui.share.model.api.icon.Icon
+import com.nextcloud.android.common.ui.share.model.api.secret.Secret
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -23,5 +24,7 @@ data class Recipient(
     @SerialName("display_name")
     val displayName: String,
 
-    val icon: Icon? = null
+    val icon: Icon? = null,
+
+    val secret: Secret
 )
