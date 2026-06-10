@@ -43,7 +43,7 @@ data class Share(
 ) {
     fun getClipEntry(): ClipEntry? {
         val label = recipients.first().displayName
-        val link = recipients.first().secret.url
+        val link = recipients.firstOrNull()?.secret?.url
 
         return if (link != null) {
             ClipData.newPlainText(label, link).toClipEntry()
@@ -52,9 +52,11 @@ data class Share(
         }
     }
 
-    fun readyToSend(): Boolean {
-        return sources.isNotEmpty() && recipients.isNotEmpty() && permissions.any { it.enabled }
-    }
+    fun readyToSend(): Boolean =
+        sources.isNotEmpty() &&
+            recipients.isNotEmpty() &&
+            permissions.any { it.enabled } &&
+            properties.none { it.required && it.value.isNullOrEmpty() }
 
     fun title(context: Context): String {
         return if (shareState == ShareState.DRAFT) {

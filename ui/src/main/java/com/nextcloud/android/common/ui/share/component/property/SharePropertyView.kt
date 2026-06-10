@@ -34,7 +34,6 @@ import com.nextcloud.android.common.ui.share.model.api.property.PropertyDate
 import com.nextcloud.android.common.ui.share.model.api.property.PropertyEnum
 import com.nextcloud.android.common.ui.share.model.api.property.PropertyPassword
 import com.nextcloud.android.common.ui.share.model.api.property.PropertyString
-import com.nextcloud.android.common.ui.share.model.api.property.clazz
 
 @Composable
 fun SharePropertyView(shareId: String, property: Property, viewModel: ShareViewModel) {
