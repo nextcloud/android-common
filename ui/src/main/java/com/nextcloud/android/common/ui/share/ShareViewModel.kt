@@ -219,11 +219,13 @@ class ShareViewModel(
             return
         }
 
+        // TODO: other recipients if user switch to anyone.
+        // THIS WILL FAIL for now UUID.randomUUID().toString() will be supported
         addRecipient(
             id = share.id,
             clazz = Recipient.TOKEN_RECIPIENT_CLASS,
             value = UUID.randomUUID().toString(),
-            instance = UUID.randomUUID().toString()
+            instance = null
         )
     }
 
