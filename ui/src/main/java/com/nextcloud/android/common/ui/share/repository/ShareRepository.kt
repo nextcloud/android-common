@@ -13,13 +13,14 @@ import com.nextcloud.android.common.ui.share.model.api.request.AddSourceRequest
 import com.nextcloud.android.common.ui.share.model.api.request.GetShareRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePermissionRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePropertyRequest
+import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareRecipientSecretRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareStateRequest
 import com.nextcloud.android.common.ui.share.model.api.share.Share
 
 interface ShareRepository {
 
     suspend fun fetchRecipients(
-        recipientTypeClass: String?,
+        recipientTypeClasses: List<String>?,
         query: String,
         limit: Int,
         offset: Int
@@ -76,5 +77,10 @@ interface ShareRepository {
     suspend fun updateSharePermission(
         id: String,
         request: UpdateSharePermissionRequest
+    ): NetworkResult<Share>
+
+    suspend fun updateShareRecipientSecret(
+        id: String,
+        request: UpdateShareRecipientSecretRequest
     ): NetworkResult<Share>
 }

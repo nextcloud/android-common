@@ -20,6 +20,7 @@ data class GetShareRequest(
 
 @Serializable
 data class UpdateShareStateRequest(
+    @SerialName("state")
     val shareState: ShareState
 )
 
@@ -55,4 +56,16 @@ data class UpdateSharePermissionRequest(
     val clazz: String,
 
     val enabled: Boolean
+)
+
+@Serializable
+data class UpdateShareRecipientSecretRequest(
+    @SerialName("class")
+    val clazz: String,
+
+    val value: String,
+
+    val instance: String? = null,
+
+    val secret: String
 )
