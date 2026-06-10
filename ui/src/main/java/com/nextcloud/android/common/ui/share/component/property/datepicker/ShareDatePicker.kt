@@ -37,7 +37,6 @@ fun ShareDatePicker(property: PropertyDate, onDateSelected: (String) -> Unit) {
     var showDatePicker by remember { mutableStateOf(false) }
     var dateValue by remember { mutableStateOf(property.value ?: "") }
 
-
     Box(modifier = Modifier.fillMaxWidth()) {
         OutlinedTextField(
             value = dateValue,
@@ -62,19 +61,21 @@ fun ShareDatePicker(property: PropertyDate, onDateSelected: (String) -> Unit) {
     }
 
     if (showDatePicker) {
-        DatePickerModal(formatter, onDateSelected = {
-            dateValue = it ?: ""
-            onDateSelected(dateValue)
-        }, onDismiss = {
-            showDatePicker = false
-        })
+        DatePickerModal(
+            formatter = formatter,
+            onDateSelected = { displayDate, isoDate ->
+                dateValue = displayDate ?: ""
+                onDateSelected(isoDate ?: "")
+            },
+            onDismiss = { showDatePicker = false }
+        )
     }
 }
 
 @Composable
 private fun DatePickerModal(
     formatter: ShareDateFormatter,
-    onDateSelected: (String?) -> Unit,
+    onDateSelected: (displayDate: String?, isoDate: String?) -> Unit,
     onDismiss: () -> Unit
 ) {
     val datePickerState = rememberDatePickerState()
@@ -83,7 +84,10 @@ private fun DatePickerModal(
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(onClick = {
-                onDateSelected(formatter.formatDate(datePickerState))
+                onDateSelected(
+                    formatter.formatDisplayDate(datePickerState),
+                    formatter.formatIso8601Date(datePickerState)
+                )
                 onDismiss()
             }) {
                 Text(stringResource(R.string.common_ok))
