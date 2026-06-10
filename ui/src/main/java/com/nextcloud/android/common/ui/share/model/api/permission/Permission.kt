@@ -15,10 +15,15 @@ data class Permission(
     @SerialName("class")
     val clazz: String,
 
+    @SerialName("source_class")
+    val sourceClass: String? = null,
+
     @SerialName("display_name")
     val displayName: String,
 
-    val category: String?,
+    val hint: String? = null,
+
+    val category: String? = null,
 
     val enabled: Boolean
 )
