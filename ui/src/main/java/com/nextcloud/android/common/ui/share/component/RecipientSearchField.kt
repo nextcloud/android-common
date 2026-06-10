@@ -216,7 +216,7 @@ private fun RecipientDropdownContent(
 }
 
 @Composable
-private fun RecipientIcon(icon: Icon, modifier: Modifier = Modifier) {
+fun RecipientIcon(icon: Icon, modifier: Modifier = Modifier) {
     val isDark = isSystemInDarkTheme()
     val url = if (isDark) icon.dark ?: icon.light else icon.light ?: icon.dark
 
