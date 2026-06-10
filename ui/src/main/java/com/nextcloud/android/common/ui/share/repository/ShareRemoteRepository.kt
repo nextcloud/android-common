@@ -19,6 +19,7 @@ import com.nextcloud.android.common.ui.share.model.api.request.AddSourceRequest
 import com.nextcloud.android.common.ui.share.model.api.request.GetShareRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePermissionRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePropertyRequest
+import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareRecipientSecretRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareStateRequest
 import com.nextcloud.android.common.ui.share.model.api.share.Share
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -35,14 +36,14 @@ class ShareRemoteRepository(
     }
 
     override suspend fun fetchRecipients(
-        recipientTypeClass: String?,
+        recipientTypeClasses: List<String>?,
         query: String,
         limit: Int,
         offset: Int
     ): NetworkResult<List<Recipient>> {
         val queryParams = buildString {
             append("?query=$query&limit=$limit&offset=$offset")
-            recipientTypeClass?.let { append("&recipientTypeClass=$it") }
+            recipientTypeClasses?.forEach { append("&recipientTypeClasses[]=$it") }
         }
         return client.executeRequest(
             endpoint = "$RECIPIENTS_ENDPOINT$queryParams",
@@ -181,6 +182,18 @@ class ShareRemoteRepository(
     ): NetworkResult<Share> =
         client.executeRequest(
             endpoint = "$SHARE_ENDPOINT/$id/enabled",
+            method = HttpMethod.PUT,
+            body = json.encodeToString(request).toRequestBody(JSON_CONTENT_TYPE)
+        ) { body ->
+            json.decodeFromString<OcsResponse<Share>>(body).ocs.data
+        }
+
+    override suspend fun updateShareRecipientSecret(
+        id: String,
+        request: UpdateShareRecipientSecretRequest
+    ): NetworkResult<Share> =
+        client.executeRequest(
+            endpoint = "$SHARE_ENDPOINT/$id/recipient/secret",
             method = HttpMethod.PUT,
             body = json.encodeToString(request).toRequestBody(JSON_CONTENT_TYPE)
         ) { body ->
