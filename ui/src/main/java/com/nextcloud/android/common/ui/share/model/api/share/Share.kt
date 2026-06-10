@@ -53,7 +53,7 @@ data class Share(
     }
 
     fun readyToSend(): Boolean {
-        return sources.isNotEmpty() && recipients.isNotEmpty() && permissions.isNotEmpty()
+        return sources.isNotEmpty() && recipients.isNotEmpty() && permissions.any { it.enabled }
     }
 
     fun title(context: Context): String {
