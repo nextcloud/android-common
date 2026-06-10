@@ -22,6 +22,7 @@ import com.nextcloud.android.common.ui.share.model.api.request.GetShareRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePermissionRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePropertyRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareStateRequest
+import com.nextcloud.android.common.ui.share.model.api.secret.Secret
 import com.nextcloud.android.common.ui.share.model.api.share.Share
 import com.nextcloud.android.common.ui.share.model.api.source.Source
 import com.nextcloud.android.common.ui.share.model.api.state.ShareState
@@ -123,7 +124,8 @@ class MockShareRepository : ShareRepository {
                     icon = Icon(
                         light = "https://mock/icons/user_light.png",
                         dark = "https://mock/icons/user_dark.png"
-                    )
+                    ),
+                    secret = Secret(false, value = "", url = "")
                 )
             )
         ),
@@ -140,7 +142,8 @@ class MockShareRepository : ShareRepository {
                     icon = Icon(
                         light = "https://mock/icons/group_light.png",
                         dark = "https://mock/icons/group_dark.png"
-                    )
+                    ),
+                    secret = Secret(false, value = "", url = "")
                 )
             ),
             owner = Owner(
@@ -181,7 +184,8 @@ class MockShareRepository : ShareRepository {
                     icon = Icon(
                         light = "https://mock/icons/external_light.png",
                         dark = "https://mock/icons/external_dark.png"
-                    )
+                    ),
+                    secret = Secret(false, value = "", url = "")
                 )
             ),
             owner = Owner(
@@ -207,7 +211,8 @@ class MockShareRepository : ShareRepository {
                     icon = Icon(
                         light = "https://mock/icons/federated_light.png",
                         dark = "https://mock/icons/federated_dark.png"
-                    )
+                    ),
+                    secret = Secret(false, value = "", url = "")
                 )
             ),
             owner = Owner(
@@ -235,7 +240,8 @@ class MockShareRepository : ShareRepository {
                 icon = Icon(
                     light = "https://mock/icons/user_light.png",
                     dark = "https://mock/icons/user_dark.png"
-                )
+                ),
+                secret = Secret(false, value = "", url = "")
             ),
             Recipient(
                 clazz = "group",
@@ -244,7 +250,8 @@ class MockShareRepository : ShareRepository {
                 icon = Icon(
                     light = "https://mock/icons/group_light.png",
                     dark = "https://mock/icons/group_dark.png"
-                )
+                ),
+                secret = Secret(false, value = "", url = "")
             ),
             Recipient(
                 clazz = "mail",
@@ -253,7 +260,8 @@ class MockShareRepository : ShareRepository {
                 icon = Icon(
                     light = "https://mock/icons/external_light.png",
                     dark = "https://mock/icons/external_dark.png"
-                )
+                ),
+                secret = Secret(false, value = "", url = "")
             ),
             Recipient(
                 clazz = "federated",
@@ -263,7 +271,8 @@ class MockShareRepository : ShareRepository {
                 icon = Icon(
                     light = "https://mock/icons/federated_light.png",
                     dark = "https://mock/icons/federated_dark.png"
-                )
+                ),
+                secret = Secret(false, value = "", url = "")
             )
         )
 
@@ -373,7 +382,8 @@ class MockShareRepository : ShareRepository {
             clazz = request.clazz,
             value = request.value,
             instance = request.instance,
-            displayName = request.value
+            displayName = request.value,
+            secret = Secret(false, value = "", url = "")
         )
         val updated = current.copy(
             recipients = current.recipients + newRecipient,
