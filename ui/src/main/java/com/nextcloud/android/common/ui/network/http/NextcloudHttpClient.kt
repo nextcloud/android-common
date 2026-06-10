@@ -29,6 +29,7 @@ class NextcloudHttpClient private constructor(
         private const val CONNECT_TIMEOUT_SECONDS = 90L
         private const val READ_TIMEOUT_SECONDS = 90L
         private const val WRITE_TIMEOUT_SECONDS = 90L
+        private const val OCS_OK = "ok"
 
         fun create(
             credentials: ServerCredentials,
@@ -68,7 +69,7 @@ class NextcloudHttpClient private constructor(
             val responseBody = response.body.string()
             if (response.isSuccessful) {
                 val envelope = OCSSerializer.json.decodeFromString<OcsResponse<JsonElement>>(responseBody)
-                if (envelope.ocs.meta.status != "ok") {
+                if (envelope.ocs.meta.status != OCS_OK) {
                     NetworkResult.ServerError(OcsResponse(Ocs(envelope.ocs.meta, envelope.ocs.meta.message)))
                 } else {
                     NetworkResult.Success(parse(responseBody))

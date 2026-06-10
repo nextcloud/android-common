@@ -211,23 +211,22 @@ class ShareViewModel(
     }
 
     fun addAnyoneRecipient(category: ShareCategory, share: Share) {
-        if (category != ShareCategory.Anyone) {
-            return
-        }
+        if (category != ShareCategory.Anyone) return
 
-        val alreadyAdded = share.recipients.any { it.clazz == Recipient.TOKEN_RECIPIENT_CLASS }
-        if (alreadyAdded) {
-            return
-        }
+        share.recipients
+            .filter { it.clazz != Recipient.TOKEN_RECIPIENT_CLASS }
+            .forEach { recipient ->
+                removeRecipient(share.id, recipient.clazz, recipient.value, recipient.instance)
+            }
 
-        // TODO: other recipients if user switch to anyone.
-        // THIS WILL FAIL for now UUID.randomUUID().toString() will be supported
-        addRecipient(
-            id = share.id,
-            clazz = Recipient.TOKEN_RECIPIENT_CLASS,
-            value = UUID.randomUUID().toString(),
-            instance = null
-        )
+        if (share.recipients.none { it.clazz == Recipient.TOKEN_RECIPIENT_CLASS }) {
+            addRecipient(
+                id = share.id,
+                clazz = Recipient.TOKEN_RECIPIENT_CLASS,
+                value = UUID.randomUUID().toString(),
+                instance = null
+            )
+        }
     }
 
     fun removeRecipient(id: String, clazz: String, value: String, instance: String? = null) {
