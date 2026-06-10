@@ -20,6 +20,7 @@ import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareProper
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareStateRequest
 import com.nextcloud.android.common.ui.share.model.api.share.Share
 import com.nextcloud.android.common.ui.share.model.api.state.ShareState
+import com.nextcloud.android.common.ui.share.model.ui.ShareCategory
 import com.nextcloud.android.common.ui.share.model.ui.ShareScreenState
 import com.nextcloud.android.common.ui.share.model.ui.filtered
 import com.nextcloud.android.common.ui.share.repository.ShareRepository
@@ -38,6 +39,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.UUID
 
 class ShareViewModel(
     private val repository: ShareRepository
@@ -191,6 +193,24 @@ class ShareViewModel(
             _activeShare.update { updated }
             replaceInList(updated)
         }
+    }
+
+    fun addAnyoneRecipient(category: ShareCategory, share: Share) {
+        if (category != ShareCategory.Anyone) {
+            return
+        }
+
+        val alreadyAdded = share.recipients.any { it.clazz == Recipient.TOKEN_RECIPIENT_CLASS }
+        if (alreadyAdded) {
+            return
+        }
+
+        addRecipient(
+            id = share.id,
+            clazz = Recipient.TOKEN_RECIPIENT_CLASS,
+            value = UUID.randomUUID().toString(),
+            instance = UUID.randomUUID().toString()
+        )
     }
 
     fun removeRecipient(id: String, clazz: String, value: String, instance: String? = null) {

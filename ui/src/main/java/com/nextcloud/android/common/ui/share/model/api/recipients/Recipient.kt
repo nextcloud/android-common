@@ -27,4 +27,8 @@ data class Recipient(
     val icon: Icon? = null,
 
     val secret: Secret
-)
+) {
+    companion object {
+        const val TOKEN_RECIPIENT_CLASS = "OC\\CoreSharing\\Recipient\\TokenShareRecipientType"
+    }
+}
