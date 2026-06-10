@@ -78,6 +78,7 @@ fun RecipientSearchField(
         }
 
         RecipientSearchDropdown(
+            enabled = share.recipients.isEmpty(),
             query = query,
             expanded = expanded,
             onQueryChange = {
@@ -145,6 +146,7 @@ private fun RecipientChipRow(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun RecipientSearchDropdown(
+    enabled: Boolean,
     query: String,
     expanded: Boolean,
     onQueryChange: (String) -> Unit,
@@ -160,6 +162,7 @@ private fun RecipientSearchDropdown(
             value = query,
             onValueChange = onQueryChange,
             label = { Text(stringResource(R.string.share_view_invited_category_label)) },
+            enabled = enabled,
             modifier = Modifier
                 .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable, true)
                 .fillMaxWidth(),
