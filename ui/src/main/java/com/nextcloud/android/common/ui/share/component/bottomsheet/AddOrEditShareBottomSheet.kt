@@ -151,7 +151,6 @@ private fun CategorySelector(
 }
 
 // TODO ADD send button
-// TODO disable multi receipients
 // TODO implement Anyone -->  /ocs/v2.php/apps/sharing/api/v1/share/{id}/recipient
 //  --> Add a recipient to a share use correspongind class value --> doesnt matter use uuid string : "value": "string",   "instance": "string"
 
