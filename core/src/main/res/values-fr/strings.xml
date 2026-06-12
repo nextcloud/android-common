@@ -20,7 +20,7 @@
     <string name="ecosystem_null_account">Compte manquant. Impossible d\'ouvrir l\'appli.</string>
     <string name="ecosystem_wrong_intent">Impossible de terminer l\'action : réception d\'une donnée non prévue</string>
     <string name="ecosystem_received_account_invalid">Le compte reçu est invalide.</string>
-    <string name="ecosystem_invalid_account">Format de compte invalide. Cela doit être une adresse de courriel.</string>
+    <string name="ecosystem_invalid_account">Format de compte invalide. Cela doit être une adresse e-mail.</string>
     <string name="ecosystem_app_not_found">Appli non installée. Redirection vers le magasin...</string>
     <string name="ecosystem_store_open_failed">Impossible d\'ouvrir le magasin d\'applis. Merci de l\'installer manuellement.</string>
 </resources>
