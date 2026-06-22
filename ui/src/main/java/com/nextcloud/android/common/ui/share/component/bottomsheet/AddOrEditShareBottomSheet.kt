@@ -231,18 +231,7 @@ private fun CategorySelector(
     }
 }
 
-// TODO copy link must be only for ANYONE
 
-// TODO discuss with laura for note to recepipent expiraitaion date proeprties etc should be collabls
-
-// TODO for COPY link use Recepient.Secret.URL side note: if value is updatable user can edit the TOKEN directly which is value
-
-// TODO fetch shares currently returns all shares SOURCE ID will be implemented so that u can only show related shares
-
-// TODO show share icon from first recipient but check with laura
-
-// TODO: Backend will change and provide us bundled permissions or list of custom permissions.
-// USE THIS FOR BOTH OPTION
 @Composable
 private fun PermissionCategories(
     share: Share,
