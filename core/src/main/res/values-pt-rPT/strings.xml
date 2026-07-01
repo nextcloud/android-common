@@ -12,5 +12,6 @@
     <string name="date_formatting_relative_minutes">%dm</string>
     <string name="ecosystem_null_account">A conta está ausente. Não é possível abrir o aplicativo.</string>
     <string name="ecosystem_received_account_invalid">A conta recebida é inválida.</string>
+    <string name="ecosystem_app_not_found">Aplicativo não instalado. Redirecionando para a loja…</string>
     <string name="ecosystem_store_open_failed">Não é possível abrir a loja de aplicativos. Por favor, instale manualmente.</string>
 </resources>
