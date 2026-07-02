@@ -212,6 +212,7 @@ private fun ActionButtons(
     }
 }
 
+// FIXME: when toggles are selected recomposition happens
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PermissionsView(
