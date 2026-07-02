@@ -9,6 +9,7 @@ package com.nextcloud.android.common.ui.share.model.api.recipients
 
 import com.nextcloud.android.common.ui.share.model.api.icon.Icon
 import com.nextcloud.android.common.ui.share.model.api.secret.Secret
+import com.nextcloud.android.common.ui.share.model.api.user.User
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -26,7 +27,9 @@ data class Recipient(
 
     val icon: Icon? = null,
 
-    val secret: Secret
+    val secret: Secret,
+
+    val initiator: User? = null
 ) {
     companion object {
         const val TOKEN_RECIPIENT_CLASS = "OC\\CoreSharing\\Recipient\\TokenShareRecipientType"
