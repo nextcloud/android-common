@@ -11,6 +11,7 @@ import com.nextcloud.android.common.ui.share.model.api.recipients.Recipient
 import com.nextcloud.android.common.ui.share.model.api.request.AddRecipientRequest
 import com.nextcloud.android.common.ui.share.model.api.request.AddSourceRequest
 import com.nextcloud.android.common.ui.share.model.api.request.GetShareRequest
+import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePermissionPresetRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePermissionRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePropertyRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareRecipientSecretRequest
@@ -77,6 +78,11 @@ interface ShareRepository {
     suspend fun updateSharePermission(
         id: String,
         request: UpdateSharePermissionRequest
+    ): NetworkResult<Share>
+
+    suspend fun updateSharePermissionPreset(
+        id: String,
+        request: UpdateSharePermissionPresetRequest
     ): NetworkResult<Share>
 
     suspend fun updateShareRecipientSecret(
