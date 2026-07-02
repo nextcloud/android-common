@@ -240,54 +240,20 @@ private fun PermissionCategories(
     onToggleCategory: (String) -> Unit,
     viewModel: ShareViewModel
 ) {
-    /*
-     var expanded by remember { mutableStateOf(false) }
+    // We have 3 options in dropdown null, edit, view
+    // If user selects null ("Can...") just show all permissions without hiding behind collabsection section
+    // If user selects edit or view dont show any toggle -> immediately update permission
 
-    DropdownMenu(
-        expanded = expanded,
-        onDismissRequest = { expanded = false }
-    ) {
-        share.permissions.forEach {
-            key(it.displayName) {
-                DropdownMenuItem(
-                    text = { Text(it.displayName) },
-                    onClick = { /* Do something... */ }
+    share.permissions
+        .forEach { permission ->
+            key(permission.clazz) {
+                ShareSwitch(
+                    label = permission.displayName,
+                    checked = permission.enabled,
+                    onCheckedChange = { isChecked ->
+                        viewModel.updatePermission(share.id, permission.clazz, isChecked)
+                    }
                 )
-            }
-        }
-
-        DropdownMenuItem(
-            text = { Text("Option 2") },
-            onClick = { /* Do something... */ }
-        )
-    }
-     */
-
-
-    sharingCapabilities.permissionCategoryTypes
-        .sortedBy { it.priority }
-        .forEach { sharingCapability ->
-            key(sharingCapability.classField) {
-                CollapsibleShareSection(
-                    label = sharingCapability.displayName,
-                    isExpanded = sharingCapability.displayName in expandedCategories,
-                    onToggle = { onToggleCategory(sharingCapability.displayName) },
-                ) {
-                    share.permissions
-                        .filter { permission -> permission.category == sharingCapability.classField }
-                        .sortedBy { it.displayName }
-                        .forEach { permission ->
-                            key(permission.clazz) {
-                                ShareSwitch(
-                                    label = permission.displayName,
-                                    checked = permission.enabled,
-                                    onCheckedChange = { isChecked ->
-                                        viewModel.updatePermission(share.id, permission.clazz, isChecked)
-                                    }
-                                )
-                            }
-                        }
-                }
             }
         }
 }

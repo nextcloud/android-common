@@ -12,12 +12,13 @@ import android.content.Context
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.toClipEntry
 import com.nextcloud.android.common.ui.R
-import com.nextcloud.android.common.ui.share.model.api.owner.Owner
 import com.nextcloud.android.common.ui.share.model.api.permission.Permission
+import com.nextcloud.android.common.ui.share.model.api.permission.PermissionPreset
 import com.nextcloud.android.common.ui.share.model.api.property.Property
 import com.nextcloud.android.common.ui.share.model.api.recipients.Recipient
 import com.nextcloud.android.common.ui.share.model.api.source.Source
 import com.nextcloud.android.common.ui.share.model.api.state.ShareState
+import com.nextcloud.android.common.ui.share.model.api.user.User
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -25,7 +26,7 @@ import kotlinx.serialization.Serializable
 data class Share(
     val id: String,
 
-    val owner: Owner,
+    val owner: User,
 
     @SerialName("last_updated")
     val lastUpdated: Long,
@@ -39,7 +40,10 @@ data class Share(
 
     val properties: List<Property>,
 
-    val permissions: List<Permission>
+    val permissions: List<Permission>,
+
+    @SerialName("permission_preset")
+    val permissionPreset: PermissionPreset? = null
 ) {
     fun getClipEntry(): ClipEntry? {
         val label = recipients.first().displayName

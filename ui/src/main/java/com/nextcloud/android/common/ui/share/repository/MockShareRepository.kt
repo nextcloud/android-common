@@ -9,8 +9,8 @@ package com.nextcloud.android.common.ui.share.repository
 
 import com.nextcloud.android.common.ui.network.model.NetworkResult
 import com.nextcloud.android.common.ui.share.model.api.icon.Icon
-import com.nextcloud.android.common.ui.share.model.api.owner.Owner
 import com.nextcloud.android.common.ui.share.model.api.permission.Permission
+import com.nextcloud.android.common.ui.share.model.api.permission.PermissionPreset
 import com.nextcloud.android.common.ui.share.model.api.property.PropertyBoolean
 import com.nextcloud.android.common.ui.share.model.api.property.PropertyDate
 import com.nextcloud.android.common.ui.share.model.api.property.PropertyPassword
@@ -27,10 +27,11 @@ import com.nextcloud.android.common.ui.share.model.api.secret.Secret
 import com.nextcloud.android.common.ui.share.model.api.share.Share
 import com.nextcloud.android.common.ui.share.model.api.source.Source
 import com.nextcloud.android.common.ui.share.model.api.state.ShareState
+import com.nextcloud.android.common.ui.share.model.api.user.User
 
 class MockShareRepository : ShareRepository {
 
-    private val mockOwner = Owner(
+    private val mockOwner = User(
         userId = "alice",
         displayName = "Alice Johnson",
         icon = Icon(
@@ -43,19 +44,19 @@ class MockShareRepository : ShareRepository {
         Permission(
             clazz = "read",
             displayName = "Read",
-            category = "access",
+            presets = listOf(PermissionPreset.VIEW, PermissionPreset.EDIT),
             enabled = true
         ),
         Permission(
             clazz = "update",
             displayName = "Update",
-            category = "access",
+            presets = listOf(PermissionPreset.EDIT),
             enabled = false
         ),
         Permission(
             clazz = "delete",
             displayName = "Delete",
-            category = "access",
+            presets = listOf(PermissionPreset.EDIT),
             enabled = false
         )
     )
@@ -99,7 +100,7 @@ class MockShareRepository : ShareRepository {
         recipients: List<Recipient>,
         shareState: ShareState = ShareState.ACTIVE,
         lastUpdated: Long = System.currentTimeMillis(),
-        owner: Owner = mockOwner
+        owner: User = mockOwner
     ) = Share(
         id = id,
         owner = owner,
@@ -147,7 +148,7 @@ class MockShareRepository : ShareRepository {
                     secret = Secret(false, value = "", url = "")
                 )
             ),
-            owner = Owner(
+            owner = User(
                 userId = "system",
                 displayName = "System",
                 icon = Icon(
@@ -163,7 +164,7 @@ class MockShareRepository : ShareRepository {
             ),
             recipients = emptyList(),
             lastUpdated = 1710000000L,
-            owner = Owner(
+            owner = User(
                 userId = "system",
                 displayName = "System",
                 icon = Icon(
@@ -189,7 +190,7 @@ class MockShareRepository : ShareRepository {
                     secret = Secret(false, value = "", url = "")
                 )
             ),
-            owner = Owner(
+            owner = User(
                 userId = "john",
                 displayName = "John External",
                 icon = Icon(
@@ -216,7 +217,7 @@ class MockShareRepository : ShareRepository {
                     secret = Secret(false, value = "", url = "")
                 )
             ),
-            owner = Owner(
+            owner = User(
                 userId = "partner",
                 displayName = "Partner Cloud",
                 icon = Icon(
