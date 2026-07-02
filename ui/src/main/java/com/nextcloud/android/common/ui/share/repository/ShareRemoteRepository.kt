@@ -182,7 +182,7 @@ class ShareRemoteRepository(
         request: UpdateSharePermissionRequest
     ): NetworkResult<Share> =
         client.executeRequest(
-            endpoint = "$SHARE_ENDPOINT/$id/enabled",
+            endpoint = "$SHARE_ENDPOINT/$id/permission",
             method = HttpMethod.PUT,
             body = json.encodeToString(request).toRequestBody(JSON_CONTENT_TYPE)
         ) { body ->
