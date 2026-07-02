@@ -38,4 +38,6 @@
     <string name="share_view_permission_preset_view">Can view</string>
     <string name="share_view_permission_preset_edit">Can edit</string>
 
+    <string name="share_view_invited_category_title">Invited people</string>
+    <string name="share_view_anyone_category_title">Anyone</string>
 </resources>
