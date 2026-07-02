@@ -155,7 +155,6 @@ private fun ShareScreen(sourceId: String, sharingCapabilities: SharingCapabiliti
     activeShare?.let {
         AddOrEditShareBottomSheet(
             share = it,
-            sharingCapabilities = sharingCapabilities,
             viewModel = viewModel,
             onDismissDraft = { draftShare ->
                 activeShare?.let { viewModel.deleteShare(draftShare.id) }

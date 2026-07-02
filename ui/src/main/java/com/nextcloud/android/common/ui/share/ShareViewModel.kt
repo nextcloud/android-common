@@ -16,6 +16,8 @@ import com.nextcloud.android.common.ui.share.model.api.recipients.Recipient
 import com.nextcloud.android.common.ui.share.model.api.request.AddRecipientRequest
 import com.nextcloud.android.common.ui.share.model.api.request.AddSourceRequest
 import com.nextcloud.android.common.ui.share.model.api.request.GetShareRequest
+import com.nextcloud.android.common.ui.share.model.api.permission.PermissionPreset
+import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePermissionPresetRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePermissionRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePropertyRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareStateRequest
@@ -295,6 +297,16 @@ class ShareViewModel(
     fun updatePermission(id: String, clazz: String, enabled: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             val result = repository.updateSharePermission(id, UpdateSharePermissionRequest(clazz, enabled))
+            val updated = result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
+                ?: return@launch
+            _activeShare.update { updated }
+            replaceInList(updated)
+        }
+    }
+
+    fun updatePermissionPreset(id: String, preset: PermissionPreset) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val result = repository.updateSharePermissionPreset(id, UpdateSharePermissionPresetRequest(preset))
             val updated = result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
                 ?: return@launch
             _activeShare.update { updated }

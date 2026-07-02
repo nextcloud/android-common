@@ -17,6 +17,7 @@ import com.nextcloud.android.common.ui.share.model.api.recipients.Recipient
 import com.nextcloud.android.common.ui.share.model.api.request.AddRecipientRequest
 import com.nextcloud.android.common.ui.share.model.api.request.AddSourceRequest
 import com.nextcloud.android.common.ui.share.model.api.request.GetShareRequest
+import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePermissionPresetRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePermissionRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePropertyRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareRecipientSecretRequest
@@ -182,6 +183,18 @@ class ShareRemoteRepository(
     ): NetworkResult<Share> =
         client.executeRequest(
             endpoint = "$SHARE_ENDPOINT/$id/enabled",
+            method = HttpMethod.PUT,
+            body = json.encodeToString(request).toRequestBody(JSON_CONTENT_TYPE)
+        ) { body ->
+            json.decodeFromString<OcsResponse<Share>>(body).ocs.data
+        }
+
+    override suspend fun updateSharePermissionPreset(
+        id: String,
+        request: UpdateSharePermissionPresetRequest
+    ): NetworkResult<Share> =
+        client.executeRequest(
+            endpoint = "$SHARE_ENDPOINT/$id/permission/preset",
             method = HttpMethod.PUT,
             body = json.encodeToString(request).toRequestBody(JSON_CONTENT_TYPE)
         ) { body ->

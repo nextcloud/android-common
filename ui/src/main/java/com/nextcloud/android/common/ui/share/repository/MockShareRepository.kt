@@ -19,6 +19,7 @@ import com.nextcloud.android.common.ui.share.model.api.recipients.Recipient
 import com.nextcloud.android.common.ui.share.model.api.request.AddRecipientRequest
 import com.nextcloud.android.common.ui.share.model.api.request.AddSourceRequest
 import com.nextcloud.android.common.ui.share.model.api.request.GetShareRequest
+import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePermissionPresetRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePermissionRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePropertyRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareRecipientSecretRequest
@@ -445,6 +446,21 @@ class MockShareRepository : ShareRepository {
         }
         val updated = current.copy(
             permissions = updatedPermissions,
+            lastUpdated = System.currentTimeMillis()
+        )
+        if (index >= 0) mockShares[index] = updated
+        return NetworkResult.Success(updated)
+    }
+
+    override suspend fun updateSharePermissionPreset(
+        id: String,
+        request: UpdateSharePermissionPresetRequest
+    ): NetworkResult<Share> {
+        val index = mockShares.indexOfFirst { it.id == id }
+        val current =
+            if (index >= 0) mockShares[index] else buildShare(id = id, sources = emptyList(), recipients = emptyList())
+        val updated = current.copy(
+            permissionPreset = request.permissionPreset,
             lastUpdated = System.currentTimeMillis()
         )
         if (index >= 0) mockShares[index] = updated

@@ -21,10 +21,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
@@ -49,9 +54,9 @@ import com.nextcloud.android.common.ui.share.component.CollapsibleShareSection
 import com.nextcloud.android.common.ui.share.component.RecipientSearchField
 import com.nextcloud.android.common.ui.share.component.ShareSwitch
 import com.nextcloud.android.common.ui.share.component.property.SharePropertyView
-import com.nextcloud.android.common.ui.share.model.api.capabilities.SharingCapabilities
 import com.nextcloud.android.common.ui.share.model.api.share.Share
 import com.nextcloud.android.common.ui.share.model.api.state.ShareState
+import com.nextcloud.android.common.ui.share.model.ui.PermissionPresetOption
 import com.nextcloud.android.common.ui.share.model.ui.ShareCategory
 import kotlinx.coroutines.launch
 
@@ -59,7 +64,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun AddOrEditShareBottomSheet(
     share: Share,
-    sharingCapabilities: SharingCapabilities,
     viewModel: ShareViewModel,
     onDismissDraft: (Share) -> Unit = {}
 ) {
@@ -68,7 +72,6 @@ fun AddOrEditShareBottomSheet(
     val categories = remember { ShareCategory.entries.toList() }
     var selectedCategory by remember { mutableStateOf(categories.first()) }
     var showAdvancedSettings by remember { mutableStateOf(false) }
-    var expandedCategories by remember { mutableStateOf(emptySet<String>()) }
 
     ModalBottomSheet(
         onDismissRequest = {
@@ -106,15 +109,6 @@ fun AddOrEditShareBottomSheet(
 
             PermissionCategories(
                 share = share,
-                sharingCapabilities = sharingCapabilities,
-                expandedCategories = expandedCategories,
-                onToggleCategory = { categoryName ->
-                    expandedCategories = if (expandedCategories.contains(categoryName)) {
-                        expandedCategories - categoryName
-                    } else {
-                        expandedCategories + categoryName
-                    }
-                },
                 viewModel = viewModel
             )
 
@@ -232,30 +226,75 @@ private fun CategorySelector(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PermissionCategories(
     share: Share,
-    sharingCapabilities: SharingCapabilities,
-    expandedCategories: Set<String>,
-    onToggleCategory: (String) -> Unit,
     viewModel: ShareViewModel
 ) {
-    // We have 3 options in dropdown null, edit, view
-    // If user selects null ("Can...") just show all permissions without hiding behind collabsection section
-    // If user selects edit or view dont show any toggle -> immediately update permission
+    var selectedPreset by remember(share.id) { mutableStateOf(share.permissionPreset) }
 
-    share.permissions
-        .forEach { permission ->
-            key(permission.clazz) {
-                ShareSwitch(
-                    label = permission.displayName,
-                    checked = permission.enabled,
-                    onCheckedChange = { isChecked ->
-                        viewModel.updatePermission(share.id, permission.clazz, isChecked)
+    PermissionPresetDropdown(
+        selectedOption = PermissionPresetOption.from(selectedPreset),
+        onOptionSelected = { option ->
+            selectedPreset = option.preset
+            option.preset?.let { viewModel.updatePermissionPreset(share.id, it) }
+        }
+    )
+
+    if (selectedPreset != null) return
+
+    share.permissions.forEach { permission ->
+        key(permission.clazz) {
+            ShareSwitch(
+                label = permission.displayName,
+                checked = permission.enabled,
+                onCheckedChange = { isChecked ->
+                    viewModel.updatePermission(share.id, permission.clazz, isChecked)
+                }
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun PermissionPresetDropdown(
+    selectedOption: PermissionPresetOption,
+    onOptionSelected: (PermissionPresetOption) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = it }
+    ) {
+        OutlinedTextField(
+            value = stringResource(selectedOption.labelRes),
+            onValueChange = {},
+            readOnly = true,
+            label = { Text(stringResource(R.string.share_view_permission_preset_label)) },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            modifier = Modifier
+                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true)
+                .fillMaxWidth()
+        )
+
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            PermissionPresetOption.entries.forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(stringResource(option.labelRes)) },
+                    onClick = {
+                        expanded = false
+                        onOptionSelected(option)
                     }
                 )
             }
         }
+    }
 }
 
 @Composable
