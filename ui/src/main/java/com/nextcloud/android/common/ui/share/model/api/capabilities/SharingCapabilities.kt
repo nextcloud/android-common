@@ -17,6 +17,4 @@ data class SharingCapabilities(
     val legacy: Legacy? = null,
     @SerialName("source_types")
     val sourceTypes: List<SourceType>,
-    @SerialName("permission_category_types")
-    val permissionCategoryTypes: List<PermissionCategoryType>,
 )
