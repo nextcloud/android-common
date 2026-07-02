@@ -11,12 +11,11 @@ package com.nextcloud.android.common.ui.share.component.bottomsheet
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material3.Button
@@ -47,6 +46,7 @@ import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.share.ShareViewModel
@@ -54,10 +54,18 @@ import com.nextcloud.android.common.ui.share.component.CollapsibleShareSection
 import com.nextcloud.android.common.ui.share.component.RecipientSearchField
 import com.nextcloud.android.common.ui.share.component.ShareSwitch
 import com.nextcloud.android.common.ui.share.component.property.SharePropertyView
+import com.nextcloud.android.common.ui.share.model.api.permission.Permission
+import com.nextcloud.android.common.ui.share.model.api.permission.PermissionPreset
+import com.nextcloud.android.common.ui.share.model.api.property.PropertyString
+import com.nextcloud.android.common.ui.share.model.api.recipients.Recipient
+import com.nextcloud.android.common.ui.share.model.api.secret.Secret
 import com.nextcloud.android.common.ui.share.model.api.share.Share
+import com.nextcloud.android.common.ui.share.model.api.source.Source
 import com.nextcloud.android.common.ui.share.model.api.state.ShareState
+import com.nextcloud.android.common.ui.share.model.api.user.User
 import com.nextcloud.android.common.ui.share.model.ui.PermissionPresetOption
 import com.nextcloud.android.common.ui.share.model.ui.ShareCategory
+import com.nextcloud.android.common.ui.share.repository.MockShareRepository
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,40 +76,50 @@ fun AddOrEditShareBottomSheet(
     onDismissDraft: (Share) -> Unit = {}
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val scrollState = rememberScrollState()
     val categories = remember { ShareCategory.entries.toList() }
     var selectedCategory by remember { mutableStateOf(categories.first()) }
     var showAdvancedSettings by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
-    ModalBottomSheet(
-        onDismissRequest = {
-            if (share.shareState == ShareState.DRAFT) {
-                onDismissDraft(share)
-            } else {
-                viewModel.setActiveShare(null)
-            }
-        },
-        sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.surface,
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .padding(bottom = 32.dp)
-                .verticalScroll(scrollState),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            ShareTitle(share)
-
-            CategorySelector(
-                categories = categories,
-                selectedCategory = selectedCategory,
-                onCategorySelected = { category ->
-                    selectedCategory = category
-                    viewModel.addAnyoneRecipient(category, share)
+        ModalBottomSheet(
+            onDismissRequest = {
+                if (share.shareState == ShareState.DRAFT) {
+                    onDismissDraft(share)
+                } else {
+                    viewModel.setActiveShare(null)
                 }
+            },
+            sheetState = sheetState,
+            containerColor = MaterialTheme.colorScheme.surface,
+        ) {
+            Text(
+                text = share.title(context),
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(16.dp)
             )
+
+            SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+                categories.forEachIndexed { index, category ->
+                    SegmentedButton(
+                        selected = selectedCategory == category,
+                        onClick = {
+                            selectedCategory = category
+                            viewModel.addAnyoneRecipient(category, share)
+                        },
+                        shape = SegmentedButtonDefaults.itemShape(index = index, count = categories.size),
+                        icon = {
+                            Icon(painter = painterResource(category.iconId), contentDescription = "")
+                        }
+                    ) {
+                        Text(stringResource(category.titleId))
+                    }
+                }
+            }
 
             if (selectedCategory == ShareCategory.Invited) {
                 RecipientSearchField(share, viewModel)
@@ -122,7 +140,7 @@ fun AddOrEditShareBottomSheet(
             }
 
             if (share.readyToSend()) {
-                Buttons(share, selectedCategory, onSend = {
+                ActionButtons(share, selectedCategory, onSend = {
                     viewModel.updateState(share.id, ShareState.ACTIVE)
                 })
             }
@@ -131,7 +149,7 @@ fun AddOrEditShareBottomSheet(
 }
 
 @Composable
-private fun Buttons(
+private fun ActionButtons(
     share: Share,
     category: ShareCategory,
     onSend: () -> Unit = {},
@@ -172,7 +190,6 @@ private fun Buttons(
             }
         }
 
-
         Button(
             onClick = onSend,
             modifier = Modifier.weight(1f),
@@ -194,40 +211,6 @@ private fun Buttons(
         }
     }
 }
-
-@Composable
-private fun ShareTitle(share: Share) {
-    val context = LocalContext.current
-    Text(
-        text = share.title(context),
-        style = MaterialTheme.typography.headlineSmall,
-        color = MaterialTheme.colorScheme.onSurface,
-        modifier = Modifier.padding(bottom = 8.dp)
-    )
-}
-
-@Composable
-private fun CategorySelector(
-    categories: List<ShareCategory>,
-    selectedCategory: ShareCategory,
-    onCategorySelected: (ShareCategory) -> Unit
-) {
-    SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-        categories.forEachIndexed { index, category ->
-            SegmentedButton(
-                selected = selectedCategory == category,
-                onClick = { onCategorySelected(category) },
-                shape = SegmentedButtonDefaults.itemShape(index = index, count = categories.size),
-                icon = {
-                    Icon(painter = painterResource(category.iconId), contentDescription = "")
-                }
-            ) {
-                Text(stringResource(category.titleId))
-            }
-        }
-    }
-}
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -269,6 +252,7 @@ private fun PermissionPresetDropdown(
     var expanded by remember { mutableStateOf(false) }
 
     ExposedDropdownMenuBox(
+        modifier = Modifier.padding(12.dp),
         expanded = expanded,
         onExpandedChange = { expanded = it }
     ) {
@@ -323,3 +307,62 @@ private fun AdvancedSettingsSection(
         }
     }
 }
+
+
+@Preview(showBackground = true)
+@Composable
+private fun AddOrEditShareBottomSheetPreview() {
+    MaterialTheme {
+        AddOrEditShareBottomSheet(
+            share = previewShare,
+            viewModel = ShareViewModel(MockShareRepository())
+        )
+    }
+}
+
+private val previewIcon =
+    com.nextcloud.android.common.ui.share.model.api.icon.Icon(svg = "<svg xmlns=\"http://www.w3.org/2000/svg\"/>")
+
+private val previewUser = User(
+    userId = "alice",
+    displayName = "Alice Johnson",
+    icon = previewIcon
+)
+
+private val previewShare = Share(
+    id = "preview",
+    owner = previewUser,
+    lastUpdated = 0L,
+    shareState = ShareState.DRAFT,
+    sources = listOf(
+        Source(clazz = "file", value = "/Photos/vacation.jpg", displayName = "vacation.jpg", icon = previewIcon)
+    ),
+    recipients = listOf(
+        Recipient(
+            clazz = "user",
+            value = "bob@example.com",
+            displayName = "Bob Smith",
+            icon = previewIcon,
+            secret = Secret(updatable = false, value = "", url = "https://example.com/s/abc123")
+        )
+    ),
+    properties = listOf(
+        PropertyString(clazz = "note", displayName = "Note", priority = 10, required = false, value = "")
+    ),
+    permissions = listOf(
+        Permission(
+            clazz = "read",
+            displayName = "Read",
+            presets = listOf(PermissionPreset.VIEW, PermissionPreset.EDIT),
+            enabled = true
+        ),
+        Permission(
+            clazz = "update",
+            displayName = "Update",
+            presets = listOf(PermissionPreset.EDIT),
+            enabled = false
+        )
+    ),
+    permissionPreset = null
+)
+
