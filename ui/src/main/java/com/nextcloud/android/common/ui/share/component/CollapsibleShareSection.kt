@@ -32,7 +32,7 @@ fun CollapsibleShareSection(
     onToggle: () -> Unit,
     content: @Composable () -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
