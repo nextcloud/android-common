@@ -125,7 +125,7 @@ fun AddOrEditShareBottomSheet(
                 RecipientSearchField(share, viewModel)
             }
 
-            PermissionCategories(
+            PermissionsView(
                 share = share,
                 viewModel = viewModel
             )
@@ -214,7 +214,7 @@ private fun ActionButtons(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun PermissionCategories(
+private fun PermissionsView(
     share: Share,
     viewModel: ShareViewModel
 ) {
