@@ -217,9 +217,12 @@ private fun CategorySelector(
             SegmentedButton(
                 selected = selectedCategory == category,
                 onClick = { onCategorySelected(category) },
-                shape = SegmentedButtonDefaults.itemShape(index = index, count = categories.size)
+                shape = SegmentedButtonDefaults.itemShape(index = index, count = categories.size),
+                icon = {
+                    Icon(painter = painterResource(category.iconId), contentDescription = "")
+                }
             ) {
-                Text(category.name)
+                Text(stringResource(category.titleId))
             }
         }
     }

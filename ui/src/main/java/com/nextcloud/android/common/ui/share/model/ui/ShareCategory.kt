@@ -7,6 +7,12 @@
 
 package com.nextcloud.android.common.ui.share.model.ui
 
-enum class ShareCategory {
-    Invited, Anyone
+import com.nextcloud.android.common.ui.R
+
+enum class ShareCategory(val titleId: Int, val iconId: Int) {
+    Invited(
+        R.string.share_view_invited_category_title,
+        R.drawable.ic_person_add
+    ),
+    Anyone(R.string.share_view_anyone_category_title, R.drawable.ic_anyone)
 }
