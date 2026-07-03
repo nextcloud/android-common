@@ -67,15 +67,22 @@ class NextcloudHttpClient private constructor(
         try {
             val response = okHttpClient.newCall(request).execute()
             val responseBody = response.body.string()
-            if (response.isSuccessful) {
-                val envelope = OCSSerializer.json.decodeFromString<OcsResponse<JsonElement>>(responseBody)
-                if (envelope.ocs.meta.status != OCS_OK) {
-                    NetworkResult.ServerError(OcsResponse(Ocs(envelope.ocs.meta, envelope.ocs.meta.message)))
-                } else {
-                    NetworkResult.Success(parse(responseBody))
-                }
+
+            if (!response.isSuccessful) {
+                return@withContext NetworkResult.ServerError(
+                    OCSSerializer.json.decodeFromString<OcsResponse<String>>(responseBody)
+                )
+            }
+
+            if (responseBody.isBlank()) {
+                return@withContext NetworkResult.Success(parse(responseBody))
+            }
+
+            val envelope = OCSSerializer.json.decodeFromString<OcsResponse<JsonElement>>(responseBody)
+            if (envelope.ocs.meta.status != OCS_OK) {
+                NetworkResult.ServerError(OcsResponse(Ocs(envelope.ocs.meta, envelope.ocs.meta.message)))
             } else {
-                NetworkResult.ServerError(OCSSerializer.json.decodeFromString<OcsResponse<String>>(responseBody))
+                NetworkResult.Success(parse(responseBody))
             }
         } catch (e: Exception) {
             NetworkResult.fromException(e)
