@@ -71,7 +71,6 @@ import com.nextcloud.android.common.ui.share.component.RecipientIcon
 import com.nextcloud.android.common.ui.share.component.bottomsheet.AddOrEditShareBottomSheet
 import com.nextcloud.android.common.ui.share.component.bottomsheet.QuickSharePermissionBottomSheet
 import com.nextcloud.android.common.ui.share.component.dialog.DeleteShareConfirmationDialog
-import com.nextcloud.android.common.ui.share.model.api.capabilities.SharingCapabilities
 import com.nextcloud.android.common.ui.share.model.api.permission.PermissionPreset
 import com.nextcloud.android.common.ui.share.model.api.share.Share
 import com.nextcloud.android.common.ui.share.model.ui.PermissionPresetOption
@@ -81,7 +80,6 @@ import com.nextcloud.android.common.ui.share.model.ui.ShareScreenState
 import com.nextcloud.android.common.ui.share.model.ui.filtered
 import com.nextcloud.android.common.ui.share.repository.ShareRemoteRepository
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 
 @Composable
 private fun ShareScreen(sourceId: String, viewModel: ShareViewModel) {
@@ -91,6 +89,7 @@ private fun ShareScreen(sourceId: String, viewModel: ShareViewModel) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val resources = LocalResources.current
+    var editorInitialPreset by remember { mutableStateOf<PermissionPresetOption?>(null) }
 
     LaunchedEffect(errorMessageId) {
         errorMessageId?.let {
@@ -154,12 +153,22 @@ private fun ShareScreen(sourceId: String, viewModel: ShareViewModel) {
                         ShareItem(
                             share = share,
                             type = type,
-                            onSelectShare = { selected -> viewModel.setActiveShare(selected) },
+                            onSelectShare = { selected ->
+                                editorInitialPreset = null
+                                viewModel.setActiveShare(selected)
+                            },
+                            onCustomizeShare = { selected ->
+                                editorInitialPreset = PermissionPresetOption.CUSTOM
+                                viewModel.setActiveShare(selected)
+                            },
                             onChangePreset = { selected, preset ->
                                 viewModel.updatePermissionPreset(selected.id, preset, updateActiveShare = false)
                             },
                             onDeleteShare = { viewModel.deleteShare(it.id) },
-                            onSendEmail = { selected -> viewModel.setActiveShare(selected) } // TODO: is that right?
+                            onSendEmail = { selected ->
+                                editorInitialPreset = null
+                                viewModel.setActiveShare(selected)
+                            }
                         )
                     }
                 }
@@ -171,6 +180,7 @@ private fun ShareScreen(sourceId: String, viewModel: ShareViewModel) {
         AddOrEditShareBottomSheet(
             share = it,
             viewModel = viewModel,
+            initialPresetOption = editorInitialPreset,
             onDismissDraft = { draftShare ->
                 activeShare?.let { viewModel.deleteShare(draftShare.id) }
                 viewModel.setActiveShare(null)
@@ -184,6 +194,7 @@ private fun ShareItem(
     share: Share,
     type: ShareItemType,
     onSelectShare: (Share) -> Unit,
+    onCustomizeShare: (Share) -> Unit,
     onChangePreset: (Share, PermissionPreset) -> Unit,
     onDeleteShare: (Share) -> Unit,
     onSendEmail: (Share) -> Unit
@@ -201,7 +212,7 @@ private fun ShareItem(
                     if (preset != null) {
                         onChangePreset(share, preset)
                     } else {
-                        onSelectShare(share)
+                        onCustomizeShare(share)
                     }
                 },
                 onDismiss = { overlayState = ShareItemOverlayState.None }
