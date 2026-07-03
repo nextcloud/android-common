@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.share.ShareViewModel
 import com.nextcloud.android.common.ui.share.component.CollapsibleShareSection
+import com.nextcloud.android.common.ui.share.component.RecipientTokenField
 import com.nextcloud.android.common.ui.share.component.SelectRecipientField
 import com.nextcloud.android.common.ui.share.component.ShareSwitch
 import com.nextcloud.android.common.ui.share.component.property.SharePropertyView
@@ -135,6 +136,17 @@ fun AddOrEditShareBottomSheet(
                     SelectRecipientField(share, viewModel)
                 }
 
+                // TODO: is it going to be included for now?
+                val editableRecipient = share.recipients.firstOrNull { it.secret.updatable }
+                if (editableRecipient != null) {
+                    RecipientTokenField(
+                        recipient = editableRecipient,
+                        onTokenChange = { token ->
+                            viewModel.updateRecipientSecret(share.id, editableRecipient, token)
+                        }
+                    )
+                }
+
                 PermissionsView(
                     share = share,
                     viewModel = viewModel
@@ -163,7 +175,6 @@ fun AddOrEditShareBottomSheet(
                 if (share.readyToSend()) {
                     ActionButtons(
                         share = share,
-                        category = selectedCategory,
                         sendEnabled = !hasPropertyErrors,
                         onSend = { viewModel.updateState(share.id, ShareState.ACTIVE) }
                     )
@@ -275,7 +286,6 @@ private fun AdvancedSettingsSection(
 @Composable
 private fun ActionButtons(
     share: Share,
-    category: ShareCategory,
     sendEnabled: Boolean,
     onSend: () -> Unit,
 ) {
@@ -286,7 +296,7 @@ private fun ActionButtons(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         val clipEntry = share.getClipEntry()
-        if (category == ShareCategory.Anyone && clipEntry != null) {
+        if (clipEntry != null) {
             val localClipboard = LocalClipboard.current
             val scope = rememberCoroutineScope()
 

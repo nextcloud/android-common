@@ -15,6 +15,7 @@
     <string name="share_view_advanced_settings">Settings</string>
 
     <string name="share_view_select_recipient_label">Recipient</string>
+    <string name="share_view_link_token_label">Link token</string>
     <string name="share_view_select_recipient_clear">Clear recipient</string>
 
     <string name="share_view_empty_title">Not shared</string>

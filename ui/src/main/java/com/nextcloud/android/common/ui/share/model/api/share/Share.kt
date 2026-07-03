@@ -45,15 +45,12 @@ data class Share(
     @SerialName("permission_preset")
     val permissionPreset: PermissionPreset? = null
 ) {
+    // FIXME: secret.url is null
     fun getClipEntry(): ClipEntry? {
-        val label = recipients.first().displayName
-        val link = recipients.firstOrNull()?.secret?.url
+        val recipient = recipients.firstOrNull() ?: return null
+        val link = recipient.secret.url ?: return null
 
-        return if (link != null) {
-            ClipData.newPlainText(label, link).toClipEntry()
-        } else {
-            null
-        }
+        return ClipData.newPlainText(recipient.displayName, link).toClipEntry()
     }
 
     fun readyToSend(): Boolean =
