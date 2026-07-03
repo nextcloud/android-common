@@ -27,7 +27,7 @@ class MainViewModel : ViewModel() {
     ) {
         viewModelScope.launch {
             val credentials = ServerCredentials(baseUrl, username, token)
-            val client = NextcloudHttpClient.create(credentials, enableLogging = true)
+            val client = NextcloudHttpClient.create(credentials)
             val service = UserStatusRepository(client)
 
             when (val result = service.fetchPredefinedStatuses()) {
