@@ -289,12 +289,14 @@ class ShareViewModel(
         }
     }
 
-    fun updatePermissionPreset(id: String, preset: PermissionPreset) {
+    fun updatePermissionPreset(id: String, preset: PermissionPreset, updateActiveShare: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             val result = repository.updateSharePermissionPreset(id, UpdateSharePermissionPresetRequest(preset))
             val updated = result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
                 ?: return@launch
-            _activeShare.update { updated }
+            if (updateActiveShare) {
+                _activeShare.update { updated }
+            }
             replaceInList(updated)
         }
     }
