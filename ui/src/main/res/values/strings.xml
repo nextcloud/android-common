@@ -37,6 +37,7 @@
     <string name="share_view_update_error_message">Failed to update share.</string>
     <string name="share_view_property_error_warning">Some settings couldn\'t be saved. Fix the highlighted fields before sharing.</string>
 
+    <string name="share_view_quick_permission_title">Set permission</string>
     <string name="share_view_permission_preset_label">Participants</string>
     <string name="share_view_permission_preset_custom">Can…</string>
     <string name="share_view_permission_preset_view">Can view</string>

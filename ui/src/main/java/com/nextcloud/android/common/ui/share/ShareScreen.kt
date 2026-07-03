@@ -8,16 +8,23 @@
 package com.nextcloud.android.common.ui.share
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ColorScheme
@@ -62,9 +69,12 @@ import com.nextcloud.android.common.ui.network.auth.ServerCredentials
 import com.nextcloud.android.common.ui.network.http.NextcloudHttpClient
 import com.nextcloud.android.common.ui.share.component.RecipientIcon
 import com.nextcloud.android.common.ui.share.component.bottomsheet.AddOrEditShareBottomSheet
+import com.nextcloud.android.common.ui.share.component.bottomsheet.QuickSharePermissionBottomSheet
 import com.nextcloud.android.common.ui.share.component.dialog.DeleteShareConfirmationDialog
 import com.nextcloud.android.common.ui.share.model.api.capabilities.SharingCapabilities
+import com.nextcloud.android.common.ui.share.model.api.permission.PermissionPreset
 import com.nextcloud.android.common.ui.share.model.api.share.Share
+import com.nextcloud.android.common.ui.share.model.ui.PermissionPresetOption
 import com.nextcloud.android.common.ui.share.model.ui.ShareItemOverlayState
 import com.nextcloud.android.common.ui.share.model.ui.ShareItemType
 import com.nextcloud.android.common.ui.share.model.ui.ShareScreenState
@@ -117,12 +127,14 @@ private fun ShareScreen(sourceId: String, sharingCapabilities: SharingCapabiliti
                     CircularProgressIndicator()
                 }
             }
+
             is ShareScreenState.Empty -> {
                 ContentUnavailableView(
                     iconId = R.drawable.ic_person_add,
                     title = stringResource(R.string.share_view_empty_title),
                 )
             }
+
             is ShareScreenState.Loaded -> {
                 LazyColumn(
                     modifier = Modifier
@@ -143,6 +155,9 @@ private fun ShareScreen(sourceId: String, sharingCapabilities: SharingCapabiliti
                             share = share,
                             type = type,
                             onSelectShare = { selected -> viewModel.setActiveShare(selected) },
+                            onChangePreset = { selected, preset ->
+                                viewModel.updatePermissionPreset(selected.id, preset)
+                            },
                             onDeleteShare = { viewModel.deleteShare(it.id) },
                             onSendEmail = { }
                         )
@@ -169,20 +184,41 @@ private fun ShareItem(
     share: Share,
     type: ShareItemType,
     onSelectShare: (Share) -> Unit,
+    onChangePreset: (Share, PermissionPreset) -> Unit,
     onDeleteShare: (Share) -> Unit,
     onSendEmail: (Share) -> Unit
 ) {
     var overlayState by remember { mutableStateOf<ShareItemOverlayState>(ShareItemOverlayState.None) }
     val haptics = LocalHapticFeedback.current
 
-    if (overlayState == ShareItemOverlayState.DeleteConfirmation) {
-        DeleteShareConfirmationDialog(
-            onConfirm = {
-                overlayState = ShareItemOverlayState.None
-                onDeleteShare(share)
-            },
-            onDismiss = { overlayState = ShareItemOverlayState.None }
-        )
+    when (overlayState) {
+        is ShareItemOverlayState.QuickShare -> {
+            QuickSharePermissionBottomSheet(
+                selectedOption = PermissionPresetOption.from(share.permissionPreset),
+                onOptionSelected = { option ->
+                    overlayState = ShareItemOverlayState.None
+                    val preset = option.preset
+                    if (preset != null) {
+                        onChangePreset(share, preset)
+                    } else {
+                        onSelectShare(share)
+                    }
+                },
+                onDismiss = { overlayState = ShareItemOverlayState.None }
+            )
+        }
+
+        is ShareItemOverlayState.DeleteConfirmation -> {
+            DeleteShareConfirmationDialog(
+                onConfirm = {
+                    overlayState = ShareItemOverlayState.None
+                    onDeleteShare(share)
+                },
+                onDismiss = { overlayState = ShareItemOverlayState.None }
+            )
+        }
+
+        else -> Unit
     }
 
     ListItem(
@@ -213,11 +249,20 @@ private fun ShareItem(
             share.recipients.first().icon?.let { RecipientIcon(icon = it) }
         },
         supportingContent = {
-            Text(
-                text = share.shareState.name,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            Row(
+                modifier = Modifier.clickable { overlayState = ShareItemOverlayState.QuickShare },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(PermissionPresetOption.from(share.permissionPreset).labelRes),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+
+                Icon(Icons.Default.KeyboardArrowDown, contentDescription = "Down arrow")
+            }
+
         },
         trailingContent = {
             Box {
@@ -230,6 +275,9 @@ private fun ShareItem(
                     onDismissRequest = { overlayState = ShareItemOverlayState.None }
                 ) {
                     DropdownMenuItem(
+                        leadingIcon = {
+                            Icon(Icons.Default.Edit, contentDescription = "Edit icon")
+                        },
                         text = { Text(stringResource(R.string.share_view_list_item_edit)) },
                         onClick = {
                             overlayState = ShareItemOverlayState.None
@@ -237,6 +285,9 @@ private fun ShareItem(
                         }
                     )
                     DropdownMenuItem(
+                        leadingIcon = {
+                            Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send icon")
+                        },
                         text = { Text(stringResource(R.string.share_view_list_item_send_email)) },
                         onClick = {
                             onSendEmail(share)
@@ -245,6 +296,9 @@ private fun ShareItem(
                     )
                     HorizontalDivider()
                     DropdownMenuItem(
+                        leadingIcon = {
+                            Icon(Icons.Default.Delete, contentDescription = "Delete icon")
+                        },
                         text = {
                             Text(
                                 stringResource(R.string.share_view_list_item_delete),
