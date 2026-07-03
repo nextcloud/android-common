@@ -18,8 +18,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
@@ -174,9 +172,11 @@ fun AddOrEditShareBottomSheet(
                     )
                 }
 
+                // FIXME: make readyToSend suitable for anyone category
                 if (share.readyToSend()) {
                     ActionButtons(
                         share = share,
+                        category = selectedCategory,
                         sendEnabled = !hasPropertyErrors,
                         onSend = { viewModel.updateState(share.id, ShareState.ACTIVE) }
                     )
@@ -287,10 +287,10 @@ private fun AdvancedSettingsSection(
     }
 }
 
-
 @Composable
 private fun ActionButtons(
     share: Share,
+    category: ShareCategory,
     sendEnabled: Boolean,
     onSend: () -> Unit,
 ) {
@@ -341,12 +341,12 @@ private fun ActionButtons(
             ),
         ) {
             Icon(
-                imageVector = Icons.AutoMirrored.Filled.Send,
+                imageVector = category.sendActionIcon,
                 contentDescription = null,
                 modifier = Modifier.size(20.dp),
             )
             Text(
-                text = stringResource(R.string.share_view_send_action),
+                text = stringResource(category.sendActionTitleId),
                 modifier = Modifier.padding(start = 8.dp),
             )
         }

@@ -63,8 +63,7 @@ data class Share(
         return if (shareState == ShareState.DRAFT) {
             context.getString(R.string.share_view_bottom_sheet_new_title)
         } else {
-            // TODO do not hardcode
-            context.getString(R.string.share_view_bottom_sheet_edit_title, "")
+            context.getString(R.string.share_view_bottom_sheet_edit_title, sources.firstOrNull()?.displayName)
         }
     }
 }
