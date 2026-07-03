@@ -53,7 +53,7 @@ import androidx.compose.ui.unit.dp
 import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.share.ShareViewModel
 import com.nextcloud.android.common.ui.share.component.CollapsibleShareSection
-import com.nextcloud.android.common.ui.share.component.RecipientSearchField
+import com.nextcloud.android.common.ui.share.component.SelectRecipientField
 import com.nextcloud.android.common.ui.share.component.ShareSwitch
 import com.nextcloud.android.common.ui.share.component.property.SharePropertyView
 import com.nextcloud.android.common.ui.share.model.api.permission.Permission
@@ -129,7 +129,7 @@ fun AddOrEditShareBottomSheet(
                 }
 
                 if (selectedCategory == ShareCategory.Invited) {
-                    RecipientSearchField(share, viewModel)
+                    SelectRecipientField(share, viewModel)
                 }
 
                 PermissionsView(
