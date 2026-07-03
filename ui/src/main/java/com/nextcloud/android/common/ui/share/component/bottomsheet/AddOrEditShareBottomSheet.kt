@@ -15,7 +15,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material3.Button
@@ -96,53 +98,59 @@ fun AddOrEditShareBottomSheet(
             sheetState = sheetState,
             containerColor = MaterialTheme.colorScheme.surface,
         ) {
-            Text(
-                text = share.title(context),
-                style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(16.dp)
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+            ) {
+                Text(
+                    text = share.title(context),
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(16.dp)
+                )
 
-            SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-                categories.forEachIndexed { index, category ->
-                    SegmentedButton(
-                        selected = selectedCategory == category,
-                        onClick = {
-                            selectedCategory = category
-                            viewModel.addAnyoneRecipient(category, share)
-                        },
-                        shape = SegmentedButtonDefaults.itemShape(index = index, count = categories.size),
-                        icon = {
-                            Icon(painter = painterResource(category.iconId), contentDescription = "")
+                SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+                    categories.forEachIndexed { index, category ->
+                        SegmentedButton(
+                            selected = selectedCategory == category,
+                            onClick = {
+                                selectedCategory = category
+                                viewModel.addAnyoneRecipient(category, share)
+                            },
+                            shape = SegmentedButtonDefaults.itemShape(index = index, count = categories.size),
+                            icon = {
+                                Icon(painter = painterResource(category.iconId), contentDescription = "")
+                            }
+                        ) {
+                            Text(stringResource(category.titleId))
                         }
-                    ) {
-                        Text(stringResource(category.titleId))
                     }
                 }
-            }
 
-            if (selectedCategory == ShareCategory.Invited) {
-                RecipientSearchField(share, viewModel)
-            }
+                if (selectedCategory == ShareCategory.Invited) {
+                    RecipientSearchField(share, viewModel)
+                }
 
-            PermissionsView(
-                share = share,
-                viewModel = viewModel
-            )
-
-            if (share.properties.isNotEmpty()) {
-                AdvancedSettingsSection(
+                PermissionsView(
                     share = share,
-                    isExpanded = showAdvancedSettings,
-                    onToggle = { showAdvancedSettings = !showAdvancedSettings },
                     viewModel = viewModel
                 )
-            }
 
-            if (share.readyToSend()) {
-                ActionButtons(share, selectedCategory, onSend = {
-                    viewModel.updateState(share.id, ShareState.ACTIVE)
-                })
+                if (share.properties.isNotEmpty()) {
+                    AdvancedSettingsSection(
+                        share = share,
+                        isExpanded = showAdvancedSettings,
+                        onToggle = { showAdvancedSettings = !showAdvancedSettings },
+                        viewModel = viewModel
+                    )
+                }
+
+                if (share.readyToSend()) {
+                    ActionButtons(share, selectedCategory, onSend = {
+                        viewModel.updateState(share.id, ShareState.ACTIVE)
+                    })
+                }
             }
         }
     }
