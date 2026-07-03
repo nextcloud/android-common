@@ -84,7 +84,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
 @Composable
-private fun ShareScreen(sourceId: String, sharingCapabilities: SharingCapabilities, viewModel: ShareViewModel) {
+private fun ShareScreen(sourceId: String, viewModel: ShareViewModel) {
     val errorMessageId by viewModel.errorMessageId.collectAsState()
     val screenState by viewModel.state.collectAsState()
     val activeShare by viewModel.activeShare.collectAsState()
@@ -316,15 +316,11 @@ private fun ShareItem(
     )
 }
 
-private val json = Json { ignoreUnknownKeys = true }
-
 fun ComposeView.initShareScreen(
     sourceId: String,
-    sharingJson: String,
     credentials: ServerCredentials,
     colorScheme: ColorScheme
 ) {
-    val sharingCapabilities = json.decodeFromString<SharingCapabilities>(sharingJson)
     val nextcloudHttpClient = NextcloudHttpClient.create(credentials)
     val viewModel = ShareViewModel(repository = ShareRemoteRepository(nextcloudHttpClient))
 
@@ -338,7 +334,7 @@ fun ComposeView.initShareScreen(
         MaterialTheme(
             colorScheme = colorScheme,
             content = {
-                ShareScreen(sourceId, sharingCapabilities, viewModel)
+                ShareScreen(sourceId, viewModel)
             }
         )
     }
