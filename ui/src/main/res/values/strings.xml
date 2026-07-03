@@ -34,6 +34,7 @@
     <string name="share_view_delete_error_message">Failed to delete share.</string>
     <string name="share_view_create_error_message">Failed to create share.</string>
     <string name="share_view_update_error_message">Failed to update share.</string>
+    <string name="share_view_property_error_warning">Some settings couldn\'t be saved. Fix the highlighted fields before sharing.</string>
 
     <string name="share_view_permission_preset_label">Participants</string>
     <string name="share_view_permission_preset_custom">Can…</string>
