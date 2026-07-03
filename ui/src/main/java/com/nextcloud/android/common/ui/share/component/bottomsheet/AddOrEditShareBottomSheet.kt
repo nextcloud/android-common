@@ -37,6 +37,7 @@ import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -82,6 +83,8 @@ fun AddOrEditShareBottomSheet(
     var selectedCategory by remember { mutableStateOf(categories.first()) }
     var showAdvancedSettings by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val propertyErrors by viewModel.propertyErrors.collectAsState()
+    val hasPropertyErrors = propertyErrors.values.any { it != null }
 
     Column(
         modifier = Modifier
@@ -146,10 +149,24 @@ fun AddOrEditShareBottomSheet(
                     )
                 }
 
+                if (hasPropertyErrors) {
+                    Text(
+                        text = stringResource(R.string.share_view_property_error_warning),
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 4.dp)
+                    )
+                }
+
                 if (share.readyToSend()) {
-                    ActionButtons(share, selectedCategory, onSend = {
-                        viewModel.updateState(share.id, ShareState.ACTIVE)
-                    })
+                    ActionButtons(
+                        share = share,
+                        category = selectedCategory,
+                        sendEnabled = !hasPropertyErrors,
+                        onSend = { viewModel.updateState(share.id, ShareState.ACTIVE) }
+                    )
                 }
             }
         }
@@ -259,6 +276,7 @@ private fun AdvancedSettingsSection(
 private fun ActionButtons(
     share: Share,
     category: ShareCategory,
+    sendEnabled: Boolean,
     onSend: () -> Unit,
 ) {
     Row(
@@ -299,6 +317,7 @@ private fun ActionButtons(
 
         Button(
             onClick = onSend,
+            enabled = sendEnabled,
             modifier = Modifier.weight(1f),
             shape = RoundedCornerShape(10.dp),
             colors = ButtonDefaults.buttonColors(
