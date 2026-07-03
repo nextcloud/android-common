@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -269,6 +270,7 @@ private fun ShareItem(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary,
                 )
+
                 Spacer(modifier = Modifier.width(4.dp))
 
                 Icon(Icons.Default.KeyboardArrowDown, contentDescription = "Down arrow")
@@ -287,7 +289,10 @@ private fun ShareItem(
                 ) {
                     DropdownMenuItem(
                         leadingIcon = {
-                            Icon(Icons.Default.Edit, contentDescription = "Edit icon")
+                            Icon(Icons.Default.Edit,
+                                contentDescription = "Edit icon",
+                                modifier = Modifier.size(18.dp)
+                            )
                         },
                         text = { Text(stringResource(R.string.share_view_list_item_edit)) },
                         onClick = {
@@ -297,7 +302,11 @@ private fun ShareItem(
                     )
                     DropdownMenuItem(
                         leadingIcon = {
-                            Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send icon")
+                            Icon(
+                                Icons.AutoMirrored.Filled.Send,
+                                contentDescription = "Send icon",
+                                modifier = Modifier.size(18.dp)
+                            )
                         },
                         text = { Text(stringResource(R.string.share_view_list_item_send_email)) },
                         onClick = {
@@ -308,7 +317,11 @@ private fun ShareItem(
                     HorizontalDivider()
                     DropdownMenuItem(
                         leadingIcon = {
-                            Icon(Icons.Default.Delete, contentDescription = "Delete icon")
+                            Icon(
+                                Icons.Default.Delete,
+                                contentDescription = "Delete icon",
+                                modifier = Modifier.size(18.dp)
+                            )
                         },
                         text = {
                             Text(
