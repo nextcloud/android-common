@@ -13,7 +13,9 @@
     <string name="share_view_bottom_sheet_edit_title">Share %s</string>
 
     <string name="share_view_advanced_settings">Settings</string>
-    <string name="share_view_invited_category_label">Add people</string>
+
+    <string name="share_view_select_recipient_label">Select recipient</string>
+    <string name="share_view_select_recipient_clear">Clear recipient</string>
 
     <string name="share_view_empty_title">Not shared</string>
     <string name="share_view_recipient_search_field_empty_result">No result</string>
