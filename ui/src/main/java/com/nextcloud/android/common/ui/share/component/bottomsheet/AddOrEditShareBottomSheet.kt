@@ -77,6 +77,7 @@ import kotlinx.coroutines.launch
 fun AddOrEditShareBottomSheet(
     share: Share,
     viewModel: ShareViewModel,
+    initialPresetOption: PermissionPresetOption? = null,
     onDismissDraft: (Share) -> Unit = {}
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -149,6 +150,7 @@ fun AddOrEditShareBottomSheet(
 
                 PermissionsView(
                     share = share,
+                    initialPresetOption = initialPresetOption,
                     viewModel = viewModel
                 )
 
@@ -188,9 +190,12 @@ fun AddOrEditShareBottomSheet(
 @Composable
 private fun PermissionsView(
     share: Share,
+    initialPresetOption: PermissionPresetOption?,
     viewModel: ShareViewModel
 ) {
-    var selectedPreset by remember(share.id) { mutableStateOf(share.permissionPreset) }
+    var selectedPreset by remember(share.id) {
+        mutableStateOf(if (initialPresetOption != null) initialPresetOption.preset else share.permissionPreset)
+    }
 
     PermissionPresetDropdown(
         selectedOption = PermissionPresetOption.from(selectedPreset),
