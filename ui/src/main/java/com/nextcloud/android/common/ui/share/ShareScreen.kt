@@ -156,10 +156,10 @@ private fun ShareScreen(sourceId: String, sharingCapabilities: SharingCapabiliti
                             type = type,
                             onSelectShare = { selected -> viewModel.setActiveShare(selected) },
                             onChangePreset = { selected, preset ->
-                                viewModel.updatePermissionPreset(selected.id, preset)
+                                viewModel.updatePermissionPreset(selected.id, preset, updateActiveShare = false)
                             },
                             onDeleteShare = { viewModel.deleteShare(it.id) },
-                            onSendEmail = { }
+                            onSendEmail = { selected -> viewModel.setActiveShare(selected) } // TODO: is that right?
                         )
                     }
                 }

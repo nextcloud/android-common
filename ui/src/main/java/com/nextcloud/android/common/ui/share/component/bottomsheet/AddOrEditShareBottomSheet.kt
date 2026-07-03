@@ -196,7 +196,7 @@ private fun PermissionsView(
         selectedOption = PermissionPresetOption.from(selectedPreset),
         onOptionSelected = { option ->
             selectedPreset = option.preset
-            option.preset?.let { viewModel.updatePermissionPreset(share.id, it) }
+            option.preset?.let { viewModel.updatePermissionPreset(share.id, it, true) }
         }
     )
 
