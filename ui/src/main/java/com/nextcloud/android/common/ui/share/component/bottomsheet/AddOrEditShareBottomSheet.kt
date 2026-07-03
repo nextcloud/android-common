@@ -148,71 +148,6 @@ fun AddOrEditShareBottomSheet(
     }
 }
 
-@Composable
-private fun ActionButtons(
-    share: Share,
-    category: ShareCategory,
-    onSend: () -> Unit = {},
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        val clipEntry = share.getClipEntry()
-        if (category == ShareCategory.Anyone && clipEntry != null) {
-            val localClipboard = LocalClipboard.current
-            val scope = rememberCoroutineScope()
-
-            Button(
-                onClick = {
-                    scope.launch {
-                        localClipboard.setClipEntry(clipEntry)
-                    }
-                },
-                modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(10.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onSurface,
-                ),
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_link),
-                    contentDescription = null,
-                    modifier = Modifier.size(20.dp),
-                )
-                Text(
-                    text = stringResource(R.string.share_view_copy_action),
-                    modifier = Modifier.padding(start = 8.dp),
-                )
-            }
-        }
-
-        Button(
-            onClick = onSend,
-            modifier = Modifier.weight(1f),
-            shape = RoundedCornerShape(10.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-            ),
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.Send,
-                contentDescription = null,
-                modifier = Modifier.size(20.dp),
-            )
-            Text(
-                text = stringResource(R.string.share_view_send_action),
-                modifier = Modifier.padding(start = 8.dp),
-            )
-        }
-    }
-}
-
-// FIXME: when toggles are selected recomposition happens
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PermissionsView(
@@ -233,10 +168,12 @@ private fun PermissionsView(
 
     share.permissions.forEach { permission ->
         key(permission.clazz) {
+            var checked by remember { mutableStateOf(permission.enabled) }
             ShareSwitch(
                 label = permission.displayName,
-                checked = permission.enabled,
+                checked = checked,
                 onCheckedChange = { isChecked ->
+                    checked = isChecked
                     viewModel.updatePermission(share.id, permission.clazz, isChecked)
                 }
             )
@@ -309,6 +246,70 @@ private fun AdvancedSettingsSection(
     }
 }
 
+
+@Composable
+private fun ActionButtons(
+    share: Share,
+    category: ShareCategory,
+    onSend: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        val clipEntry = share.getClipEntry()
+        if (category == ShareCategory.Anyone && clipEntry != null) {
+            val localClipboard = LocalClipboard.current
+            val scope = rememberCoroutineScope()
+
+            Button(
+                onClick = {
+                    scope.launch {
+                        localClipboard.setClipEntry(clipEntry)
+                    }
+                },
+                modifier = Modifier.weight(1f),
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onSurface,
+                ),
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_link),
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp),
+                )
+                Text(
+                    text = stringResource(R.string.share_view_copy_action),
+                    modifier = Modifier.padding(start = 8.dp),
+                )
+            }
+        }
+
+        Button(
+            onClick = onSend,
+            modifier = Modifier.weight(1f),
+            shape = RoundedCornerShape(10.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+            ),
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.Send,
+                contentDescription = null,
+                modifier = Modifier.size(20.dp),
+            )
+            Text(
+                text = stringResource(R.string.share_view_send_action),
+                modifier = Modifier.padding(start = 8.dp),
+            )
+        }
+    }
+}
 
 @Preview(showBackground = true)
 @Composable

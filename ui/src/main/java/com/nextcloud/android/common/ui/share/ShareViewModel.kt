@@ -299,7 +299,6 @@ class ShareViewModel(
             val result = repository.updateSharePermission(id, UpdateSharePermissionRequest(clazz, enabled))
             val updated = result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
                 ?: return@launch
-            _activeShare.update { updated }
             replaceInList(updated)
         }
     }
