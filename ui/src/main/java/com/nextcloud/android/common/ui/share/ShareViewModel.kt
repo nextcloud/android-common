@@ -20,6 +20,7 @@ import com.nextcloud.android.common.ui.share.model.api.permission.PermissionPres
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePermissionPresetRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePermissionRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePropertyRequest
+import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareRecipientSecretRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareStateRequest
 import com.nextcloud.android.common.ui.share.model.api.share.Share
 import com.nextcloud.android.common.ui.share.model.api.state.ShareState
@@ -69,6 +70,8 @@ class ShareViewModel(
     val propertyErrors: StateFlow<Map<String, String?>> = _propertyErrors
 
     private val propertyUpdateJobs = mutableMapOf<String, Job>()
+
+    private var secretUpdateJob: Job? = null
 
     private val currentShares: List<Share>
         get() = (_state.value as? ShareScreenState.Loaded)?.shares ?: emptyList()
@@ -226,6 +229,24 @@ class ShareViewModel(
     fun removeRecipient(id: String, clazz: String, value: String, instance: String? = null) {
         viewModelScope.launch(Dispatchers.IO) {
             val result = repository.removeShareRecipient(id, clazz, value, instance)
+            val updated = result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
+                ?: return@launch
+            _activeShare.update { updated }
+            replaceInList(updated)
+        }
+    }
+
+    fun updateRecipientSecret(shareId: String, recipient: Recipient, secret: String) {
+        secretUpdateJob?.cancel()
+        secretUpdateJob = viewModelScope.launch(Dispatchers.IO) {
+            delay(PROPERTY_DEBOUNCE_DELAY.milliseconds)
+            val request = UpdateShareRecipientSecretRequest(
+                clazz = recipient.clazz,
+                value = recipient.value,
+                instance = recipient.instance,
+                secret = secret
+            )
+            val result = repository.updateShareRecipientSecret(shareId, request)
             val updated = result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
                 ?: return@launch
             _activeShare.update { updated }
