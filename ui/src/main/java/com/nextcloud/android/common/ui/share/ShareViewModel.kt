@@ -30,9 +30,6 @@ import com.nextcloud.android.common.ui.share.repository.ShareRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -50,8 +47,8 @@ class ShareViewModel(
 ) : ViewModel() {
 
     companion object {
-        private const val SEARCH_DEBOUNCE_DELAY_MS = 300L
-        private const val PROPERTY_DEBOUNCE_DELAY_MS = 1000L
+        private const val SEARCH_DEBOUNCE_DELAY = 300L
+        private const val PROPERTY_DEBOUNCE_DELAY = 1000L
     }
 
     private val _state = MutableStateFlow<ShareScreenState>(ShareScreenState.Loading)
@@ -68,12 +65,10 @@ class ShareViewModel(
     private val _errorMessageId = MutableStateFlow<Int?>(null)
     val errorMessageId: StateFlow<Int?> = _errorMessageId
 
-    private data class PendingPropertyUpdate(val job: Job, val shareId: String, val value: String)
+    private val _propertyErrors = MutableStateFlow<Map<String, String?>>(emptyMap())
+    val propertyErrors: StateFlow<Map<String, String?>> = _propertyErrors
 
-    private val pendingPropertyJobs = mutableMapOf<String, PendingPropertyUpdate>()
-
-    private val _propertyErrors = MutableStateFlow<Map<String, Int?>>(emptyMap())
-    val propertyErrors: StateFlow<Map<String, Int?>> = _propertyErrors
+    private val propertyUpdateJobs = mutableMapOf<String, Job>()
 
     private val currentShares: List<Share>
         get() = (_state.value as? ShareScreenState.Loaded)?.shares ?: emptyList()
@@ -88,7 +83,7 @@ class ShareViewModel(
     private fun initSearchQuery() {
         viewModelScope.launch {
             _searchQuery
-                .debounce(SEARCH_DEBOUNCE_DELAY_MS.milliseconds)
+                .debounce(SEARCH_DEBOUNCE_DELAY.milliseconds)
                 .distinctUntilChanged()
                 .filter { it.isNotBlank() }
                 .collect { query -> executeSearch(query) }
@@ -160,11 +155,8 @@ class ShareViewModel(
 
     // region state
     fun updateState(id: String, shareState: ShareState) {
-        viewModelScope.launch {
-            flushPendingProperties(id)
-            val result = withContext(Dispatchers.IO) {
-                repository.updateShareState(id, UpdateShareStateRequest(shareState))
-            }
+        viewModelScope.launch(Dispatchers.IO) {
+            val result = repository.updateShareState(id, UpdateShareStateRequest(shareState))
             val updated = result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
                 ?: return@launch
             if (shareState == ShareState.ACTIVE) {
@@ -243,51 +235,24 @@ class ShareViewModel(
     // endregion
 
     // region properties
-    fun updateProperty(id: String, clazz: String, value: String?) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val result = repository.updateShareProperty(id, UpdateSharePropertyRequest(clazz, value))
-            val updated = result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
-                ?: return@launch
-            _activeShare.update { updated }
-            replaceInList(updated)
-        }
-    }
+    fun updateProperty(shareId: String, clazz: String, value: String?) {
+        propertyUpdateJobs[clazz]?.cancel()
+        propertyUpdateJobs[clazz] = viewModelScope.launch(Dispatchers.IO) {
+            delay(PROPERTY_DEBOUNCE_DELAY.milliseconds)
+            when (val result = repository.updateShareProperty(shareId, UpdateSharePropertyRequest(clazz, value))) {
+                is NetworkResult.Success -> {
+                    _propertyErrors.update { it - clazz }
+                    _activeShare.update { result.data }
+                    replaceInList(result.data)
+                }
 
-    fun updatePropertyDebounced(shareId: String, clazz: String, value: String) {
-        pendingPropertyJobs[clazz]?.job?.cancel()
-        val job = viewModelScope.launch {
-            delay(PROPERTY_DEBOUNCE_DELAY_MS.milliseconds)
-            pendingPropertyJobs.remove(clazz)
-            withContext(Dispatchers.IO) { executePropertyUpdate(shareId, clazz, value) }
-        }
-        pendingPropertyJobs[clazz] = PendingPropertyUpdate(job, shareId, value)
-    }
+                is NetworkResult.ServerError -> {
+                    _propertyErrors.update { it + (clazz to result.response.ocs.meta.message) }
+                }
 
-    private suspend fun flushPendingProperties(shareId: String) {
-        val snapshot = pendingPropertyJobs.toMap()
-        snapshot.values.forEach { it.job.cancel() }
-        pendingPropertyJobs.clear()
-        if (snapshot.isEmpty()) return
-        withContext(Dispatchers.IO) {
-            coroutineScope {
-                snapshot.entries.map { (clazz, pending) ->
-                    async { executePropertyUpdate(shareId, clazz, pending.value) }
-                }.awaitAll()
-            }
-        }
-    }
-
-    private suspend fun executePropertyUpdate(shareId: String, clazz: String, value: String) {
-        when (val result = repository.updateShareProperty(shareId, UpdateSharePropertyRequest(clazz, value))) {
-            is NetworkResult.Success -> {
-                _propertyErrors.update { it - clazz }
-                _activeShare.update { result.data }
-                replaceInList(result.data)
-            }
-
-            is NetworkResult.ServerError,
-            is NetworkResult.NetworkException -> {
-                _propertyErrors.update { it + (clazz to R.string.share_view_update_error_message) }
+                is NetworkResult.NetworkException -> {
+                    _propertyErrors.update { it + (clazz to null) }
+                }
             }
         }
     }

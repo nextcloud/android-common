@@ -20,7 +20,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -38,7 +37,12 @@ import com.nextcloud.android.common.ui.share.model.api.property.PropertyString
 @Composable
 fun SharePropertyView(shareId: String, property: Property, viewModel: ShareViewModel) {
     val propertyErrors by viewModel.propertyErrors.collectAsState()
-    val hasError = propertyErrors[property.clazz] != null
+    val fallbackError = stringResource(R.string.share_view_update_error_message)
+    val errorMessage = if (propertyErrors.containsKey(property.clazz)) {
+        propertyErrors[property.clazz] ?: fallbackError
+    } else {
+        null
+    }
 
     when (property) {
         is PropertyBoolean -> {
@@ -50,12 +54,12 @@ fun SharePropertyView(shareId: String, property: Property, viewModel: ShareViewM
                     checked = checkedValue,
                     onCheckedChange = { isChecked ->
                         checkedValue = isChecked
-                        viewModel.updatePropertyDebounced(shareId, property.clazz, isChecked.toString())
+                        viewModel.updateProperty(shareId, property.clazz, isChecked.toString())
                     }
                 )
-                if (hasError) {
+                if (errorMessage != null) {
                     Text(
-                        text = stringResource(R.string.share_view_update_error_message),
+                        text = errorMessage,
                         color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)
@@ -71,15 +75,11 @@ fun SharePropertyView(shareId: String, property: Property, viewModel: ShareViewM
                 value = textValue,
                 onValueChange = {
                     textValue = it
-                    viewModel.updatePropertyDebounced(shareId, property.clazz, it)
+                    viewModel.updateProperty(shareId, property.clazz, it)
                 },
                 label = { Text(property.displayName) },
-                isError = hasError,
-                supportingText = if (hasError) {
-                    { Text(stringResource(R.string.share_view_update_error_message)) }
-                } else {
-                    null
-                },
+                isError = errorMessage != null,
+                supportingText = errorMessage?.let { { Text(it) } },
                 modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                 singleLine = true
             )
@@ -92,17 +92,13 @@ fun SharePropertyView(shareId: String, property: Property, viewModel: ShareViewM
                 value = passwordValue,
                 onValueChange = {
                     passwordValue = it
-                    viewModel.updatePropertyDebounced(shareId, property.clazz, it)
+                    viewModel.updateProperty(shareId, property.clazz, it)
                 },
                 label = { Text(property.displayName) },
                 placeholder = property.hint?.let { { Text(it) } },
                 visualTransformation = PasswordVisualTransformation(),
-                isError = hasError,
-                supportingText = if (hasError) {
-                    { Text(stringResource(R.string.share_view_update_error_message)) }
-                } else {
-                    null
-                },
+                isError = errorMessage != null,
+                supportingText = errorMessage?.let { { Text(it) } },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 4.dp),
@@ -111,13 +107,17 @@ fun SharePropertyView(shareId: String, property: Property, viewModel: ShareViewM
         }
 
         is PropertyDate -> {
-            ShareDatePicker(property, onDateSelected = { dateValue ->
+            ShareDatePicker(property, errorMessage = errorMessage, onDateSelected = { dateValue ->
                 viewModel.updateProperty(shareId, property.clazz, dateValue)
             })
         }
 
         is PropertyEnum -> {
-            Text(text = "Enum Property: ${property.displayName} (Under Construction)", color = Color.Gray)
+            SharePropertyEnumField(
+                property = property,
+                errorMessage = errorMessage,
+                onValueSelected = { value -> viewModel.updateProperty(shareId, property.clazz, value) }
+            )
         }
     }
 }

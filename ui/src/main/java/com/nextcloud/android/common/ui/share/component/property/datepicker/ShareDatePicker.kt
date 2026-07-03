@@ -32,10 +32,10 @@ import com.nextcloud.android.common.ui.share.component.property.datepicker.util.
 import com.nextcloud.android.common.ui.share.model.api.property.PropertyDate
 
 @Composable
-fun ShareDatePicker(property: PropertyDate, onDateSelected: (String) -> Unit) {
-    val formatter = ShareDateFormatter()
+fun ShareDatePicker(property: PropertyDate, errorMessage: String?, onDateSelected: (String) -> Unit) {
+    val formatter = remember { ShareDateFormatter() }
     var showDatePicker by remember { mutableStateOf(false) }
-    var dateValue by remember { mutableStateOf(property.value ?: "") }
+    var dateValue by remember(property.clazz) { mutableStateOf(formatter.formatIsoForDisplay(property.value)) }
 
     Box(modifier = Modifier.fillMaxWidth()) {
         OutlinedTextField(
@@ -43,6 +43,8 @@ fun ShareDatePicker(property: PropertyDate, onDateSelected: (String) -> Unit) {
             onValueChange = {},
             readOnly = true,
             enabled = true,
+            isError = errorMessage != null,
+            supportingText = errorMessage?.let { { Text(it) } },
             modifier = Modifier.fillMaxWidth(),
             label = { Text(formatter.getDisplayName(property)) },
             trailingIcon = {
@@ -117,6 +119,7 @@ private fun ShareDatePickerPreview() {
                 minDate = "2026-01-01",
                 maxDate = "2027-12-31"
             ),
+            errorMessage = null,
             onDateSelected = {}
         )
     }
