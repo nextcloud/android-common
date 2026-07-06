@@ -89,4 +89,6 @@ interface ShareRepository {
         id: String,
         request: UpdateShareRecipientSecretRequest
     ): NetworkResult<Share>
+
+    suspend fun generateSecret(): NetworkResult<String>
 }

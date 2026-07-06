@@ -434,6 +434,8 @@ class MockShareRepository : ShareRepository {
         return NetworkResult.Success(current)
     }
 
+    override suspend fun generateSecret(): NetworkResult<String> = NetworkResult.Success("mockSecret12345")
+
     override suspend fun updateSharePermission(
         id: String,
         request: UpdateSharePermissionRequest
