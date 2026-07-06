@@ -46,18 +46,31 @@ data class Share(
     val permissionPreset: PermissionPreset? = null
 ) {
     // FIXME: secret.url is null
-    fun getClipEntry(): ClipEntry? {
-        val recipient = recipients.firstOrNull() ?: return null
-        val link = recipient.secret.url ?: return null
+    val clipEntry: ClipEntry?
+        get() {
+            val recipient = recipients.firstOrNull() ?: return null
+            val link = recipient.secret.url ?: return null
 
-        return ClipData.newPlainText(recipient.displayName, link).toClipEntry()
-    }
+            return ClipData.newPlainText(recipient.displayName, link).toClipEntry()
+        }
 
-    fun readyToSend(): Boolean =
-        sources.isNotEmpty() &&
-            recipients.isNotEmpty() &&
-            permissions.any { it.enabled } &&
-            properties.none { it.required && it.value.isNullOrEmpty() }
+    val editableRecipient: Recipient?
+        get() {
+            return recipients.firstOrNull { it.secret.updatable }
+        }
+
+    val isAdvancedSettingsExists: Boolean
+        get() {
+            return properties.isNotEmpty() || editableRecipient != null
+        }
+
+    val canSend: Boolean
+        get() {
+            return sources.isNotEmpty() &&
+                recipients.isNotEmpty() &&
+                permissions.any { it.enabled } &&
+                properties.none { it.required && it.value.isNullOrEmpty() }
+        }
 
     fun title(context: Context): String {
         return if (shareState == ShareState.DRAFT) {
