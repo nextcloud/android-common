@@ -73,9 +73,7 @@ fun CustomLink(
                 token = trimmed
                 if (trimmed.isNotBlank()) onTokenChange(trimmed)
             },
-            label = {
-                Text(prefix)
-            },
+            label = { Text(prefix) },
             singleLine = true,
             trailingIcon = {
                 IconButton(
