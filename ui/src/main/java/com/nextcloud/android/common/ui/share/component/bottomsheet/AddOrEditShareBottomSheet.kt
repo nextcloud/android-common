@@ -141,11 +141,9 @@ fun AddOrEditShareBottomSheet(
                     viewModel = viewModel
                 )
 
-                val editableRecipient = share.recipients.firstOrNull { it.secret.updatable }
-                if (share.properties.isNotEmpty() || editableRecipient != null) {
+                if (share.isAdvancedSettingsExists) {
                     AdvancedSettingsSection(
                         share = share,
-                        editableRecipient = editableRecipient,
                         isExpanded = showAdvancedSettings,
                         onToggle = { showAdvancedSettings = !showAdvancedSettings },
                         viewModel = viewModel
@@ -164,7 +162,7 @@ fun AddOrEditShareBottomSheet(
                 }
 
                 // FIXME: make readyToSend suitable for anyone category
-                if (share.readyToSend()) {
+                if (share.canSend) {
                     ActionButtons(
                         share = share,
                         category = selectedCategory,
@@ -257,7 +255,6 @@ private fun PermissionPresetDropdown(
 @Composable
 private fun AdvancedSettingsSection(
     share: Share,
-    editableRecipient: Recipient?,
     isExpanded: Boolean,
     onToggle: () -> Unit,
     viewModel: ShareViewModel
@@ -277,11 +274,11 @@ private fun AdvancedSettingsSection(
             }
         }
 
-        if (editableRecipient != null) {
+        share.editableRecipient?.let {
             CustomLink(
-                recipient = editableRecipient,
+                recipient = it,
                 onTokenChange = { token ->
-                    viewModel.updateRecipientSecret(share.id, editableRecipient, token)
+                    viewModel.updateRecipientSecret(share.id, it, token)
                 }
             )
         }
@@ -301,15 +298,14 @@ private fun ActionButtons(
             .padding(16.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        val clipEntry = share.getClipEntry()
-        if (clipEntry != null) {
+        if (share.clipEntry != null) {
             val localClipboard = LocalClipboard.current
             val scope = rememberCoroutineScope()
 
             Button(
                 onClick = {
                     scope.launch {
-                        localClipboard.setClipEntry(clipEntry)
+                        localClipboard.setClipEntry(share.clipEntry)
                     }
                 },
                 modifier = Modifier.weight(1f),
