@@ -117,6 +117,7 @@ fun AddOrEditShareBottomSheet(
                     categories.forEachIndexed { index, category ->
                         SegmentedButton(
                             selected = selectedCategory == category,
+                            enabled = category != ShareCategory.Anyone || !share.hasInvitedRecipients,
                             onClick = {
                                 selectedCategory = category
                                 viewModel.addAnyoneRecipient(category, share)
@@ -277,6 +278,7 @@ private fun AdvancedSettingsSection(
         share.editableRecipient?.let {
             CustomLink(
                 recipient = it,
+                onGenerateSecret = { viewModel.generateSecret() },
                 onTokenChange = { token ->
                     viewModel.updateRecipientSecret(share.id, it, token)
                 }

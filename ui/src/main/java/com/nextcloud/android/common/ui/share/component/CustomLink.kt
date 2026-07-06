@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -28,9 +29,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.share.model.api.recipients.Recipient
+import kotlinx.coroutines.launch
+
+private const val MAX_TOKEN_LENGTH = 32
 
 @Composable
-fun CustomLink(recipient: Recipient, onTokenChange: (String) -> Unit) {
+fun CustomLink(
+    recipient: Recipient,
+    onGenerateSecret: suspend () -> String?,
+    onTokenChange: (String) -> Unit
+) {
+    val scope = rememberCoroutineScope()
     val prefix = remember(recipient.secret.url, recipient.secret.value) {
         val url = recipient.secret.url.orEmpty()
         val token = recipient.secret.value.orEmpty()
@@ -60,7 +69,7 @@ fun CustomLink(recipient: Recipient, onTokenChange: (String) -> Unit) {
         OutlinedTextField(
             value = token,
             onValueChange = { newValue ->
-                val trimmed = newValue.take(ShareTokenGenerator.MAX_LENGTH)
+                val trimmed = newValue.take(MAX_TOKEN_LENGTH)
                 token = trimmed
                 if (trimmed.isNotBlank()) onTokenChange(trimmed)
             },
@@ -71,9 +80,11 @@ fun CustomLink(recipient: Recipient, onTokenChange: (String) -> Unit) {
             trailingIcon = {
                 IconButton(
                     onClick = {
-                        val refreshedToken = ShareTokenGenerator.generate()
-                        token = refreshedToken
-                        onTokenChange(refreshedToken)
+                        scope.launch {
+                            val generated = onGenerateSecret() ?: return@launch
+                            token = generated
+                            onTokenChange(generated)
+                        }
                     }
                 ) {
                     Icon(

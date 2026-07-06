@@ -253,6 +253,12 @@ class ShareViewModel(
             replaceInList(updated)
         }
     }
+
+    suspend fun generateSecret(): String? = withContext(Dispatchers.IO) {
+        _errorMessageId.update { null }
+        val result = repository.generateSecret()
+        result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
+    }
     // endregion
 
     // region properties

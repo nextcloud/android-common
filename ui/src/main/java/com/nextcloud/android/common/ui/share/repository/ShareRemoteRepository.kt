@@ -34,6 +34,7 @@ class ShareRemoteRepository(
         private const val SHARE_ENDPOINT = "/ocs/v2.php/apps/sharing/api/v1/share"
         private const val SHARES_ENDPOINT = "/ocs/v2.php/apps/sharing/api/v1/shares"
         private const val RECIPIENTS_ENDPOINT = "/ocs/v2.php/apps/sharing/api/v1/recipients"
+        private const val SECRET_ENDPOINT = "/ocs/v2.php/apps/sharing/api/v1/secret"
     }
 
     override suspend fun fetchRecipients(
@@ -211,5 +212,13 @@ class ShareRemoteRepository(
             body = json.encodeToString(request).toRequestBody(JSON_CONTENT_TYPE)
         ) { body ->
             json.decodeFromString<OcsResponse<Share>>(body).ocs.data
+        }
+
+    override suspend fun generateSecret(): NetworkResult<String> =
+        client.executeRequest(
+            endpoint = SECRET_ENDPOINT,
+            method = HttpMethod.GET
+        ) { body ->
+            json.decodeFromString<OcsResponse<String>>(body).ocs.data
         }
 }
