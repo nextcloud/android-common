@@ -32,6 +32,6 @@ data class Recipient(
     val initiator: User? = null
 ) {
     companion object {
-        const val TOKEN_RECIPIENT_CLASS = "OC\\CoreSharing\\Recipient\\TokenShareRecipientType"
+        const val TOKEN_RECIPIENT_CLASS = """\OC\Core\Sharing\Recipient\TokenShareRecipientType"""
     }
 }
