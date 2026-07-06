@@ -71,8 +71,6 @@ class ShareViewModel(
 
     private val propertyUpdateJobs = mutableMapOf<String, Job>()
 
-    private var internalLink: String = ""
-
     private var secretUpdateJob: Job? = null
 
     private val currentShares: List<Share>
@@ -186,12 +184,6 @@ class ShareViewModel(
             replaceInList(updated)
         }
     }
-
-    fun setInternalLink(value: String) {
-        internalLink = value
-    }
-
-    fun getInternalLink(): String = internalLink
 
     fun removeSource(id: String, clazz: String, value: String) {
         viewModelScope.launch(Dispatchers.IO) {
