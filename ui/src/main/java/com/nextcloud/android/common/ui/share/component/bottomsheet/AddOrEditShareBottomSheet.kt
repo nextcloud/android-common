@@ -117,10 +117,9 @@ fun AddOrEditShareBottomSheet(
                     categories.forEachIndexed { index, category ->
                         SegmentedButton(
                             selected = selectedCategory == category,
-                            enabled = category != ShareCategory.Anyone || !share.hasInvitedRecipients,
                             onClick = {
                                 selectedCategory = category
-                                viewModel.addAnyoneRecipient(category, share)
+                                viewModel.selectCategory(category, share)
                             },
                             shape = SegmentedButtonDefaults.itemShape(index = index, count = categories.size),
                             icon = {
@@ -142,9 +141,11 @@ fun AddOrEditShareBottomSheet(
                     viewModel = viewModel
                 )
 
-                if (share.isAdvancedSettingsExists) {
+                val editableRecipient = share.editableRecipient
+                if (share.properties.isNotEmpty() || editableRecipient != null) {
                     AdvancedSettingsSection(
                         share = share,
+                        editableRecipient = editableRecipient,
                         isExpanded = showAdvancedSettings,
                         onToggle = { showAdvancedSettings = !showAdvancedSettings },
                         viewModel = viewModel
@@ -256,6 +257,7 @@ private fun PermissionPresetDropdown(
 @Composable
 private fun AdvancedSettingsSection(
     share: Share,
+    editableRecipient: Recipient?,
     isExpanded: Boolean,
     onToggle: () -> Unit,
     viewModel: ShareViewModel
@@ -275,7 +277,7 @@ private fun AdvancedSettingsSection(
             }
         }
 
-        share.editableRecipient?.let {
+        editableRecipient?.let {
             CustomLink(
                 recipient = it,
                 onGenerateSecret = { viewModel.generateSecret() },
