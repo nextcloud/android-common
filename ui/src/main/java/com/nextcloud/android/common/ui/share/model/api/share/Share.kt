@@ -19,7 +19,6 @@ import com.nextcloud.android.common.ui.share.model.api.recipients.Recipient
 import com.nextcloud.android.common.ui.share.model.api.source.Source
 import com.nextcloud.android.common.ui.share.model.api.state.ShareState
 import com.nextcloud.android.common.ui.share.model.api.user.User
-import com.nextcloud.android.common.ui.share.model.ui.ShareCategory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -46,25 +45,17 @@ data class Share(
     @SerialName("permission_preset")
     val permissionPreset: PermissionPreset? = null
 ) {
-    fun getClipEntry(category: ShareCategory, internalLink: String): ClipEntry? {
-        val recipient = recipients.firstOrNull() ?: return null
-
-        return if (category == ShareCategory.Anyone) {
+    val clipEntry: ClipEntry?
+        get() {
+            val recipient = recipients.firstOrNull() ?: return null
             val link = recipient.secret.url ?: return null
-            ClipData.newPlainText(recipient.displayName, link).toClipEntry()
-        } else {
-            ClipData.newPlainText(recipient.displayName, internalLink).toClipEntry()
+            return ClipData.newPlainText(recipient.displayName, link).toClipEntry()
         }
-    }
 
-    fun getCustomLinkRecipient(category: ShareCategory): Recipient? {
-        return if (category == ShareCategory.Anyone) {
-            recipients.firstOrNull { it.secret.updatable }
-        } else {
-            val firstRecipient = recipients.firstOrNull()
-            firstRecipient?.copy(clazz = Recipient.TOKEN_RECIPIENT_CLASS)
+    val customLinkRecipient: Recipient?
+        get() {
+            return recipients.firstOrNull { it.secret.updatable }
         }
-    }
 
     val canSend: Boolean
         get() {
