@@ -141,16 +141,13 @@ fun AddOrEditShareBottomSheet(
                     viewModel = viewModel
                 )
 
-                val editableRecipient = share.editableRecipient
-                if (share.properties.isNotEmpty() || editableRecipient != null) {
-                    AdvancedSettingsSection(
-                        share = share,
-                        editableRecipient = editableRecipient,
-                        isExpanded = showAdvancedSettings,
-                        onToggle = { showAdvancedSettings = !showAdvancedSettings },
-                        viewModel = viewModel
-                    )
-                }
+                AdvancedSettingsSection(
+                    share = share,
+                    category = selectedCategory,
+                    isExpanded = showAdvancedSettings,
+                    onToggle = { showAdvancedSettings = !showAdvancedSettings },
+                    viewModel = viewModel
+                )
 
                 if (hasPropertyErrors) {
                     Text(
@@ -163,11 +160,11 @@ fun AddOrEditShareBottomSheet(
                     )
                 }
 
-                // FIXME: make readyToSend suitable for anyone category
                 if (share.canSend) {
                     ActionButtons(
                         share = share,
                         category = selectedCategory,
+                        internalLink = viewModel.getInternalLink(),
                         sendEnabled = !hasPropertyErrors,
                         onSend = { viewModel.updateState(share.id, ShareState.ACTIVE) }
                     )
@@ -257,7 +254,7 @@ private fun PermissionPresetDropdown(
 @Composable
 private fun AdvancedSettingsSection(
     share: Share,
-    editableRecipient: Recipient?,
+    category: ShareCategory,
     isExpanded: Boolean,
     onToggle: () -> Unit,
     viewModel: ShareViewModel
@@ -277,12 +274,16 @@ private fun AdvancedSettingsSection(
             }
         }
 
-        editableRecipient?.let {
+        share.getCustomLinkRecipient(category)?.let {
             CustomLink(
                 recipient = it,
                 onGenerateSecret = { viewModel.generateSecret() },
                 onTokenChange = { token ->
-                    viewModel.updateRecipientSecret(share.id, it, token)
+                    var recipient = it
+                    if (category == ShareCategory.Invited) {
+                        recipient = it.copy(value = token)
+                    }
+                    viewModel.updateRecipientSecret(share.id, recipient, token)
                 }
             )
         }
@@ -293,6 +294,7 @@ private fun AdvancedSettingsSection(
 private fun ActionButtons(
     share: Share,
     category: ShareCategory,
+    internalLink: String,
     sendEnabled: Boolean,
     onSend: () -> Unit,
 ) {
@@ -302,14 +304,15 @@ private fun ActionButtons(
             .padding(16.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        if (share.clipEntry != null) {
+        val clipEntry = share.getClipEntry(category, internalLink)
+        if (clipEntry != null) {
             val localClipboard = LocalClipboard.current
             val scope = rememberCoroutineScope()
 
             Button(
                 onClick = {
                     scope.launch {
-                        localClipboard.setClipEntry(share.clipEntry)
+                        localClipboard.setClipEntry(clipEntry)
                     }
                 },
                 modifier = Modifier.weight(1f),
