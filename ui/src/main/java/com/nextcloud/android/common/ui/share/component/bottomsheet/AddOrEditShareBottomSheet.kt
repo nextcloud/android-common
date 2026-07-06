@@ -141,13 +141,14 @@ fun AddOrEditShareBottomSheet(
                     viewModel = viewModel
                 )
 
-                AdvancedSettingsSection(
-                    share = share,
-                    category = selectedCategory,
-                    isExpanded = showAdvancedSettings,
-                    onToggle = { showAdvancedSettings = !showAdvancedSettings },
-                    viewModel = viewModel
-                )
+                if (share.properties.isNotEmpty() || share.customLinkRecipient != null) {
+                    AdvancedSettingsSection(
+                        share = share,
+                        isExpanded = showAdvancedSettings,
+                        onToggle = { showAdvancedSettings = !showAdvancedSettings },
+                        viewModel = viewModel
+                    )
+                }
 
                 if (hasPropertyErrors) {
                     Text(
@@ -164,7 +165,6 @@ fun AddOrEditShareBottomSheet(
                     ActionButtons(
                         share = share,
                         category = selectedCategory,
-                        internalLink = viewModel.getInternalLink(),
                         sendEnabled = !hasPropertyErrors,
                         onSend = { viewModel.updateState(share.id, ShareState.ACTIVE) }
                     )
@@ -254,7 +254,6 @@ private fun PermissionPresetDropdown(
 @Composable
 private fun AdvancedSettingsSection(
     share: Share,
-    category: ShareCategory,
     isExpanded: Boolean,
     onToggle: () -> Unit,
     viewModel: ShareViewModel
@@ -274,16 +273,12 @@ private fun AdvancedSettingsSection(
             }
         }
 
-        share.getCustomLinkRecipient(category)?.let {
+        share.customLinkRecipient?.let {
             CustomLink(
                 recipient = it,
                 onGenerateSecret = { viewModel.generateSecret() },
                 onTokenChange = { token ->
-                    var recipient = it
-                    if (category == ShareCategory.Invited) {
-                        recipient = it.copy(value = token)
-                    }
-                    viewModel.updateRecipientSecret(share.id, recipient, token)
+                    viewModel.updateRecipientSecret(share.id, it, token)
                 }
             )
         }
@@ -294,7 +289,6 @@ private fun AdvancedSettingsSection(
 private fun ActionButtons(
     share: Share,
     category: ShareCategory,
-    internalLink: String,
     sendEnabled: Boolean,
     onSend: () -> Unit,
 ) {
@@ -304,15 +298,14 @@ private fun ActionButtons(
             .padding(16.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        val clipEntry = share.getClipEntry(category, internalLink)
-        if (clipEntry != null) {
+        if (share.clipEntry != null) {
             val localClipboard = LocalClipboard.current
             val scope = rememberCoroutineScope()
 
             Button(
                 onClick = {
                     scope.launch {
-                        localClipboard.setClipEntry(clipEntry)
+                        localClipboard.setClipEntry(share.clipEntry)
                     }
                 },
                 modifier = Modifier.weight(1f),

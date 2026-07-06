@@ -355,13 +355,10 @@ private fun ShareItem(
 fun ComposeView.initShareScreen(
     sourceId: String,
     credentials: ServerCredentials,
-    internalLink: String,
     colorScheme: ColorScheme
 ) {
     val nextcloudHttpClient = NextcloudHttpClient.create(credentials)
-    val viewModel = ShareViewModel(repository = ShareRemoteRepository(nextcloudHttpClient)).apply {
-        setInternalLink(internalLink)
-    }
+    val viewModel = ShareViewModel(repository = ShareRemoteRepository(nextcloudHttpClient))
 
     setContent {
         setSingletonImageLoaderFactory { context ->
