@@ -28,7 +28,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.share.model.api.recipients.Recipient
-import java.util.UUID
 
 @Composable
 fun CustomLink(recipient: Recipient, onTokenChange: (String) -> Unit) {
@@ -60,9 +59,10 @@ fun CustomLink(recipient: Recipient, onTokenChange: (String) -> Unit) {
 
         OutlinedTextField(
             value = token,
-            onValueChange = {
-                token = it
-                onTokenChange(it)
+            onValueChange = { newValue ->
+                val trimmed = newValue.take(ShareTokenGenerator.MAX_LENGTH)
+                token = trimmed
+                if (trimmed.isNotBlank()) onTokenChange(trimmed)
             },
             label = {
                 Text(prefix)
@@ -71,7 +71,7 @@ fun CustomLink(recipient: Recipient, onTokenChange: (String) -> Unit) {
             trailingIcon = {
                 IconButton(
                     onClick = {
-                        val refreshedToken = UUID.randomUUID().toString()
+                        val refreshedToken = ShareTokenGenerator.generate()
                         token = refreshedToken
                         onTokenChange(refreshedToken)
                     }
