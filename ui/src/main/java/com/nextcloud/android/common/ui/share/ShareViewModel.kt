@@ -207,23 +207,30 @@ class ShareViewModel(
         }
     }
 
-    fun addAnyoneRecipient(category: ShareCategory, share: Share) {
-        if (category != ShareCategory.Anyone) return
-
-        share.recipients
-            .filter { it.clazz != Recipient.TOKEN_RECIPIENT_CLASS }
-            .forEach { recipient ->
-                removeRecipient(share.id, recipient.clazz, recipient.value, recipient.instance)
+    fun selectCategory(category: ShareCategory, share: Share) {
+        when (category) {
+            ShareCategory.Anyone -> {
+                removeRecipients(share) { it.clazz != Recipient.TOKEN_RECIPIENT_CLASS }
+                if (share.recipients.none { it.clazz == Recipient.TOKEN_RECIPIENT_CLASS }) {
+                    addRecipient(
+                        id = share.id,
+                        clazz = Recipient.TOKEN_RECIPIENT_CLASS,
+                        value = UUID.randomUUID().toString(),
+                        instance = null
+                    )
+                }
             }
 
-        if (share.recipients.none { it.clazz == Recipient.TOKEN_RECIPIENT_CLASS }) {
-            addRecipient(
-                id = share.id,
-                clazz = Recipient.TOKEN_RECIPIENT_CLASS,
-                value = UUID.randomUUID().toString(),
-                instance = null
-            )
+            ShareCategory.Invited -> {
+                removeRecipients(share) { it.clazz == Recipient.TOKEN_RECIPIENT_CLASS }
+            }
         }
+    }
+
+    private fun removeRecipients(share: Share, predicate: (Recipient) -> Boolean) {
+        share.recipients
+            .filter(predicate)
+            .forEach { removeRecipient(share.id, it.clazz, it.value, it.instance) }
     }
 
     fun removeRecipient(id: String, clazz: String, value: String, instance: String? = null) {
