@@ -12,11 +12,11 @@ import androidx.lifecycle.viewModelScope
 import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.network.model.NetworkResult
 import com.nextcloud.android.common.ui.network.model.dataOrElse
+import com.nextcloud.android.common.ui.share.model.api.permission.PermissionPreset
 import com.nextcloud.android.common.ui.share.model.api.recipients.Recipient
 import com.nextcloud.android.common.ui.share.model.api.request.AddRecipientRequest
 import com.nextcloud.android.common.ui.share.model.api.request.AddSourceRequest
 import com.nextcloud.android.common.ui.share.model.api.request.GetShareRequest
-import com.nextcloud.android.common.ui.share.model.api.permission.PermissionPreset
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePermissionPresetRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePermissionRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePropertyRequest
@@ -70,6 +70,8 @@ class ShareViewModel(
     val propertyErrors: StateFlow<Map<String, String?>> = _propertyErrors
 
     private val propertyUpdateJobs = mutableMapOf<String, Job>()
+
+    private var internalLink: String = ""
 
     private var secretUpdateJob: Job? = null
 
@@ -184,6 +186,12 @@ class ShareViewModel(
             replaceInList(updated)
         }
     }
+
+    fun setInternalLink(value: String) {
+        internalLink = value
+    }
+
+    fun getInternalLink(): String = internalLink
 
     fun removeSource(id: String, clazz: String, value: String) {
         viewModelScope.launch(Dispatchers.IO) {
