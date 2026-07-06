@@ -59,16 +59,6 @@ data class Share(
             return recipients.firstOrNull { it.secret.updatable }
         }
 
-    val hasInvitedRecipients: Boolean
-        get() {
-            return recipients.any { it.clazz != Recipient.TOKEN_RECIPIENT_CLASS }
-        }
-
-    val isAdvancedSettingsExists: Boolean
-        get() {
-            return properties.isNotEmpty() || editableRecipient != null
-        }
-
     val canSend: Boolean
         get() {
             return sources.isNotEmpty() &&
