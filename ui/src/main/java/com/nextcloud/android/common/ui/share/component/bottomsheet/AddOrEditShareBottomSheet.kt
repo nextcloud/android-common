@@ -52,7 +52,7 @@ import androidx.compose.ui.unit.dp
 import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.share.ShareViewModel
 import com.nextcloud.android.common.ui.share.component.CollapsibleShareSection
-import com.nextcloud.android.common.ui.share.component.RecipientTokenField
+import com.nextcloud.android.common.ui.share.component.CustomLink
 import com.nextcloud.android.common.ui.share.component.SelectRecipientField
 import com.nextcloud.android.common.ui.share.component.ShareSwitch
 import com.nextcloud.android.common.ui.share.component.property.SharePropertyView
@@ -135,26 +135,17 @@ fun AddOrEditShareBottomSheet(
                     SelectRecipientField(share, viewModel)
                 }
 
-                // TODO: is it going to be included for now?
-                val editableRecipient = share.recipients.firstOrNull { it.secret.updatable }
-                if (editableRecipient != null) {
-                    RecipientTokenField(
-                        recipient = editableRecipient,
-                        onTokenChange = { token ->
-                            viewModel.updateRecipientSecret(share.id, editableRecipient, token)
-                        }
-                    )
-                }
-
                 PermissionsView(
                     share = share,
                     initialPresetOption = initialPresetOption,
                     viewModel = viewModel
                 )
 
-                if (share.properties.isNotEmpty()) {
+                val editableRecipient = share.recipients.firstOrNull { it.secret.updatable }
+                if (share.properties.isNotEmpty() || editableRecipient != null) {
                     AdvancedSettingsSection(
                         share = share,
+                        editableRecipient = editableRecipient,
                         isExpanded = showAdvancedSettings,
                         onToggle = { showAdvancedSettings = !showAdvancedSettings },
                         viewModel = viewModel
@@ -266,6 +257,7 @@ private fun PermissionPresetDropdown(
 @Composable
 private fun AdvancedSettingsSection(
     share: Share,
+    editableRecipient: Recipient?,
     isExpanded: Boolean,
     onToggle: () -> Unit,
     viewModel: ShareViewModel
@@ -283,6 +275,15 @@ private fun AdvancedSettingsSection(
                     viewModel = viewModel
                 )
             }
+        }
+
+        if (editableRecipient != null) {
+            CustomLink(
+                recipient = editableRecipient,
+                onTokenChange = { token ->
+                    viewModel.updateRecipientSecret(share.id, editableRecipient, token)
+                }
+            )
         }
     }
 }
