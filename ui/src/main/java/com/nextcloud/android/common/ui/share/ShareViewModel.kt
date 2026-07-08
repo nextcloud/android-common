@@ -24,6 +24,7 @@ import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareRecipi
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareStateRequest
 import com.nextcloud.android.common.ui.share.model.api.share.Share
 import com.nextcloud.android.common.ui.share.model.api.state.ShareState
+import com.nextcloud.android.common.ui.share.model.ui.ActiveShareState
 import com.nextcloud.android.common.ui.share.model.ui.ShareCategory
 import com.nextcloud.android.common.ui.share.model.ui.ShareScreenState
 import com.nextcloud.android.common.ui.share.model.ui.filtered
@@ -55,8 +56,8 @@ class ShareViewModel(
     private val _state = MutableStateFlow<ShareScreenState>(ShareScreenState.Loading)
     val state: StateFlow<ShareScreenState> = _state
 
-    private val _activeShare = MutableStateFlow<Share?>(null)
-    val activeShare: StateFlow<Share?> = _activeShare
+    private val _activeShare = MutableStateFlow<ActiveShareState>(ActiveShareState.Dismiss)
+    val activeShare: StateFlow<ActiveShareState> = _activeShare
 
     private val _searchQuery = MutableStateFlow("")
 
@@ -133,7 +134,7 @@ class ShareViewModel(
             val share = result.dataOrElse { _errorMessageId.update { R.string.share_view_fetch_error_message } }
                 ?: return@launch
 
-            _activeShare.update { share }
+            _activeShare.update { share.toActiveShare() }
             replaceInList(share)
         }
     }
@@ -148,7 +149,7 @@ class ShareViewModel(
         val draft = result.dataOrElse { _errorMessageId.update { R.string.share_view_create_error_message } }
 
         if (draft != null) {
-            _activeShare.update { draft }
+            _activeShare.update { draft.toActiveShare() }
             _state.update { ShareScreenState.Loaded(listOf(draft) + currentShares) }
         }
 
@@ -157,15 +158,19 @@ class ShareViewModel(
     // endregion
 
     // region state
-    fun updateState(id: String, shareState: ShareState) {
+    fun updateState(id: String, shareState: ShareState, updateAndDontDismiss: Boolean = false) {
         viewModelScope.launch(Dispatchers.IO) {
             val result = repository.updateShareState(id, UpdateShareStateRequest(shareState))
             val updated = result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
                 ?: return@launch
             if (shareState == ShareState.ACTIVE) {
-                _activeShare.update { null }
+                if (updateAndDontDismiss) {
+                    _activeShare.update { ActiveShareState.Update(updated) }
+                } else {
+                    _activeShare.update { ActiveShareState.Dismiss }
+                }
             } else {
-                _activeShare.update { updated }
+                _activeShare.update { updated.toActiveShare() }
             }
             replaceInList(updated)
         }
@@ -180,7 +185,7 @@ class ShareViewModel(
             val result = repository.addShareSource(id, AddSourceRequest(clazz, value))
             val updated = result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
                 ?: return@launch
-            _activeShare.update { updated }
+            _activeShare.update { updated.toActiveShare() }
             replaceInList(updated)
         }
     }
@@ -190,7 +195,7 @@ class ShareViewModel(
             val result = repository.removeShareSource(id, clazz, value)
             val updated = result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
                 ?: return@launch
-            _activeShare.update { updated }
+            _activeShare.update { updated.toActiveShare() }
             replaceInList(updated)
         }
     }
@@ -202,7 +207,7 @@ class ShareViewModel(
             val result = repository.addShareRecipient(id, AddRecipientRequest(clazz, value, instance))
             val updated = result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
                 ?: return@launch
-            _activeShare.update { updated }
+            _activeShare.update { updated.toActiveShare() }
             replaceInList(updated)
         }
     }
@@ -238,7 +243,7 @@ class ShareViewModel(
             val result = repository.removeShareRecipient(id, clazz, value, instance)
             val updated = result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
                 ?: return@launch
-            _activeShare.update { updated }
+            _activeShare.update { updated.toActiveShare() }
             replaceInList(updated)
         }
     }
@@ -256,7 +261,7 @@ class ShareViewModel(
             val result = repository.updateShareRecipientSecret(shareId, request)
             val updated = result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
                 ?: return@launch
-            _activeShare.update { updated }
+            _activeShare.update { updated.toActiveShare() }
             replaceInList(updated)
         }
     }
@@ -276,7 +281,7 @@ class ShareViewModel(
             when (val result = repository.updateShareProperty(shareId, UpdateSharePropertyRequest(clazz, value))) {
                 is NetworkResult.Success -> {
                     _propertyErrors.update { it - clazz }
-                    _activeShare.update { result.data }
+                    _activeShare.update { result.data.toActiveShare() }
                     replaceInList(result.data)
                 }
 
@@ -308,7 +313,7 @@ class ShareViewModel(
             val updated = result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
                 ?: return@launch
             if (updateActiveShare) {
-                _activeShare.update { updated }
+                _activeShare.update { updated.toActiveShare() }
             }
             replaceInList(updated)
         }
@@ -326,7 +331,13 @@ class ShareViewModel(
                 if (remaining.filtered().isEmpty()) ShareScreenState.Empty
                 else ShareScreenState.Loaded(remaining)
             }
-            if (_activeShare.value?.id == id) _activeShare.update { null }
+
+            if (_activeShare.value is ActiveShareState.SharedAndDismiss) {
+                val sharedAndDismiss = (_activeShare.value as ActiveShareState.SharedAndDismiss)
+                if (sharedAndDismiss.value.id == id) {
+                    _activeShare.update { ActiveShareState.Dismiss }
+                }
+            }
         }
     }
     // endregion
@@ -338,7 +349,10 @@ class ShareViewModel(
 
     fun setActiveShare(value: Share?) {
         _propertyErrors.update { emptyMap() }
-        _activeShare.update { value }
+
+        value?.let {
+            _activeShare.update { value.toActiveShare() }
+        }
     }
     // endregion
 

@@ -76,6 +76,7 @@ import com.nextcloud.android.common.ui.share.component.bottomsheet.QuickSharePer
 import com.nextcloud.android.common.ui.share.component.dialog.DeleteShareConfirmationDialog
 import com.nextcloud.android.common.ui.share.model.api.permission.PermissionPreset
 import com.nextcloud.android.common.ui.share.model.api.share.Share
+import com.nextcloud.android.common.ui.share.model.ui.ActiveShareState
 import com.nextcloud.android.common.ui.share.model.ui.PermissionPresetOption
 import com.nextcloud.android.common.ui.share.model.ui.ShareItemOverlayState
 import com.nextcloud.android.common.ui.share.model.ui.ShareItemType
@@ -179,17 +180,23 @@ private fun ShareScreen(sourceId: String, internalLink: String, viewModel: Share
         }
     }
 
-    activeShare?.let {
-        AddOrEditShareBottomSheet(
-            share = it,
-            internalLink = internalLink,
-            viewModel = viewModel,
-            initialPresetOption = editorInitialPreset,
-            onDismissDraft = { draftShare ->
-                activeShare?.let { viewModel.deleteShare(draftShare.id) }
-                viewModel.setActiveShare(null)
-            }
-        )
+    if (activeShare !is ActiveShareState.Dismiss) {
+        val share = activeShare as? ActiveShareState.SharedAndDismiss
+        val share2 = activeShare as? ActiveShareState.Update
+        val activeShareObject = share?.value ?: share2?.value
+
+        activeShareObject?.let {
+            AddOrEditShareBottomSheet(
+                share = it,
+                internalLink = internalLink,
+                viewModel = viewModel,
+                initialPresetOption = editorInitialPreset,
+                onDismissDraft = { draftShare ->
+                    activeShare.let { viewModel.deleteShare(draftShare.id) }
+                    viewModel.setActiveShare(null)
+                }
+            )
+        }
     }
 }
 

@@ -19,6 +19,7 @@ import com.nextcloud.android.common.ui.share.model.api.recipients.Recipient
 import com.nextcloud.android.common.ui.share.model.api.source.Source
 import com.nextcloud.android.common.ui.share.model.api.state.ShareState
 import com.nextcloud.android.common.ui.share.model.api.user.User
+import com.nextcloud.android.common.ui.share.model.ui.ActiveShareState
 import com.nextcloud.android.common.ui.share.model.ui.ShareCategory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -46,6 +47,10 @@ data class Share(
     @SerialName("permission_preset")
     val permissionPreset: PermissionPreset? = null
 ) {
+    fun toActiveShare(): ActiveShareState {
+        return ActiveShareState.SharedAndDismiss(this)
+    }
+
     fun getClipEntry(internalLink: String, category: ShareCategory): ClipEntry? {
         val recipient = recipients.firstOrNull() ?: return null
 

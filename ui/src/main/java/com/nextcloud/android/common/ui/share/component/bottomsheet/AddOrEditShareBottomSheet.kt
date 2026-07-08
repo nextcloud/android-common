@@ -168,7 +168,7 @@ fun AddOrEditShareBottomSheet(
                         internalLink = internalLink,
                         category = selectedCategory,
                         sendEnabled = !hasPropertyErrors,
-                        onSend = { viewModel.updateState(share.id, ShareState.ACTIVE) }
+                        viewModel = viewModel
                     )
                 }
             }
@@ -293,7 +293,7 @@ private fun ActionButtons(
     internalLink: String,
     category: ShareCategory,
     sendEnabled: Boolean,
-    onSend: () -> Unit,
+    viewModel: ShareViewModel
 ) {
     Row(
         modifier = Modifier
@@ -308,7 +308,18 @@ private fun ActionButtons(
             onClick = {
                 scope.launch {
                     share.getClipEntry(internalLink, category)?.let {
-                        localClipboard.setClipEntry(it)
+                        if (category == ShareCategory.Anyone) {
+
+                            // recompose ActionButtons
+                            viewModel.updateState(share.id, ShareState.ACTIVE, updateAndDontDismiss = true)
+
+                            // share object is updated active share
+                            if (share.shareState == ShareState.ACTIVE) {
+                                localClipboard.setClipEntry(it)
+                            }
+                        } else {
+                            localClipboard.setClipEntry(it)
+                        }
                     }
                 }
             },
@@ -332,7 +343,9 @@ private fun ActionButtons(
 
         if (category == ShareCategory.Invited) {
             Button(
-                onClick = onSend,
+                onClick = {
+                    viewModel.updateState(share.id, ShareState.ACTIVE)
+                },
                 enabled = sendEnabled,
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(10.dp),
@@ -353,7 +366,9 @@ private fun ActionButtons(
             }
         } else {
             Button(
-                onClick = onSend,
+                onClick = {
+                    viewModel.updateState(share.id, ShareState.ACTIVE)
+                },
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(10.dp),
                 colors = ButtonDefaults.buttonColors(
