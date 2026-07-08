@@ -74,6 +74,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun AddOrEditShareBottomSheet(
     share: Share,
+    internalLink: String,
     viewModel: ShareViewModel,
     initialPresetOption: PermissionPresetOption? = null,
     onDismissDraft: (Share) -> Unit = {}
@@ -164,6 +165,7 @@ fun AddOrEditShareBottomSheet(
                 if (share.canSend) {
                     ActionButtons(
                         share = share,
+                        internalLink = internalLink,
                         category = selectedCategory,
                         sendEnabled = !hasPropertyErrors,
                         onSend = { viewModel.updateState(share.id, ShareState.ACTIVE) }
@@ -288,6 +290,7 @@ private fun AdvancedSettingsSection(
 @Composable
 private fun ActionButtons(
     share: Share,
+    internalLink: String,
     category: ShareCategory,
     sendEnabled: Boolean,
     onSend: () -> Unit,
@@ -298,14 +301,15 @@ private fun ActionButtons(
             .padding(16.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        if (share.clipEntry != null) {
+        val clipEntry = share.getClipEntry(internalLink, category)
+        if (clipEntry != null) {
             val localClipboard = LocalClipboard.current
             val scope = rememberCoroutineScope()
 
             Button(
                 onClick = {
                     scope.launch {
-                        localClipboard.setClipEntry(share.clipEntry)
+                        localClipboard.setClipEntry(clipEntry)
                     }
                 },
                 modifier = Modifier.weight(1f),
@@ -321,31 +325,48 @@ private fun ActionButtons(
                     modifier = Modifier.size(20.dp),
                 )
                 Text(
-                    text = stringResource(R.string.share_view_copy_action),
+                    text = stringResource(category.copyLinkTitleId),
                     modifier = Modifier.padding(start = 8.dp),
                 )
             }
         }
 
-        Button(
-            onClick = onSend,
-            enabled = sendEnabled,
-            modifier = Modifier.weight(1f),
-            shape = RoundedCornerShape(10.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-            ),
-        ) {
-            Icon(
-                imageVector = category.sendActionIcon,
-                contentDescription = null,
-                modifier = Modifier.size(20.dp),
-            )
-            Text(
-                text = stringResource(category.sendActionTitleId),
-                modifier = Modifier.padding(start = 8.dp),
-            )
+        if (category == ShareCategory.Invited) {
+            Button(
+                onClick = onSend,
+                enabled = sendEnabled,
+                modifier = Modifier.weight(1f),
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                ),
+            ) {
+                Icon(
+                    imageVector = category.sendActionIcon,
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp),
+                )
+                Text(
+                    text = stringResource(category.sendActionTitleId),
+                    modifier = Modifier.padding(start = 8.dp),
+                )
+            }
+        } else {
+            Button(
+                onClick = onSend,
+                modifier = Modifier.weight(1f),
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onSurface,
+                ),
+            ) {
+                Text(
+                    text = stringResource(category.sendActionTitleId),
+                    modifier = Modifier.padding(start = 8.dp),
+                )
+            }
         }
     }
 }
@@ -356,6 +377,7 @@ private fun AddOrEditShareBottomSheetPreview() {
     MaterialTheme {
         AddOrEditShareBottomSheet(
             share = previewShare,
+            internalLink = "internal_link",
             viewModel = ShareViewModel(MockShareRepository())
         )
     }

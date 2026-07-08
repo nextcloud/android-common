@@ -19,6 +19,9 @@ enum class ShareCategory(val titleId: Int, val iconId: Int) {
     ),
     Anyone(R.string.share_view_anyone_category_title, R.drawable.ic_anyone);
 
+    val copyLinkTitleId
+        get() = if (this == Invited) R.string.share_view_invited_copy_action else R.string.share_view_anyone_copy_action
+
     val sendActionTitleId
         get() = if (this == Invited) R.string.share_view_send_action else R.string.share_view_share_action
 

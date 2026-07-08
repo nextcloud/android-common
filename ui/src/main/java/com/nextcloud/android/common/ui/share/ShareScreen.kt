@@ -85,7 +85,7 @@ import com.nextcloud.android.common.ui.share.repository.ShareRemoteRepository
 import kotlinx.coroutines.launch
 
 @Composable
-private fun ShareScreen(sourceId: String, viewModel: ShareViewModel) {
+private fun ShareScreen(sourceId: String, internalLink: String, viewModel: ShareViewModel) {
     val errorMessageId by viewModel.errorMessageId.collectAsState()
     val screenState by viewModel.state.collectAsState()
     val activeShare by viewModel.activeShare.collectAsState()
@@ -182,6 +182,7 @@ private fun ShareScreen(sourceId: String, viewModel: ShareViewModel) {
     activeShare?.let {
         AddOrEditShareBottomSheet(
             share = it,
+            internalLink = internalLink,
             viewModel = viewModel,
             initialPresetOption = editorInitialPreset,
             onDismissDraft = { draftShare ->
@@ -354,6 +355,7 @@ private fun ShareItem(
 
 fun ComposeView.initShareScreen(
     sourceId: String,
+    internalLink: String,
     credentials: ServerCredentials,
     colorScheme: ColorScheme
 ) {
@@ -370,7 +372,7 @@ fun ComposeView.initShareScreen(
         MaterialTheme(
             colorScheme = colorScheme,
             content = {
-                ShareScreen(sourceId, viewModel)
+                ShareScreen(sourceId, internalLink, viewModel)
             }
         )
     }
