@@ -48,7 +48,7 @@ data class Share(
     val permissionPreset: PermissionPreset? = null
 ) {
     fun toActiveShare(): ActiveShareState {
-        return ActiveShareState.SharedAndDismiss(this)
+        return ActiveShareState.Editing(this)
     }
 
     fun getClipEntry(internalLink: String, category: ShareCategory): ClipEntry? {
