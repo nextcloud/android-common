@@ -76,7 +76,6 @@ import com.nextcloud.android.common.ui.share.component.bottomsheet.QuickSharePer
 import com.nextcloud.android.common.ui.share.component.dialog.DeleteShareConfirmationDialog
 import com.nextcloud.android.common.ui.share.model.api.permission.PermissionPreset
 import com.nextcloud.android.common.ui.share.model.api.share.Share
-import com.nextcloud.android.common.ui.share.model.ui.ActiveShareState
 import com.nextcloud.android.common.ui.share.model.ui.PermissionPresetOption
 import com.nextcloud.android.common.ui.share.model.ui.ShareItemOverlayState
 import com.nextcloud.android.common.ui.share.model.ui.ShareItemType
@@ -180,23 +179,17 @@ private fun ShareScreen(sourceId: String, internalLink: String, viewModel: Share
         }
     }
 
-    if (activeShare !is ActiveShareState.Dismiss) {
-        val share = activeShare as? ActiveShareState.SharedAndDismiss
-        val share2 = activeShare as? ActiveShareState.Update
-        val activeShareObject = share?.value ?: share2?.value
-
-        activeShareObject?.let {
-            AddOrEditShareBottomSheet(
-                share = it,
-                internalLink = internalLink,
-                viewModel = viewModel,
-                initialPresetOption = editorInitialPreset,
-                onDismissDraft = { draftShare ->
-                    activeShare.let { viewModel.deleteShare(draftShare.id) }
-                    viewModel.setActiveShare(null)
-                }
-            )
-        }
+    activeShare.shareOrNull?.let { activeShareObject ->
+        AddOrEditShareBottomSheet(
+            share = activeShareObject,
+            internalLink = internalLink,
+            viewModel = viewModel,
+            initialPresetOption = editorInitialPreset,
+            onDismissDraft = { draftShare ->
+                viewModel.deleteShare(draftShare.id)
+                viewModel.setActiveShare(null)
+            }
+        )
     }
 }
 
@@ -252,7 +245,7 @@ private fun ShareItem(
                 onLongClick = {
                     haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                     overlayState = ShareItemOverlayState.ContextMenu
-                },
+                }
             )
             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
         headlineContent = {

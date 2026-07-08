@@ -56,7 +56,7 @@ class ShareViewModel(
     private val _state = MutableStateFlow<ShareScreenState>(ShareScreenState.Loading)
     val state: StateFlow<ShareScreenState> = _state
 
-    private val _activeShare = MutableStateFlow<ActiveShareState>(ActiveShareState.Dismiss)
+    private val _activeShare = MutableStateFlow<ActiveShareState>(ActiveShareState.None)
     val activeShare: StateFlow<ActiveShareState> = _activeShare
 
     private val _searchQuery = MutableStateFlow("")
@@ -165,9 +165,9 @@ class ShareViewModel(
                 ?: return@launch
             if (shareState == ShareState.ACTIVE) {
                 if (updateAndDontDismiss) {
-                    _activeShare.update { ActiveShareState.Update(updated) }
+                    _activeShare.update { ActiveShareState.Activating(updated) }
                 } else {
-                    _activeShare.update { ActiveShareState.Dismiss }
+                    _activeShare.update { ActiveShareState.None }
                 }
             } else {
                 _activeShare.update { updated.toActiveShare() }
@@ -332,11 +332,9 @@ class ShareViewModel(
                 else ShareScreenState.Loaded(remaining)
             }
 
-            if (_activeShare.value is ActiveShareState.SharedAndDismiss) {
-                val sharedAndDismiss = (_activeShare.value as ActiveShareState.SharedAndDismiss)
-                if (sharedAndDismiss.value.id == id) {
-                    _activeShare.update { ActiveShareState.Dismiss }
-                }
+            val editingShare = _activeShare.value
+            if (editingShare is ActiveShareState.Editing && editingShare.share.id == id) {
+                _activeShare.update { ActiveShareState.None }
             }
         }
     }
