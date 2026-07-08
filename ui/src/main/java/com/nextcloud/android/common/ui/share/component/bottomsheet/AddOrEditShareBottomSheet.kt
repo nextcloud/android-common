@@ -301,34 +301,33 @@ private fun ActionButtons(
             .padding(16.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        val clipEntry = share.getClipEntry(internalLink, category)
-        if (clipEntry != null) {
-            val localClipboard = LocalClipboard.current
-            val scope = rememberCoroutineScope()
+        val localClipboard = LocalClipboard.current
+        val scope = rememberCoroutineScope()
 
-            Button(
-                onClick = {
-                    scope.launch {
-                        localClipboard.setClipEntry(clipEntry)
+        Button(
+            onClick = {
+                scope.launch {
+                    share.getClipEntry(internalLink, category)?.let {
+                        localClipboard.setClipEntry(it)
                     }
-                },
-                modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(10.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onSurface,
-                ),
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_link),
-                    contentDescription = null,
-                    modifier = Modifier.size(20.dp),
-                )
-                Text(
-                    text = stringResource(category.copyLinkTitleId),
-                    modifier = Modifier.padding(start = 8.dp),
-                )
-            }
+                }
+            },
+            modifier = Modifier.weight(1f),
+            shape = RoundedCornerShape(10.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onSurface,
+            ),
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.ic_link),
+                contentDescription = null,
+                modifier = Modifier.size(20.dp),
+            )
+            Text(
+                text = stringResource(category.copyLinkTitleId),
+                modifier = Modifier.padding(start = 8.dp),
+            )
         }
 
         if (category == ShareCategory.Invited) {
