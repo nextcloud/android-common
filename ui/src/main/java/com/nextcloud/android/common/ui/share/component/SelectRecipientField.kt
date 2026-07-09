@@ -9,6 +9,7 @@ package com.nextcloud.android.common.ui.share.component
 
 import android.graphics.Color
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -199,5 +200,8 @@ fun RecipientIcon(icon: Icon, modifier: Modifier = Modifier) {
             contentDescription = null,
             modifier = modifier,
         )
+    } else {
+        // reserve the same space even with no image
+        Box(modifier = modifier)
     }
 }
