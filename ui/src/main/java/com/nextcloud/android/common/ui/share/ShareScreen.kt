@@ -98,6 +98,7 @@ private fun ShareScreen(sourceId: String, internalLink: String, viewModel: Share
     val snackbarHostState = remember { SnackbarHostState() }
     val resources = LocalResources.current
     var editorInitialPreset by remember { mutableStateOf<PermissionPresetOption?>(null) }
+    val context = LocalContext.current
 
     LaunchedEffect(errorMessageId) {
         errorMessageId?.let {
@@ -149,8 +150,10 @@ private fun ShareScreen(sourceId: String, internalLink: String, viewModel: Share
                         .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    itemsIndexed(state.shares.filtered(), key = { _, share -> share.id }) { index, share ->
-                        val type = ShareItemType.type(index, state.shares.lastIndex)
+                    val shares = state.shares.filtered()
+                    itemsIndexed(shares, key = { _, share -> share.id }) { index, share ->
+                        val type = ShareItemType.type(index, shares.lastIndex)
+                        val title = share.getHeadline(context, shares)
 
                         if (index == 0) {
                             Spacer(modifier = Modifier.height(16.dp))
@@ -160,6 +163,7 @@ private fun ShareScreen(sourceId: String, internalLink: String, viewModel: Share
 
                         ShareItem(
                             share = share,
+                            title = title,
                             type = type,
                             onSelectShare = { selected ->
                                 editorInitialPreset = null
@@ -201,6 +205,7 @@ private fun ShareScreen(sourceId: String, internalLink: String, viewModel: Share
 @Composable
 private fun ShareItem(
     share: Share,
+    title: String,
     type: ShareItemType,
     onSelectShare: (Share) -> Unit,
     onCustomizeShare: (Share) -> Unit,
@@ -208,7 +213,6 @@ private fun ShareItem(
     onDeleteShare: (Share) -> Unit,
     onSendEmail: (Share) -> Unit
 ) {
-    val context = LocalContext.current
     var overlayState by remember { mutableStateOf<ShareItemOverlayState>(ShareItemOverlayState.None) }
     val haptics = LocalHapticFeedback.current
 
@@ -256,7 +260,7 @@ private fun ShareItem(
             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
         headlineContent = {
             Text(
-                text = share.getHeadline(context),
+                text = title,
                 style = MaterialTheme.typography.titleMedium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
