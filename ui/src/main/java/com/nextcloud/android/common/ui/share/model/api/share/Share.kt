@@ -62,17 +62,17 @@ data class Share(
         }
     }
 
-    fun getHeadline(context: Context): String {
-        return if (belongsAnyoneTab) {
-            // TODO: maybe backend can provide this
-            // FIXME: Share link 1,2,3 show this in UI
+    fun getHeadline(context: Context, shares: List<Share>): String {
+        if (!belongsAnyoneTab) {
+            return recipients.firstOrNull()?.displayName ?: ""
+        }
+
+        val publicLinks = shares.filter { it.belongsAnyoneTab }
+        return if (publicLinks.size <= 1) {
             context.getString(R.string.share_view_public_link)
         } else {
-            if (recipients.isNotEmpty()) {
-                recipients.first().displayName
-            } else {
-                ""
-            }
+            val position = publicLinks.sortedBy { it.lastUpdated }.indexOfFirst { it.id == id } + 1
+            context.getString(R.string.share_view_public_link_numbered, position)
         }
     }
 
