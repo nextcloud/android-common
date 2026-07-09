@@ -63,6 +63,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.ImageLoader
 import coil3.compose.setSingletonImageLoaderFactory
@@ -254,15 +255,22 @@ private fun ShareItem(
         headlineContent = {
             Text(
                 text = share.getHeadline(context),
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
         },
         leadingContent = {
-            val icon =  share.recipients.first().icon
-            if (icon != null) {
-                RecipientIcon(icon = icon)
-            } else {
-                PublicLinkIcon()
+            Box(
+                modifier = Modifier.size(24.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                val icon = share.recipients.firstOrNull()?.icon
+                if (icon != null) {
+                    RecipientIcon(icon = icon, modifier = Modifier.size(24.dp))
+                } else {
+                    PublicLinkIcon(modifier = Modifier.size(24.dp))
+                }
             }
         },
         supportingContent = {
@@ -280,6 +288,8 @@ private fun ShareItem(
                     text = stringResource(PermissionPresetOption.from(share.permissionPreset).labelRes),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
 
                 Spacer(modifier = Modifier.width(2.dp))
