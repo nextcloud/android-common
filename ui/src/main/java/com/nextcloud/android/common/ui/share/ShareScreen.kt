@@ -82,6 +82,7 @@ import com.nextcloud.android.common.ui.share.component.dialog.DeleteShareConfirm
 import com.nextcloud.android.common.ui.share.model.api.permission.PermissionPreset
 import com.nextcloud.android.common.ui.share.model.api.share.Share
 import com.nextcloud.android.common.ui.share.model.ui.PermissionPresetOption
+import com.nextcloud.android.common.ui.share.model.ui.ShareEditorEntry
 import com.nextcloud.android.common.ui.share.model.ui.ShareItemOverlayState
 import com.nextcloud.android.common.ui.share.model.ui.ShareItemType
 import com.nextcloud.android.common.ui.share.model.ui.ShareScreenState
@@ -97,7 +98,7 @@ private fun ShareScreen(sourceId: String, internalLink: String, viewModel: Share
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val resources = LocalResources.current
-    var editorInitialPreset by remember { mutableStateOf<PermissionPresetOption?>(null) }
+    var editorEntry by remember { mutableStateOf(ShareEditorEntry.EDIT) }
     val context = LocalContext.current
 
     LaunchedEffect(errorMessageId) {
@@ -166,11 +167,11 @@ private fun ShareScreen(sourceId: String, internalLink: String, viewModel: Share
                             title = title,
                             type = type,
                             onSelectShare = { selected ->
-                                editorInitialPreset = null
+                                editorEntry = ShareEditorEntry.EDIT
                                 viewModel.setActiveShare(selected)
                             },
                             onCustomizeShare = { selected ->
-                                editorInitialPreset = PermissionPresetOption.CUSTOM
+                                editorEntry = ShareEditorEntry.CUSTOMIZE_PERMISSION
                                 viewModel.setActiveShare(selected)
                             },
                             onChangePreset = { selected, preset ->
@@ -178,7 +179,7 @@ private fun ShareScreen(sourceId: String, internalLink: String, viewModel: Share
                             },
                             onDeleteShare = { viewModel.deleteShare(it.id) },
                             onSendEmail = { selected ->
-                                editorInitialPreset = null
+                                editorEntry = ShareEditorEntry.SEND_EMAIL
                                 viewModel.setActiveShare(selected)
                             }
                         )
@@ -193,7 +194,7 @@ private fun ShareScreen(sourceId: String, internalLink: String, viewModel: Share
             share = activeShareObject,
             internalLink = internalLink,
             viewModel = viewModel,
-            initialPresetOption = editorInitialPreset,
+            entry = editorEntry,
             onDismissDraft = { draftShare ->
                 viewModel.deleteShare(draftShare.id)
                 viewModel.setActiveShare(null)
