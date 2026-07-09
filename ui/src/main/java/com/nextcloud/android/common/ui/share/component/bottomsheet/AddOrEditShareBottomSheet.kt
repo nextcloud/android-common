@@ -81,7 +81,9 @@ fun AddOrEditShareBottomSheet(
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val categories = remember { ShareCategory.entries.toList() }
-    var selectedCategory by remember { mutableStateOf(categories.first()) }
+    var selectedCategory by remember(share.id) {
+        mutableStateOf(if (share.belongsAnyoneTab) ShareCategory.Anyone else ShareCategory.Invited)
+    }
     var showAdvancedSettings by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val propertyErrors by viewModel.propertyErrors.collectAsState()
@@ -114,23 +116,15 @@ fun AddOrEditShareBottomSheet(
                     modifier = Modifier.padding(16.dp)
                 )
 
-                SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-                    categories.forEachIndexed { index, category ->
-                        SegmentedButton(
-                            selected = selectedCategory == category,
-                            onClick = {
-                                selectedCategory = category
-                                viewModel.selectCategory(category, share)
-                            },
-                            shape = SegmentedButtonDefaults.itemShape(index = index, count = categories.size),
-                            icon = {
-                                Icon(painter = painterResource(category.iconId), contentDescription = "")
-                            }
-                        ) {
-                            Text(stringResource(category.titleId))
-                        }
+                ShareCategorySelector(
+                    share = share,
+                    categories = categories,
+                    selectedCategory = selectedCategory,
+                    onCategorySelected = { category ->
+                        selectedCategory = category
+                        viewModel.selectCategory(category, share)
                     }
-                }
+                )
 
                 if (selectedCategory == ShareCategory.Invited) {
                     SelectRecipientField(share, viewModel)
@@ -171,6 +165,33 @@ fun AddOrEditShareBottomSheet(
                         viewModel = viewModel
                     )
                 }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ShareCategorySelector(
+    share: Share,
+    categories: List<ShareCategory>,
+    selectedCategory: ShareCategory,
+    onCategorySelected: (ShareCategory) -> Unit
+) {
+    // only allow user to select between taps if it is draft share
+    if (share.shareState != ShareState.DRAFT) return
+
+    SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+        categories.forEachIndexed { index, category ->
+            SegmentedButton(
+                selected = selectedCategory == category,
+                onClick = { onCategorySelected(category) },
+                shape = SegmentedButtonDefaults.itemShape(index = index, count = categories.size),
+                icon = {
+                    Icon(painter = painterResource(category.iconId), contentDescription = "")
+                }
+            ) {
+                Text(stringResource(category.titleId))
             }
         }
     }
