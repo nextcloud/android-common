@@ -58,6 +58,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
@@ -70,6 +71,7 @@ import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.component.ContentUnavailableView
 import com.nextcloud.android.common.ui.network.auth.ServerCredentials
 import com.nextcloud.android.common.ui.network.http.NextcloudHttpClient
+import com.nextcloud.android.common.ui.share.component.PublicLinkIcon
 import com.nextcloud.android.common.ui.share.component.RecipientIcon
 import com.nextcloud.android.common.ui.share.component.bottomsheet.AddOrEditShareBottomSheet
 import com.nextcloud.android.common.ui.share.component.bottomsheet.QuickSharePermissionBottomSheet
@@ -203,6 +205,7 @@ private fun ShareItem(
     onDeleteShare: (Share) -> Unit,
     onSendEmail: (Share) -> Unit
 ) {
+    val context = LocalContext.current
     var overlayState by remember { mutableStateOf<ShareItemOverlayState>(ShareItemOverlayState.None) }
     val haptics = LocalHapticFeedback.current
 
@@ -249,19 +252,18 @@ private fun ShareItem(
             )
             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
         headlineContent = {
-            val headline = if (share.recipients.isNotEmpty()) {
-                share.recipients.first().displayName
-            } else {
-                ""
-            }
-
             Text(
-                text = headline,
+                text = share.getHeadline(context),
                 style = MaterialTheme.typography.titleMedium
             )
         },
         leadingContent = {
-            share.recipients.first().icon?.let { RecipientIcon(icon = it) }
+            val icon =  share.recipients.first().icon
+            if (icon != null) {
+                RecipientIcon(icon = icon)
+            } else {
+                PublicLinkIcon()
+            }
         },
         supportingContent = {
             val chipHorizontalPadding = 10.dp
