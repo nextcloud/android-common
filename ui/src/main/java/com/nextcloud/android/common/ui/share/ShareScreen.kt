@@ -54,6 +54,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -63,6 +64,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.ImageLoader
@@ -275,6 +277,8 @@ private fun ShareItem(
         },
         supportingContent = {
             val chipHorizontalPadding = 10.dp
+            val selectedLabelRes = PermissionPresetOption.from(share.permissionPreset).labelRes
+
             Row(
                 modifier = Modifier
                     .offset(x = -chipHorizontalPadding)
@@ -284,13 +288,25 @@ private fun ShareItem(
                     .padding(horizontal = chipHorizontalPadding, vertical = 2.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = stringResource(PermissionPresetOption.from(share.permissionPreset).labelRes),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+                Box(contentAlignment = Alignment.CenterStart) {
+                    PermissionPresetOption.entries.forEach { option ->
+                        Text(
+                            text = stringResource(option.labelRes),
+                            style = MaterialTheme.typography.bodyMedium,
+                            maxLines = 1,
+                            modifier = Modifier
+                                .alpha(0f)
+                                .clearAndSetSemantics {}
+                        )
+                    }
+
+                    Text(
+                        text = stringResource(selectedLabelRes),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        maxLines = 1
+                    )
+                }
 
                 Spacer(modifier = Modifier.width(2.dp))
 
