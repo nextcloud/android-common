@@ -67,6 +67,7 @@ import com.nextcloud.android.common.ui.share.model.api.state.ShareState
 import com.nextcloud.android.common.ui.share.model.api.user.User
 import com.nextcloud.android.common.ui.share.model.ui.PermissionPresetOption
 import com.nextcloud.android.common.ui.share.model.ui.ShareCategory
+import com.nextcloud.android.common.ui.share.model.ui.ShareEditorEntry
 import com.nextcloud.android.common.ui.share.repository.MockShareRepository
 import kotlinx.coroutines.launch
 
@@ -76,7 +77,7 @@ fun AddOrEditShareBottomSheet(
     share: Share,
     internalLink: String,
     viewModel: ShareViewModel,
-    initialPresetOption: PermissionPresetOption? = null,
+    entry: ShareEditorEntry = ShareEditorEntry.EDIT,
     onDismissDraft: (Share) -> Unit = {}
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -84,7 +85,11 @@ fun AddOrEditShareBottomSheet(
     var selectedCategory by remember(share.id) {
         mutableStateOf(if (share.belongsAnyoneTab) ShareCategory.Anyone else ShareCategory.Invited)
     }
-    var showAdvancedSettings by remember { mutableStateOf(false) }
+    val initialPresetOption = when (entry) {
+        ShareEditorEntry.CUSTOMIZE_PERMISSION -> PermissionPresetOption.CUSTOM
+        else -> null
+    }
+    var showAdvancedSettings by remember(share.id) { mutableStateOf(entry == ShareEditorEntry.SEND_EMAIL) }
     val context = LocalContext.current
     val propertyErrors by viewModel.propertyErrors.collectAsState()
     val hasPropertyErrors = propertyErrors.values.any { it != null }
