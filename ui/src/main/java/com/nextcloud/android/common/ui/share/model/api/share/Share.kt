@@ -62,6 +62,25 @@ data class Share(
         }
     }
 
+    fun getHeadline(context: Context): String {
+        return if (belongsAnyoneTab) {
+            // TODO: maybe backend can provide this
+            // FIXME: Share link 1,2,3 show this in UI
+            context.getString(R.string.share_view_public_link)
+        } else {
+            if (recipients.isNotEmpty()) {
+                recipients.first().displayName
+            } else {
+                ""
+            }
+        }
+    }
+
+    val belongsAnyoneTab: Boolean
+        get() {
+            return customLinkRecipient != null
+        }
+
     val customLinkRecipient: Recipient?
         get() {
             return recipients.firstOrNull { it.secret.updatable }
