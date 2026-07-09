@@ -347,10 +347,7 @@ class ShareViewModel(
 
     fun setActiveShare(value: Share?) {
         _propertyErrors.update { emptyMap() }
-
-        value?.let {
-            _activeShare.update { value.toActiveShare() }
-        }
+        _activeShare.update { value?.toActiveShare() ?: ActiveShareState.None }
     }
     // endregion
 
