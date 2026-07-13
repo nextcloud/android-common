@@ -45,18 +45,21 @@ class MockShareRepository : ShareRepository {
         Permission(
             clazz = "read",
             displayName = "Read",
+            priority = 10,
             presets = listOf(PermissionPreset.VIEW, PermissionPreset.EDIT),
             enabled = true
         ),
         Permission(
             clazz = "update",
             displayName = "Update",
+            priority = 20,
             presets = listOf(PermissionPreset.EDIT),
             enabled = false
         ),
         Permission(
             clazz = "delete",
             displayName = "Delete",
+            priority = 30,
             presets = listOf(PermissionPreset.EDIT),
             enabled = false
         )
@@ -68,6 +71,7 @@ class MockShareRepository : ShareRepository {
             displayName = "Note",
             priority = 10,
             required = false,
+            advanced = false,
             value = "Design review – please check latest changes"
         ),
         PropertyPassword(
@@ -75,6 +79,7 @@ class MockShareRepository : ShareRepository {
             displayName = "Password",
             priority = 20,
             required = false,
+            advanced = false,
             value = null
         ),
         PropertyDate(
@@ -82,6 +87,7 @@ class MockShareRepository : ShareRepository {
             displayName = "Expiration date",
             priority = 30,
             required = false,
+            advanced = true,
             value = null,
             minDate = "2026-01-01",
             maxDate = "2027-01-01"
@@ -91,6 +97,7 @@ class MockShareRepository : ShareRepository {
             displayName = "Hide download",
             priority = 40,
             required = false,
+            advanced = true,
             value = "false"
         )
     )

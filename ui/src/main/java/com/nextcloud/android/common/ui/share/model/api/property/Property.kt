@@ -21,6 +21,7 @@ sealed class Property {
     abstract val hint: String?
     abstract val priority: Int
     abstract val required: Boolean
+    abstract val advanced: Boolean
     abstract val value: String?
 }
 
@@ -32,6 +33,7 @@ data class PropertyBoolean(
     override val hint: String? = null,
     override val priority: Int,
     override val required: Boolean,
+    override val advanced: Boolean,
     override val value: String? = null
 ) : Property() {
     fun isTrue(): Boolean = value == "true"
@@ -45,6 +47,7 @@ data class PropertyDate(
     override val hint: String? = null,
     override val priority: Int,
     override val required: Boolean,
+    override val advanced: Boolean,
     override val value: String? = null,
     @SerialName("min_date") val minDate: String? = null,
     @SerialName("max_date") val maxDate: String? = null
@@ -58,6 +61,7 @@ data class PropertyEnum(
     override val hint: String? = null,
     override val priority: Int,
     override val required: Boolean,
+    override val advanced: Boolean,
     override val value: String? = null,
     @SerialName("valid_values") val validValues: List<String>
 ) : Property()
@@ -70,6 +74,7 @@ data class PropertyPassword(
     override val hint: String? = null,
     override val priority: Int,
     override val required: Boolean,
+    override val advanced: Boolean,
     override val value: String? = null
 ) : Property()
 
@@ -81,6 +86,7 @@ data class PropertyString(
     override val hint: String? = null,
     override val priority: Int,
     override val required: Boolean,
+    override val advanced: Boolean,
     override val value: String? = null,
     @SerialName("min_length") val minLength: Int? = null,
     @SerialName("max_length") val maxLength: Int? = null

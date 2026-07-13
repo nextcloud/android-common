@@ -115,6 +115,7 @@ private fun ShareDatePickerPreview() {
                 displayName = "Expiration Date",
                 priority = 1,
                 required = false,
+                advanced = false,
                 value = "2026-12-31",
                 minDate = "2026-01-01",
                 maxDate = "2027-12-31"
