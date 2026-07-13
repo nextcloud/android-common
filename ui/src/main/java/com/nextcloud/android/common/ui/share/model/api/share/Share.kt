@@ -47,6 +47,22 @@ data class Share(
     @SerialName("permission_preset")
     val permissionPreset: PermissionPreset? = null
 ) {
+    val basicProperties: List<Property>
+        get() = properties.filterNot { it.advanced }.sortedBy { it.priority }
+
+    val advancedProperties: List<Property>
+        get() = properties.filter { it.advanced }.sortedBy { it.priority }
+
+    val isBasicSectionAvailable: Boolean
+        get() {
+            return basicProperties.isNotEmpty()
+        }
+
+    val isAdvancedSectionAvailable: Boolean
+        get() {
+            return advancedProperties.isNotEmpty() || customLinkRecipient != null
+        }
+
     fun toActiveShare(): ActiveShareState {
         return ActiveShareState.Editing(this)
     }
