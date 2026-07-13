@@ -108,7 +108,8 @@ class ShareViewModel(
 
     // region shares list
     fun fetchShares(
-        sourceClass: String? = null,
+        filterSourceTypeClass: String? = null,
+        filterSourceTypeValue: String? = null,
         lastShareID: String? = null,
         limit: Int = 50
     ) {
@@ -116,7 +117,7 @@ class ShareViewModel(
             _state.update { ShareScreenState.Loading }
             _errorMessageId.update { null }
 
-            val result = repository.fetchShares(sourceClass, lastShareID, limit)
+            val result = repository.fetchShares(filterSourceTypeClass, filterSourceTypeValue, lastShareID, limit)
             val fetched = result.dataOrElse { _errorMessageId.update { R.string.share_view_fetch_error_message } }
                 ?: return@launch
             _state.update {
