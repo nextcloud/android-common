@@ -59,6 +59,7 @@ class NextcloudHttpClient private constructor(
         parse: (String) -> T
     ): NetworkResult<T> = withContext(Dispatchers.IO) {
         val request = buildOcsRequest("$baseUrl$endpoint", method, body)
+        debugLogger.logRequest(endpoint, method, body)
         try {
             val response = okHttpClient.newCall(request).execute()
             val responseBody = response.body.string()
