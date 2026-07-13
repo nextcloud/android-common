@@ -141,14 +141,17 @@ fun AddOrEditShareBottomSheet(
                     viewModel = viewModel
                 )
 
-                if (share.properties.isNotEmpty() || share.customLinkRecipient != null) {
-                    AdvancedSettingsSection(
-                        share = share,
-                        isExpanded = showAdvancedSettings,
-                        onToggle = { showAdvancedSettings = !showAdvancedSettings },
-                        viewModel = viewModel
-                    )
-                }
+                BasicSettingsSection(
+                    share = share,
+                    viewModel = viewModel
+                )
+
+                AdvancedSettingsSection(
+                    share = share,
+                    isExpanded = showAdvancedSettings,
+                    onToggle = { showAdvancedSettings = !showAdvancedSettings },
+                    viewModel = viewModel
+                )
 
                 if (hasPropertyErrors) {
                     Text(
@@ -280,18 +283,44 @@ private fun PermissionPresetDropdown(
 }
 
 @Composable
+private fun BasicSettingsSection(
+    share: Share,
+    viewModel: ShareViewModel
+) {
+    if (!share.isBasicSectionAvailable) {
+        return
+    }
+
+    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+        share.basicProperties.forEach { property ->
+            key(property.clazz) {
+                SharePropertyView(
+                    shareId = share.id,
+                    property = property,
+                    viewModel = viewModel
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun AdvancedSettingsSection(
     share: Share,
     isExpanded: Boolean,
     onToggle: () -> Unit,
     viewModel: ShareViewModel
 ) {
+    if (!share.isAdvancedSectionAvailable) {
+        return
+    }
+
     CollapsibleShareSection(
         label = stringResource(R.string.share_view_advanced_settings),
         isExpanded = isExpanded,
         onToggle = onToggle
     ) {
-        share.properties.sortedBy { it.priority }.forEach { property ->
+        share.advancedProperties.forEach { property ->
             key(property.clazz) {
                 SharePropertyView(
                     shareId = share.id,
@@ -450,18 +479,27 @@ private val previewShare = Share(
         )
     ),
     properties = listOf(
-        PropertyString(clazz = "note", displayName = "Note", priority = 10, required = false, value = "")
+        PropertyString(
+            clazz = "note",
+            displayName = "Note",
+            priority = 10,
+            required = false,
+            advanced = false,
+            value = ""
+        )
     ),
     permissions = listOf(
         Permission(
             clazz = "read",
             displayName = "Read",
+            priority = 10,
             presets = listOf(PermissionPreset.VIEW, PermissionPreset.EDIT),
             enabled = true
         ),
         Permission(
             clazz = "update",
             displayName = "Update",
+            priority = 20,
             presets = listOf(PermissionPreset.EDIT),
             enabled = false
         )

@@ -23,6 +23,8 @@ data class Permission(
 
     val hint: String? = null,
 
+    val priority: Int,
+
     val presets: List<PermissionPreset>,
 
     val enabled: Boolean
