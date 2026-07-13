@@ -24,6 +24,9 @@ import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareRecipi
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareStateRequest
 import com.nextcloud.android.common.ui.share.model.api.share.Share
 import okhttp3.RequestBody.Companion.toRequestBody
+import java.net.URLEncoder
+
+private fun String.urlEncoded(): String = URLEncoder.encode(this, Charsets.UTF_8.name())
 
 class ShareRemoteRepository(
     private val client: NextcloudHttpClient,
@@ -44,8 +47,8 @@ class ShareRemoteRepository(
         offset: Int
     ): NetworkResult<List<Recipient>> {
         val queryParams = buildString {
-            append("?query=$query&limit=$limit&offset=$offset")
-            recipientTypeClasses?.forEach { append("&recipientTypeClasses[]=$it") }
+            append("?query=${query.urlEncoded()}&limit=$limit&offset=$offset")
+            recipientTypeClasses?.forEach { append("&recipientTypeClasses[]=${it.urlEncoded()}") }
         }
         return client.executeRequest(
             endpoint = "$RECIPIENTS_ENDPOINT$queryParams",
@@ -83,14 +86,16 @@ class ShareRemoteRepository(
         ) { }
 
     override suspend fun fetchShares(
-        sourceClass: String?,
+        filterSourceTypeClass: String?,
+        filterSourceTypeValue: String?,
         lastShareID: String?,
         limit: Int
     ): NetworkResult<List<Share>> {
         val queryParams = buildString {
             append("?limit=$limit")
-            sourceClass?.let { append("&sourceClass=$it") }
-            lastShareID?.let { append("&lastShareID=$it") }
+            filterSourceTypeClass?.let { append("&filterSourceTypeClass=${it.urlEncoded()}") }
+            filterSourceTypeValue?.let { append("&filterSourceTypeValue=${it.urlEncoded()}") }
+            lastShareID?.let { append("&lastShareID=${it.urlEncoded()}") }
         }
         return client.executeRequest(
             endpoint = "$SHARES_ENDPOINT$queryParams",
@@ -130,7 +135,7 @@ class ShareRemoteRepository(
         value: String
     ): NetworkResult<Share> =
         client.executeRequest(
-            endpoint = "$SHARE_ENDPOINT/$id/source?class=$clazz&value=$value",
+            endpoint = "$SHARE_ENDPOINT/$id/source?class=${clazz.urlEncoded()}&value=${value.urlEncoded()}",
             method = HttpMethod.DELETE
         ) { body ->
             json.decodeFromString<OcsResponse<Share>>(body).ocs.data
@@ -155,8 +160,8 @@ class ShareRemoteRepository(
         instance: String?
     ): NetworkResult<Share> {
         val queryParams = buildString {
-            append("?class=$clazz&value=$value")
-            instance?.let { append("&instance=$it") }
+            append("?class=${clazz.urlEncoded()}&value=${value.urlEncoded()}")
+            instance?.let { append("&instance=${it.urlEncoded()}") }
         }
         return client.executeRequest(
             endpoint = "$SHARE_ENDPOINT/$id/recipient$queryParams",
