@@ -10,6 +10,7 @@ package com.nextcloud.android.common.ui.network.http
 import com.nextcloud.android.common.ui.BuildConfig
 import com.nextcloud.android.common.ui.network.auth.AuthInterceptor
 import com.nextcloud.android.common.ui.network.auth.ServerCredentials
+import com.nextcloud.android.common.ui.network.model.Meta
 import com.nextcloud.android.common.ui.network.model.NetworkResult
 import com.nextcloud.android.common.ui.network.model.Ocs
 import com.nextcloud.android.common.ui.network.model.OcsResponse
@@ -31,6 +32,7 @@ class NextcloudHttpClient private constructor(
         private const val READ_TIMEOUT_SECONDS = 90L
         private const val WRITE_TIMEOUT_SECONDS = 90L
         private const val OCS_OK = "ok"
+        private const val OCS_FAILURE = "failure"
 
         fun create(
             credentials: ServerCredentials
@@ -48,6 +50,8 @@ class NextcloudHttpClient private constructor(
 
     private val baseUrl get() = credentials.baseURL.trimEnd('/')
 
+    private fun errorMeta(code: Int): Meta = Meta(status = OCS_FAILURE, statusCode = code, message = "")
+
     suspend fun <T> executeRequest(
         endpoint: String,
         method: HttpMethod,
@@ -59,24 +63,25 @@ class NextcloudHttpClient private constructor(
             val response = okHttpClient.newCall(request).execute()
             val responseBody = response.body.string()
 
-            if (!response.isSuccessful) {
-                debugLogger.logResponse(endpoint, method, response.code, responseBody, isError = true)
-                return@withContext NetworkResult.ServerError(
-                    OCSSerializer.json.decodeFromString<OcsResponse<String>>(responseBody)
-                )
-            }
-
             if (responseBody.isBlank()) {
-                debugLogger.logResponse(endpoint, method, response.code, responseBody, isError = false)
-                return@withContext NetworkResult.Success(parse(responseBody))
+                val isError = !response.isSuccessful
+                debugLogger.logResponse(endpoint, method, response.code, responseBody, isError = isError)
+                return@withContext if (isError) {
+                    NetworkResult.ServerError(OcsResponse(Ocs(errorMeta(response.code), "")))
+                } else {
+                    NetworkResult.Success(parse(responseBody))
+                }
             }
 
-            val envelope = OCSSerializer.json.decodeFromString<OcsResponse<JsonElement>>(responseBody)
-            if (envelope.ocs.meta.status != OCS_OK) {
-                debugLogger.logResponse(endpoint, method, response.code, responseBody, isError = true)
-                NetworkResult.ServerError(OcsResponse(Ocs(envelope.ocs.meta, envelope.ocs.meta.message)))
+            val meta = OCSSerializer.json
+                .decodeFromString<OcsResponse<JsonElement>>(responseBody)
+                .ocs.meta
+            val isError = !response.isSuccessful || meta.status != OCS_OK
+            debugLogger.logResponse(endpoint, method, response.code, responseBody, isError = isError)
+
+            if (isError) {
+                NetworkResult.ServerError(OcsResponse(Ocs(meta, meta.message)))
             } else {
-                debugLogger.logResponse(endpoint, method, response.code, responseBody, isError = false)
                 NetworkResult.Success(parse(responseBody))
             }
         } catch (e: Exception) {
