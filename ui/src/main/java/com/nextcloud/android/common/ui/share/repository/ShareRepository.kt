@@ -7,6 +7,7 @@
 package com.nextcloud.android.common.ui.share.repository
 
 import com.nextcloud.android.common.ui.network.model.NetworkResult
+import com.nextcloud.android.common.ui.share.model.api.capabilities.SharingCapabilities
 import com.nextcloud.android.common.ui.share.model.api.recipients.Recipient
 import com.nextcloud.android.common.ui.share.model.api.request.AddRecipientRequest
 import com.nextcloud.android.common.ui.share.model.api.request.AddSourceRequest
@@ -92,4 +93,6 @@ interface ShareRepository {
     ): NetworkResult<Share>
 
     suspend fun generateSecret(): NetworkResult<String>
+
+    suspend fun fetchSharingCapabilities(): NetworkResult<SharingCapabilities>
 }

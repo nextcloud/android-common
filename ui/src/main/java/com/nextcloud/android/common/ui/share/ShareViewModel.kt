@@ -12,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.network.model.NetworkResult
 import com.nextcloud.android.common.ui.network.model.dataOrElse
+import com.nextcloud.android.common.ui.share.model.api.permission.PermissionPreset
 import com.nextcloud.android.common.ui.share.model.api.recipients.Recipient
 import com.nextcloud.android.common.ui.share.model.api.request.AddRecipientRequest
 import com.nextcloud.android.common.ui.share.model.api.request.AddSourceRequest
@@ -63,6 +64,9 @@ class ShareViewModel(
     private val _recipientSearchResults = MutableStateFlow<List<Recipient>>(emptyList())
     val recipientSearchResults: StateFlow<List<Recipient>> = _recipientSearchResults
 
+    private val _permissionPresets = MutableStateFlow<List<PermissionPreset>>(emptyList())
+    val permissionPresets: StateFlow<List<PermissionPreset>> = _permissionPresets
+
     private val _errorMessageId = MutableStateFlow<Int?>(null)
     val errorMessageId: StateFlow<Int?> = _errorMessageId
 
@@ -79,6 +83,16 @@ class ShareViewModel(
     init {
         fetchShares()
         initSearchQuery()
+        fetchSharingCapabilities()
+    }
+
+    private fun fetchSharingCapabilities() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val result = repository.fetchSharingCapabilities()
+            if (result is NetworkResult.Success) {
+                _permissionPresets.update { result.data.permissionPresets }
+            }
+        }
     }
 
     // region search query
