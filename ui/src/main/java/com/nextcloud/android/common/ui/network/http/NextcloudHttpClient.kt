@@ -18,6 +18,7 @@ import com.nextcloud.android.common.ui.network.serialization.OCSSerializer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonPrimitive
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
 import java.util.concurrent.TimeUnit
@@ -74,14 +75,17 @@ class NextcloudHttpClient private constructor(
                 }
             }
 
-            val meta = OCSSerializer.json
+            val ocs = OCSSerializer.json
                 .decodeFromString<OcsResponse<JsonElement>>(responseBody)
-                .ocs.meta
+                .ocs
+            val meta = ocs.meta
             val isError = !response.isSuccessful || meta.status != OCS_OK
             debugLogger.logResponse(endpoint, method, response.code, responseBody, isError = isError)
 
             if (isError) {
-                NetworkResult.ServerError(OcsResponse(Ocs(meta, meta.message)))
+                val dataMessage = (ocs.data as? JsonPrimitive)?.takeIf { it.isString }?.content
+                val message = dataMessage?.takeIf { it.isNotBlank() } ?: meta.message
+                NetworkResult.ServerError(OcsResponse(Ocs(meta, message)))
             } else {
                 NetworkResult.Success(parse(responseBody))
             }
