@@ -7,19 +7,30 @@
 
 package com.nextcloud.android.common.ui.share.model.ui
 
-import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.share.model.api.permission.PermissionPreset
+import com.nextcloud.android.common.ui.share.model.api.share.Share
 
-enum class PermissionPresetOption(
-    val preset: PermissionPreset?,
-    val labelRes: Int
-) {
-    CUSTOM(null, R.string.share_view_permission_preset_custom),
-    VIEW(PermissionPreset.VIEW, R.string.share_view_permission_preset_view),
-    EDIT(PermissionPreset.EDIT, R.string.share_view_permission_preset_edit);
+sealed interface PermissionPresetOption {
+
+    val presetClass: String?
+
+    data object Custom : PermissionPresetOption {
+        override val presetClass: String? = null
+    }
+
+    data class Preset(val preset: PermissionPreset) : PermissionPresetOption {
+        override val presetClass: String get() = preset.clazz
+    }
 
     companion object {
-        fun from(preset: PermissionPreset?): PermissionPresetOption =
-            entries.firstOrNull { it.preset == preset } ?: CUSTOM
+        fun optionsFor(share: Share, presets: List<PermissionPreset>): List<PermissionPresetOption> {
+            val applicableClasses = share.permissions.flatMap { it.presets }.toSet()
+            return presets.filter { it.clazz in applicableClasses }.map { Preset(it) } + Custom
+        }
+
+        fun from(presetClass: String?, presets: List<PermissionPreset>): PermissionPresetOption {
+            if (presetClass == null) return Custom
+            return presets.firstOrNull { it.clazz == presetClass }?.let { Preset(it) } ?: Custom
+        }
     }
 }

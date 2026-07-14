@@ -11,10 +11,12 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-enum class PermissionPreset {
-    @SerialName("view")
-    VIEW,
+data class PermissionPreset(
+    @SerialName("class")
+    val clazz: String,
 
-    @SerialName("edit")
-    EDIT
-}
+    @SerialName("display_name")
+    val displayName: String,
+
+    val hint: String? = null
+)
