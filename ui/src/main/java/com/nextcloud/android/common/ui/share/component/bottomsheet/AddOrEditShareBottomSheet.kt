@@ -94,7 +94,9 @@ fun AddOrEditShareBottomSheet(
     var showAdvancedSettings by remember(share.id) { mutableStateOf(entry == ShareEditorEntry.SEND_EMAIL) }
     val context = LocalContext.current
     val propertyErrors by viewModel.propertyErrors.collectAsState()
-    val hasPropertyErrors = propertyErrors.values.any { it != null }
+    val pendingProperties by viewModel.pendingProperties.collectAsState()
+    val hasPropertyErrors = propertyErrors.isNotEmpty()
+    val sendEnabled = !hasPropertyErrors && pendingProperties.isEmpty()
 
     Column(
         modifier = Modifier
@@ -172,7 +174,7 @@ fun AddOrEditShareBottomSheet(
                         share = share,
                         internalLink = internalLink,
                         category = selectedCategory,
-                        sendEnabled = !hasPropertyErrors,
+                        sendEnabled = sendEnabled,
                         viewModel = viewModel
                     )
                 }
@@ -384,6 +386,7 @@ private fun ActionButtons(
                     }
                 }
             },
+            enabled = category != ShareCategory.Anyone || sendEnabled,
             modifier = Modifier.weight(1f),
             shape = RoundedCornerShape(10.dp),
             colors = ButtonDefaults.buttonColors(
@@ -430,6 +433,7 @@ private fun ActionButtons(
                 onClick = {
                     viewModel.updateState(share.id, ShareState.ACTIVE)
                 },
+                enabled = sendEnabled,
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(10.dp),
                 colors = ButtonDefaults.buttonColors(

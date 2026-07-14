@@ -73,6 +73,9 @@ class ShareViewModel(
     private val _propertyErrors = MutableStateFlow<Map<String, String?>>(emptyMap())
     val propertyErrors: StateFlow<Map<String, String?>> = _propertyErrors
 
+    private val _pendingProperties = MutableStateFlow<Set<String>>(emptySet())
+    val pendingProperties: StateFlow<Set<String>> = _pendingProperties
+
     private val propertyUpdateJobs = mutableMapOf<String, Job>()
 
     private var secretUpdateJob: Job? = null
@@ -290,6 +293,10 @@ class ShareViewModel(
     // region properties
     fun updateProperty(shareId: String, clazz: String, value: String?) {
         propertyUpdateJobs[clazz]?.cancel()
+        _pendingProperties.update { it + clazz }
+        if (value.isNullOrEmpty()) {
+            _propertyErrors.update { it - clazz }
+        }
         propertyUpdateJobs[clazz] = viewModelScope.launch(Dispatchers.IO) {
             delay(PROPERTY_DEBOUNCE_DELAY.milliseconds)
             when (val result = repository.updateShareProperty(shareId, UpdateSharePropertyRequest(clazz, value))) {
@@ -300,13 +307,18 @@ class ShareViewModel(
                 }
 
                 is NetworkResult.ServerError -> {
-                    _propertyErrors.update { it + (clazz to result.response.ocs.meta.message) }
+                    if (!value.isNullOrEmpty()) {
+                        _propertyErrors.update { it + (clazz to result.response.ocs.data) }
+                    }
                 }
 
                 is NetworkResult.NetworkException -> {
-                    _propertyErrors.update { it + (clazz to null) }
+                    if (!value.isNullOrEmpty()) {
+                        _propertyErrors.update { it + (clazz to null) }
+                    }
                 }
             }
+            _pendingProperties.update { it - clazz }
         }
     }
     // endregion
@@ -361,6 +373,7 @@ class ShareViewModel(
 
     fun setActiveShare(value: Share?) {
         _propertyErrors.update { emptyMap() }
+        _pendingProperties.update { emptySet() }
         _activeShare.update { value?.toActiveShare() ?: ActiveShareState.None }
     }
     // endregion
