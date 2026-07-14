@@ -47,6 +47,9 @@ class ShareRemoteRepository(
         private const val NODE_SHARING = "sharing"
     }
 
+    private fun decodeShare(body: String): Share =
+        json.decodeFromString<OcsResponse<Share>>(body).ocs.data
+
     override suspend fun fetchRecipients(
         recipientTypeClasses: List<String>?,
         query: String,
@@ -70,9 +73,7 @@ class ShareRemoteRepository(
             endpoint = SHARE_ENDPOINT,
             method = HttpMethod.POST,
             body = ByteArray(0).toRequestBody()
-        ) { body ->
-            json.decodeFromString<OcsResponse<Share>>(body).ocs.data
-        }
+        ) { decodeShare(it) }
 
     override suspend fun fetchShare(
         id: String,
@@ -82,9 +83,7 @@ class ShareRemoteRepository(
             endpoint = "$SHARE_ENDPOINT/$id",
             method = HttpMethod.POST,
             body = json.encodeToString(request).toRequestBody(JSON_CONTENT_TYPE)
-        ) { body ->
-            json.decodeFromString<OcsResponse<Share>>(body).ocs.data
-        }
+        ) { decodeShare(it) }
 
     override suspend fun deleteShare(id: String): NetworkResult<Unit> =
         client.executeRequest(
@@ -120,9 +119,7 @@ class ShareRemoteRepository(
             endpoint = "$SHARE_ENDPOINT/$id/state",
             method = HttpMethod.PUT,
             body = json.encodeToString(request).toRequestBody(JSON_CONTENT_TYPE)
-        ) { body ->
-            json.decodeFromString<OcsResponse<Share>>(body).ocs.data
-        }
+        ) { decodeShare(it) }
 
     override suspend fun addShareSource(
         id: String,
@@ -132,9 +129,7 @@ class ShareRemoteRepository(
             endpoint = "$SHARE_ENDPOINT/$id/source",
             method = HttpMethod.POST,
             body = json.encodeToString(request).toRequestBody(JSON_CONTENT_TYPE)
-        ) { body ->
-            json.decodeFromString<OcsResponse<Share>>(body).ocs.data
-        }
+        ) { decodeShare(it) }
 
     override suspend fun removeShareSource(
         id: String,
@@ -144,9 +139,7 @@ class ShareRemoteRepository(
         client.executeRequest(
             endpoint = "$SHARE_ENDPOINT/$id/source?class=${clazz.urlEncoded()}&value=${value.urlEncoded()}",
             method = HttpMethod.DELETE
-        ) { body ->
-            json.decodeFromString<OcsResponse<Share>>(body).ocs.data
-        }
+        ) { decodeShare(it) }
 
     override suspend fun addShareRecipient(
         id: String,
@@ -156,9 +149,7 @@ class ShareRemoteRepository(
             endpoint = "$SHARE_ENDPOINT/$id/recipient",
             method = HttpMethod.POST,
             body = json.encodeToString(request).toRequestBody(JSON_CONTENT_TYPE)
-        ) { body ->
-            json.decodeFromString<OcsResponse<Share>>(body).ocs.data
-        }
+        ) { decodeShare(it) }
 
     override suspend fun removeShareRecipient(
         id: String,
@@ -173,9 +164,7 @@ class ShareRemoteRepository(
         return client.executeRequest(
             endpoint = "$SHARE_ENDPOINT/$id/recipient$queryParams",
             method = HttpMethod.DELETE
-        ) { body ->
-            json.decodeFromString<OcsResponse<Share>>(body).ocs.data
-        }
+        ) { decodeShare(it) }
     }
 
     override suspend fun updateShareProperty(
@@ -186,9 +175,7 @@ class ShareRemoteRepository(
             endpoint = "$SHARE_ENDPOINT/$id/property",
             method = HttpMethod.PUT,
             body = json.encodeToString(request).toRequestBody(JSON_CONTENT_TYPE)
-        ) { body ->
-            json.decodeFromString<OcsResponse<Share>>(body).ocs.data
-        }
+        ) { decodeShare(it) }
 
     override suspend fun updateSharePermission(
         id: String,
@@ -198,9 +185,7 @@ class ShareRemoteRepository(
             endpoint = "$SHARE_ENDPOINT/$id/permission",
             method = HttpMethod.PUT,
             body = json.encodeToString(request).toRequestBody(JSON_CONTENT_TYPE)
-        ) { body ->
-            json.decodeFromString<OcsResponse<Share>>(body).ocs.data
-        }
+        ) { decodeShare(it) }
 
     override suspend fun updateSharePermissionPreset(
         id: String,
@@ -210,9 +195,7 @@ class ShareRemoteRepository(
             endpoint = "$SHARE_ENDPOINT/$id/permission/preset",
             method = HttpMethod.PUT,
             body = json.encodeToString(request).toRequestBody(JSON_CONTENT_TYPE)
-        ) { body ->
-            json.decodeFromString<OcsResponse<Share>>(body).ocs.data
-        }
+        ) { decodeShare(it) }
 
     override suspend fun updateShareRecipientSecret(
         id: String,
@@ -222,9 +205,7 @@ class ShareRemoteRepository(
             endpoint = "$SHARE_ENDPOINT/$id/recipient/secret",
             method = HttpMethod.PUT,
             body = json.encodeToString(request).toRequestBody(JSON_CONTENT_TYPE)
-        ) { body ->
-            json.decodeFromString<OcsResponse<Share>>(body).ocs.data
-        }
+        ) { decodeShare(it) }
 
     override suspend fun generateSecret(): NetworkResult<String> =
         client.executeRequest(

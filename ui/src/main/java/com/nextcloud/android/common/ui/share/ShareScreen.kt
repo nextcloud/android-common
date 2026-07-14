@@ -225,12 +225,14 @@ private fun ShareItem(
 ) {
     var overlayState by remember { mutableStateOf<ShareItemOverlayState>(ShareItemOverlayState.None) }
     val haptics = LocalHapticFeedback.current
+    val presetOptions = PermissionPresetOption.optionsFor(share, permissionPresets)
+    val selectedPresetOption = PermissionPresetOption.from(share.permissionPreset, permissionPresets)
 
     when (overlayState) {
         is ShareItemOverlayState.QuickShare -> {
             QuickSharePermissionBottomSheet(
-                options = PermissionPresetOption.optionsFor(share, permissionPresets),
-                selectedOption = PermissionPresetOption.from(share.permissionPreset, permissionPresets),
+                options = presetOptions,
+                selectedOption = selectedPresetOption,
                 onOptionSelected = { option ->
                     overlayState = ShareItemOverlayState.None
                     val presetClass = option.presetClass
@@ -292,7 +294,7 @@ private fun ShareItem(
         },
         supportingContent = {
             val chipHorizontalPadding = 10.dp
-            val selectedLabel = PermissionPresetOption.from(share.permissionPreset, permissionPresets).label()
+            val selectedLabel = selectedPresetOption.label()
 
             Row(
                 modifier = Modifier
@@ -304,7 +306,7 @@ private fun ShareItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(contentAlignment = Alignment.CenterStart) {
-                    PermissionPresetOption.optionsFor(share, permissionPresets).forEach { option ->
+                    presetOptions.forEach { option ->
                         Text(
                             text = option.label(),
                             style = MaterialTheme.typography.bodyMedium,

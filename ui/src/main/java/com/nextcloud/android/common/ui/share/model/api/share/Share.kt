@@ -46,11 +46,13 @@ data class Share(
     @SerialName("permission_preset")
     val permissionPreset: String? = null
 ) {
-    val basicProperties: List<Property>
-        get() = properties.filterNot { it.advanced }.sortedBy { it.priority }
+    val basicProperties: List<Property> by lazy {
+        properties.filterNot { it.advanced }.sortedBy { it.priority }
+    }
 
-    val advancedProperties: List<Property>
-        get() = properties.filter { it.advanced }.sortedBy { it.priority }
+    val advancedProperties: List<Property> by lazy {
+        properties.filter { it.advanced }.sortedBy { it.priority }
+    }
 
     val isBasicSectionAvailable: Boolean
         get() {
@@ -96,10 +98,9 @@ data class Share(
             return customLinkRecipient != null
         }
 
-    val customLinkRecipient: Recipient?
-        get() {
-            return recipients.firstOrNull { it.secret.updatable }
-        }
+    val customLinkRecipient: Recipient? by lazy {
+        recipients.firstOrNull { it.secret.updatable }
+    }
 
     val canSend: Boolean
         get() {
