@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.share.ShareViewModel
@@ -68,43 +69,25 @@ fun SharePropertyView(shareId: String, property: Property, viewModel: ShareViewM
             }
         }
 
-        is PropertyString -> {
-            var textValue by remember(property.clazz) { mutableStateOf(property.value ?: "") }
+        is PropertyString -> ShareTextPropertyField(
+            shareId = shareId,
+            clazz = property.clazz,
+            displayName = property.displayName,
+            initialValue = property.value ?: "",
+            errorMessage = errorMessage,
+            viewModel = viewModel
+        )
 
-            OutlinedTextField(
-                value = textValue,
-                onValueChange = {
-                    textValue = it
-                    viewModel.updateProperty(shareId, property.clazz, it)
-                },
-                label = { Text(property.displayName) },
-                isError = errorMessage != null,
-                supportingText = errorMessage?.let { { Text(it) } },
-                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                singleLine = true
-            )
-        }
-
-        is PropertyPassword -> {
-            var passwordValue by remember(property.clazz) { mutableStateOf(property.value ?: "") }
-
-            OutlinedTextField(
-                value = passwordValue,
-                onValueChange = {
-                    passwordValue = it
-                    viewModel.updateProperty(shareId, property.clazz, it)
-                },
-                label = { Text(property.displayName) },
-                placeholder = property.hint?.let { { Text(it) } },
-                visualTransformation = PasswordVisualTransformation(),
-                isError = errorMessage != null,
-                supportingText = errorMessage?.let { { Text(it) } },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp),
-                singleLine = true
-            )
-        }
+        is PropertyPassword -> ShareTextPropertyField(
+            shareId = shareId,
+            clazz = property.clazz,
+            displayName = property.displayName,
+            initialValue = property.value ?: "",
+            errorMessage = errorMessage,
+            viewModel = viewModel,
+            hint = property.hint,
+            visualTransformation = PasswordVisualTransformation()
+        )
 
         is PropertyDate -> {
             ShareDatePicker(property, errorMessage = errorMessage, onDateSelected = { dateValue ->
@@ -120,4 +103,35 @@ fun SharePropertyView(shareId: String, property: Property, viewModel: ShareViewM
             )
         }
     }
+}
+
+@Composable
+private fun ShareTextPropertyField(
+    shareId: String,
+    clazz: String,
+    displayName: String,
+    initialValue: String,
+    errorMessage: String?,
+    viewModel: ShareViewModel,
+    hint: String? = null,
+    visualTransformation: VisualTransformation = VisualTransformation.None
+) {
+    var value by remember(clazz) { mutableStateOf(initialValue) }
+
+    OutlinedTextField(
+        value = value,
+        onValueChange = {
+            value = it
+            viewModel.updateProperty(shareId, clazz, it)
+        },
+        label = { Text(displayName) },
+        placeholder = hint?.let { { Text(it) } },
+        visualTransformation = visualTransformation,
+        isError = errorMessage != null,
+        supportingText = errorMessage?.let { { Text(it) } },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        singleLine = true
+    )
 }
