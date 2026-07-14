@@ -87,11 +87,17 @@ import com.nextcloud.android.common.ui.share.model.ui.ShareItemOverlayState
 import com.nextcloud.android.common.ui.share.model.ui.ShareItemType
 import com.nextcloud.android.common.ui.share.model.ui.ShareScreenState
 import com.nextcloud.android.common.ui.share.model.ui.filtered
+import com.nextcloud.android.common.ui.share.model.ui.label
 import com.nextcloud.android.common.ui.share.repository.ShareRemoteRepository
 import kotlinx.coroutines.launch
 
 @Composable
-private fun ShareScreen(sourceId: String, internalLink: String, viewModel: ShareViewModel) {
+private fun ShareScreen(
+    sourceId: String,
+    internalLink: String,
+    viewModel: ShareViewModel,
+    permissionPresets: List<PermissionPreset>
+) {
     val errorMessageId by viewModel.errorMessageId.collectAsState()
     val screenState by viewModel.state.collectAsState()
     val activeShare by viewModel.activeShare.collectAsState()
@@ -166,6 +172,7 @@ private fun ShareScreen(sourceId: String, internalLink: String, viewModel: Share
                             share = share,
                             title = title,
                             type = type,
+                            permissionPresets = permissionPresets,
                             onSelectShare = { selected ->
                                 editorEntry = ShareEditorEntry.EDIT
                                 viewModel.setActiveShare(selected)
@@ -194,6 +201,7 @@ private fun ShareScreen(sourceId: String, internalLink: String, viewModel: Share
             share = activeShareObject,
             internalLink = internalLink,
             viewModel = viewModel,
+            permissionPresets = permissionPresets,
             entry = editorEntry,
             onDismissDraft = { draftShare ->
                 viewModel.deleteShare(draftShare.id)
@@ -208,9 +216,10 @@ private fun ShareItem(
     share: Share,
     title: String,
     type: ShareItemType,
+    permissionPresets: List<PermissionPreset>,
     onSelectShare: (Share) -> Unit,
     onCustomizeShare: (Share) -> Unit,
-    onChangePreset: (Share, PermissionPreset) -> Unit,
+    onChangePreset: (Share, String) -> Unit,
     onDeleteShare: (Share) -> Unit,
     onSendEmail: (Share) -> Unit
 ) {
@@ -220,12 +229,13 @@ private fun ShareItem(
     when (overlayState) {
         is ShareItemOverlayState.QuickShare -> {
             QuickSharePermissionBottomSheet(
-                selectedOption = PermissionPresetOption.from(share.permissionPreset),
+                options = PermissionPresetOption.optionsFor(share, permissionPresets),
+                selectedOption = PermissionPresetOption.from(share.permissionPreset, permissionPresets),
                 onOptionSelected = { option ->
                     overlayState = ShareItemOverlayState.None
-                    val preset = option.preset
-                    if (preset != null) {
-                        onChangePreset(share, preset)
+                    val presetClass = option.presetClass
+                    if (presetClass != null) {
+                        onChangePreset(share, presetClass)
                     } else {
                         onCustomizeShare(share)
                     }
@@ -282,7 +292,7 @@ private fun ShareItem(
         },
         supportingContent = {
             val chipHorizontalPadding = 10.dp
-            val selectedLabelRes = PermissionPresetOption.from(share.permissionPreset).labelRes
+            val selectedLabel = PermissionPresetOption.from(share.permissionPreset, permissionPresets).label()
 
             Row(
                 modifier = Modifier
@@ -294,9 +304,9 @@ private fun ShareItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(contentAlignment = Alignment.CenterStart) {
-                    PermissionPresetOption.entries.forEach { option ->
+                    PermissionPresetOption.optionsFor(share, permissionPresets).forEach { option ->
                         Text(
-                            text = stringResource(option.labelRes),
+                            text = option.label(),
                             style = MaterialTheme.typography.bodyMedium,
                             maxLines = 1,
                             modifier = Modifier
@@ -306,7 +316,7 @@ private fun ShareItem(
                     }
 
                     Text(
-                        text = stringResource(selectedLabelRes),
+                        text = selectedLabel,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.primary,
                         maxLines = 1
@@ -390,7 +400,8 @@ fun ComposeView.initShareScreen(
     sourceId: String,
     internalLink: String,
     credentials: ServerCredentials,
-    colorScheme: ColorScheme
+    colorScheme: ColorScheme,
+    permissionPresets: List<PermissionPreset> = emptyList()
 ) {
     val nextcloudHttpClient = NextcloudHttpClient.create(credentials)
     val viewModel = ShareViewModel(repository = ShareRemoteRepository(nextcloudHttpClient))
@@ -405,7 +416,7 @@ fun ComposeView.initShareScreen(
         MaterialTheme(
             colorScheme = colorScheme,
             content = {
-                ShareScreen(sourceId, internalLink, viewModel)
+                ShareScreen(sourceId, internalLink, viewModel, permissionPresets)
             }
         )
     }

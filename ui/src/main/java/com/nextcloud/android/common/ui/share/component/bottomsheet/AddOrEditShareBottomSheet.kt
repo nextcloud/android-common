@@ -68,6 +68,7 @@ import com.nextcloud.android.common.ui.share.model.api.user.User
 import com.nextcloud.android.common.ui.share.model.ui.PermissionPresetOption
 import com.nextcloud.android.common.ui.share.model.ui.ShareCategory
 import com.nextcloud.android.common.ui.share.model.ui.ShareEditorEntry
+import com.nextcloud.android.common.ui.share.model.ui.label
 import com.nextcloud.android.common.ui.share.repository.MockShareRepository
 import kotlinx.coroutines.launch
 
@@ -77,6 +78,7 @@ fun AddOrEditShareBottomSheet(
     share: Share,
     internalLink: String,
     viewModel: ShareViewModel,
+    permissionPresets: List<PermissionPreset> = emptyList(),
     entry: ShareEditorEntry = ShareEditorEntry.EDIT,
     onDismissDraft: (Share) -> Unit = {}
 ) {
@@ -86,7 +88,7 @@ fun AddOrEditShareBottomSheet(
         mutableStateOf(if (share.belongsAnyoneTab) ShareCategory.Anyone else ShareCategory.Invited)
     }
     val initialPresetOption = when (entry) {
-        ShareEditorEntry.CUSTOMIZE_PERMISSION -> PermissionPresetOption.CUSTOM
+        ShareEditorEntry.CUSTOMIZE_PERMISSION -> PermissionPresetOption.Custom
         else -> null
     }
     var showAdvancedSettings by remember(share.id) { mutableStateOf(entry == ShareEditorEntry.SEND_EMAIL) }
@@ -138,6 +140,7 @@ fun AddOrEditShareBottomSheet(
                 PermissionsView(
                     share = share,
                     initialPresetOption = initialPresetOption,
+                    permissionPresets = permissionPresets,
                     viewModel = viewModel
                 )
 
@@ -210,17 +213,19 @@ private fun ShareCategorySelector(
 private fun PermissionsView(
     share: Share,
     initialPresetOption: PermissionPresetOption?,
+    permissionPresets: List<PermissionPreset>,
     viewModel: ShareViewModel
 ) {
     var selectedPreset by remember(share.id) {
-        mutableStateOf(if (initialPresetOption != null) initialPresetOption.preset else share.permissionPreset)
+        mutableStateOf(if (initialPresetOption != null) initialPresetOption.presetClass else share.permissionPreset)
     }
 
     PermissionPresetDropdown(
-        selectedOption = PermissionPresetOption.from(selectedPreset),
+        options = PermissionPresetOption.optionsFor(share, permissionPresets),
+        selectedOption = PermissionPresetOption.from(selectedPreset, permissionPresets),
         onOptionSelected = { option ->
-            selectedPreset = option.preset
-            option.preset?.let { viewModel.updatePermissionPreset(share.id, it, true) }
+            selectedPreset = option.presetClass
+            option.presetClass?.let { viewModel.updatePermissionPreset(share.id, it, true) }
         }
     )
 
@@ -244,6 +249,7 @@ private fun PermissionsView(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PermissionPresetDropdown(
+    options: List<PermissionPresetOption>,
     selectedOption: PermissionPresetOption,
     onOptionSelected: (PermissionPresetOption) -> Unit
 ) {
@@ -255,7 +261,7 @@ private fun PermissionPresetDropdown(
         onExpandedChange = { expanded = it }
     ) {
         OutlinedTextField(
-            value = stringResource(selectedOption.labelRes),
+            value = selectedOption.label(),
             onValueChange = {},
             readOnly = true,
             label = { Text(stringResource(R.string.share_view_permission_preset_label)) },
@@ -269,9 +275,9 @@ private fun PermissionPresetDropdown(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            PermissionPresetOption.entries.forEach { option ->
+            options.forEach { option ->
                 DropdownMenuItem(
-                    text = { Text(stringResource(option.labelRes)) },
+                    text = { Text(option.label()) },
                     onClick = {
                         expanded = false
                         onOptionSelected(option)
@@ -493,14 +499,14 @@ private val previewShare = Share(
             clazz = "read",
             displayName = "Read",
             priority = 10,
-            presets = listOf(PermissionPreset.VIEW, PermissionPreset.EDIT),
+            presets = listOf("view", "edit"),
             enabled = true
         ),
         Permission(
             clazz = "update",
             displayName = "Update",
             priority = 20,
-            presets = listOf(PermissionPreset.EDIT),
+            presets = listOf("edit"),
             enabled = false
         )
     ),

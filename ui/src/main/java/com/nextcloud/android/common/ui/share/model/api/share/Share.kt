@@ -13,7 +13,6 @@ import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.toClipEntry
 import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.share.model.api.permission.Permission
-import com.nextcloud.android.common.ui.share.model.api.permission.PermissionPreset
 import com.nextcloud.android.common.ui.share.model.api.property.Property
 import com.nextcloud.android.common.ui.share.model.api.recipients.Recipient
 import com.nextcloud.android.common.ui.share.model.api.source.Source
@@ -45,7 +44,7 @@ data class Share(
     val permissions: List<Permission>,
 
     @SerialName("permission_preset")
-    val permissionPreset: PermissionPreset? = null
+    val permissionPreset: String? = null
 ) {
     val basicProperties: List<Property>
         get() = properties.filterNot { it.advanced }.sortedBy { it.priority }
