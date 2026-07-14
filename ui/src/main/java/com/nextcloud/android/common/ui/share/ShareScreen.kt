@@ -95,12 +95,12 @@ import kotlinx.coroutines.launch
 private fun ShareScreen(
     sourceId: String,
     internalLink: String,
-    viewModel: ShareViewModel,
-    permissionPresets: List<PermissionPreset>
+    viewModel: ShareViewModel
 ) {
     val errorMessageId by viewModel.errorMessageId.collectAsState()
     val screenState by viewModel.state.collectAsState()
     val activeShare by viewModel.activeShare.collectAsState()
+    val permissionPresets by viewModel.permissionPresets.collectAsState()
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val resources = LocalResources.current
@@ -400,8 +400,7 @@ fun ComposeView.initShareScreen(
     sourceId: String,
     internalLink: String,
     credentials: ServerCredentials,
-    colorScheme: ColorScheme,
-    permissionPresets: List<PermissionPreset> = emptyList()
+    colorScheme: ColorScheme
 ) {
     val nextcloudHttpClient = NextcloudHttpClient.create(credentials)
     val viewModel = ShareViewModel(repository = ShareRemoteRepository(nextcloudHttpClient))
@@ -416,7 +415,7 @@ fun ComposeView.initShareScreen(
         MaterialTheme(
             colorScheme = colorScheme,
             content = {
-                ShareScreen(sourceId, internalLink, viewModel, permissionPresets)
+                ShareScreen(sourceId, internalLink, viewModel)
             }
         )
     }
