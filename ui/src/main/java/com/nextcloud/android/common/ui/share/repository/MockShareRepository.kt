@@ -8,8 +8,10 @@
 package com.nextcloud.android.common.ui.share.repository
 
 import com.nextcloud.android.common.ui.network.model.NetworkResult
+import com.nextcloud.android.common.ui.share.model.api.capabilities.SharingCapabilities
 import com.nextcloud.android.common.ui.share.model.api.icon.Icon
 import com.nextcloud.android.common.ui.share.model.api.permission.Permission
+import com.nextcloud.android.common.ui.share.model.api.permission.PermissionPreset
 import com.nextcloud.android.common.ui.share.model.api.property.PropertyBoolean
 import com.nextcloud.android.common.ui.share.model.api.property.PropertyDate
 import com.nextcloud.android.common.ui.share.model.api.property.PropertyPassword
@@ -479,4 +481,14 @@ class MockShareRepository : ShareRepository {
         if (index >= 0) mockShares[index] = updated
         return NetworkResult.Success(updated)
     }
+
+    override suspend fun fetchSharingCapabilities(): NetworkResult<SharingCapabilities> =
+        NetworkResult.Success(
+            SharingCapabilities(
+                permissionPresets = listOf(
+                    PermissionPreset(clazz = "view", displayName = "Can view"),
+                    PermissionPreset(clazz = "edit", displayName = "Can edit")
+                )
+            )
+        )
 }
