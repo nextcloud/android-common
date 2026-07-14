@@ -10,6 +10,9 @@ package com.nextcloud.android.common.ui.share.model.api.permission
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+/**
+ * [presets] holds the class identifiers of the [PermissionPreset]s this permission belongs to.
+ */
 @Serializable
 data class Permission(
     @SerialName("class")
@@ -25,7 +28,7 @@ data class Permission(
 
     val priority: Int,
 
-    val presets: List<PermissionPreset>,
+    val presets: List<String>,
 
     val enabled: Boolean
 )

@@ -28,10 +28,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.share.model.ui.PermissionPresetOption
+import com.nextcloud.android.common.ui.share.model.ui.label
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QuickSharePermissionBottomSheet(
+    options: List<PermissionPresetOption>,
     selectedOption: PermissionPresetOption,
     onOptionSelected: (PermissionPresetOption) -> Unit,
     onDismiss: () -> Unit
@@ -55,10 +57,10 @@ fun QuickSharePermissionBottomSheet(
                 modifier = Modifier.padding(16.dp)
             )
 
-            PermissionPresetOption.entries.forEach { option ->
+            options.forEach { option ->
                 ListItem(
                     modifier = Modifier.clickable { onOptionSelected(option) },
-                    headlineContent = { Text(stringResource(option.labelRes)) },
+                    headlineContent = { Text(option.label()) },
                     trailingContent = {
                         if (option == selectedOption) {
                             Icon(

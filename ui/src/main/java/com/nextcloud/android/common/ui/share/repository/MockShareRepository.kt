@@ -10,7 +10,6 @@ package com.nextcloud.android.common.ui.share.repository
 import com.nextcloud.android.common.ui.network.model.NetworkResult
 import com.nextcloud.android.common.ui.share.model.api.icon.Icon
 import com.nextcloud.android.common.ui.share.model.api.permission.Permission
-import com.nextcloud.android.common.ui.share.model.api.permission.PermissionPreset
 import com.nextcloud.android.common.ui.share.model.api.property.PropertyBoolean
 import com.nextcloud.android.common.ui.share.model.api.property.PropertyDate
 import com.nextcloud.android.common.ui.share.model.api.property.PropertyPassword
@@ -46,21 +45,21 @@ class MockShareRepository : ShareRepository {
             clazz = "read",
             displayName = "Read",
             priority = 10,
-            presets = listOf(PermissionPreset.VIEW, PermissionPreset.EDIT),
+            presets = listOf("view", "edit"),
             enabled = true
         ),
         Permission(
             clazz = "update",
             displayName = "Update",
             priority = 20,
-            presets = listOf(PermissionPreset.EDIT),
+            presets = listOf("edit"),
             enabled = false
         ),
         Permission(
             clazz = "delete",
             displayName = "Delete",
             priority = 30,
-            presets = listOf(PermissionPreset.EDIT),
+            presets = listOf("edit"),
             enabled = false
         )
     )
@@ -474,7 +473,7 @@ class MockShareRepository : ShareRepository {
         val current =
             if (index >= 0) mockShares[index] else buildShare(id = id, sources = emptyList(), recipients = emptyList())
         val updated = current.copy(
-            permissionPreset = request.permissionPreset,
+            permissionPreset = request.permissionPresetClass,
             lastUpdated = System.currentTimeMillis()
         )
         if (index >= 0) mockShares[index] = updated
