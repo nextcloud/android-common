@@ -7,7 +7,6 @@
 
 package com.nextcloud.android.common.ui.share.model.api.request
 
-import com.nextcloud.android.common.ui.share.model.api.permission.PermissionPreset
 import com.nextcloud.android.common.ui.share.model.api.state.ShareState
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -61,7 +60,7 @@ data class UpdateSharePermissionRequest(
 
 @Serializable
 data class UpdateSharePermissionPresetRequest(
-    val permissionPreset: PermissionPreset
+    val permissionPresetClass: String
 )
 
 @Serializable
