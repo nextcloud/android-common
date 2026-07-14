@@ -13,6 +13,7 @@ import com.nextcloud.android.common.ui.network.http.NextcloudHttpClient
 import com.nextcloud.android.common.ui.network.model.NetworkResult
 import com.nextcloud.android.common.ui.network.model.OcsResponse
 import com.nextcloud.android.common.ui.network.serialization.OCSSerializer
+import com.nextcloud.android.common.ui.share.model.api.capabilities.SharingCapabilities
 import com.nextcloud.android.common.ui.share.model.api.recipients.Recipient
 import com.nextcloud.android.common.ui.share.model.api.request.AddRecipientRequest
 import com.nextcloud.android.common.ui.share.model.api.request.AddSourceRequest
@@ -23,6 +24,9 @@ import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareProper
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareRecipientSecretRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareStateRequest
 import com.nextcloud.android.common.ui.share.model.api.share.Share
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.decodeFromJsonElement
+import kotlinx.serialization.json.jsonObject
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.net.URLEncoder
 
@@ -38,6 +42,9 @@ class ShareRemoteRepository(
         private const val SHARES_ENDPOINT = "/ocs/v2.php/apps/sharing/api/v1/shares"
         private const val RECIPIENTS_ENDPOINT = "/ocs/v2.php/apps/sharing/api/v1/recipients"
         private const val SECRET_ENDPOINT = "/ocs/v2.php/apps/sharing/api/v1/secret"
+        private const val CAPABILITIES_ENDPOINT = "/ocs/v2.php/cloud/capabilities"
+        private const val NODE_CAPABILITIES = "capabilities"
+        private const val NODE_SHARING = "sharing"
     }
 
     override suspend fun fetchRecipients(
@@ -225,5 +232,15 @@ class ShareRemoteRepository(
             method = HttpMethod.GET
         ) { body ->
             json.decodeFromString<OcsResponse<String>>(body).ocs.data
+        }
+
+    override suspend fun fetchSharingCapabilities(): NetworkResult<SharingCapabilities> =
+        client.executeRequest(
+            endpoint = CAPABILITIES_ENDPOINT,
+            method = HttpMethod.GET
+        ) { body ->
+            val sharing = json.decodeFromString<OcsResponse<JsonObject>>(body)
+                .ocs.data[NODE_CAPABILITIES]?.jsonObject?.get(NODE_SHARING)
+            sharing?.let { json.decodeFromJsonElement<SharingCapabilities>(it) } ?: SharingCapabilities()
         }
 }
