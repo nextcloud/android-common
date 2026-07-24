@@ -93,7 +93,9 @@ class ShareViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             val result = repository.fetchSharingCapabilities()
             if (result is NetworkResult.Success) {
-                _permissionPresets.update { result.data.permissionPresets }
+                _permissionPresets.update {
+                    result.data.permissionPresets
+                }
             }
         }
     }

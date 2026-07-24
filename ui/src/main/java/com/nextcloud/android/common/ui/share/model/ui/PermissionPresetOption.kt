@@ -25,7 +25,11 @@ sealed interface PermissionPresetOption {
     companion object {
         fun optionsFor(share: Share, presets: List<PermissionPreset>): List<PermissionPresetOption> {
             val applicableClasses = share.permissions.flatMap { it.presets }.toSet()
-            return presets.filter { it.clazz in applicableClasses }.map { Preset(it) } + Custom
+            val defaultClass = share.defaultPermissionPresetClass
+            return  presets
+                .filter { it.clazz in applicableClasses }
+                .sortedByDescending { it.clazz == defaultClass }
+                .map { Preset(it) } + Custom
         }
 
         fun from(presetClass: String?, presets: List<PermissionPreset>): PermissionPresetOption {
