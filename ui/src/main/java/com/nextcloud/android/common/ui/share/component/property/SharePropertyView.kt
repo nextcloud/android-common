@@ -20,6 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -117,13 +118,12 @@ private fun ShareTextPropertyField(
     visualTransformation: VisualTransformation = VisualTransformation.None
 ) {
     var value by remember(clazz) { mutableStateOf(initialValue) }
+    var committedValue by remember(clazz) { mutableStateOf(initialValue) }
+    var wasFocused by remember(clazz) { mutableStateOf(false) }
 
     OutlinedTextField(
         value = value,
-        onValueChange = {
-            value = it
-            viewModel.updateProperty(shareId, clazz, it)
-        },
+        onValueChange = { value = it },
         label = { Text(displayName) },
         placeholder = hint?.let { { Text(it) } },
         visualTransformation = visualTransformation,
@@ -131,7 +131,14 @@ private fun ShareTextPropertyField(
         supportingText = errorMessage?.let { { Text(it) } },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
+            .padding(vertical = 4.dp)
+            .onFocusChanged { focusState ->
+                if (wasFocused && !focusState.isFocused && value != committedValue) {
+                    committedValue = value
+                    viewModel.updateProperty(shareId, clazz, value)
+                }
+                wasFocused = focusState.isFocused
+            },
         singleLine = true
     )
 }
