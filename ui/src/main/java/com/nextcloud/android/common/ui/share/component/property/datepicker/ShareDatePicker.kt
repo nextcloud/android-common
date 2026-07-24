@@ -28,6 +28,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.nextcloud.android.common.ui.R
+import com.nextcloud.android.common.ui.share.component.property.datepicker.util.NoPastSelectableDates
 import com.nextcloud.android.common.ui.share.component.property.datepicker.util.ShareDateFormatter
 import com.nextcloud.android.common.ui.share.model.api.property.PropertyDate
 
@@ -80,7 +81,9 @@ private fun DatePickerModal(
     onDateSelected: (displayDate: String?, isoDate: String?) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val datePickerState = rememberDatePickerState()
+    val datePickerState = rememberDatePickerState(
+        selectableDates = remember { NoPastSelectableDates() }
+    )
 
     DatePickerDialog(
         onDismissRequest = onDismiss,
