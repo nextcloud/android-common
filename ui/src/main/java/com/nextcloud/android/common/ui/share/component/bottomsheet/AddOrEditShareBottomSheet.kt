@@ -219,7 +219,8 @@ private fun PermissionsView(
     viewModel: ShareViewModel
 ) {
     var selectedPreset by remember(share.id) {
-        mutableStateOf(if (initialPresetOption != null) initialPresetOption.presetClass else share.permissionPreset)
+        val default = share.getDefaultPermissionPresetOption(permissionPresets).presetClass
+        mutableStateOf(initialPresetOption?.presetClass ?: share.permissionPreset ?: default)
     }
 
     PermissionPresetDropdown(
