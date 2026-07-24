@@ -24,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -39,13 +40,11 @@ fun CustomLink(
     onGenerateSecret: suspend () -> String?,
     onTokenChange: (String) -> Unit
 ) {
-    val scope = rememberCoroutineScope()
     val prefix = remember(recipient.secret.url, recipient.secret.value) {
         val url = recipient.secret.url.orEmpty()
         val token = recipient.secret.value.orEmpty()
         if (token.isNotEmpty() && url.endsWith(token)) url.removeSuffix(token) else url
     }
-    var token by remember(recipient.value) { mutableStateOf(recipient.secret.value ?: "") }
 
     Column(
         modifier = Modifier
@@ -66,32 +65,60 @@ fun CustomLink(
             modifier = Modifier.padding(top = 4.dp, bottom = 8.dp)
         )
 
-        OutlinedTextField(
-            value = token,
-            onValueChange = { newValue ->
-                val trimmed = newValue.take(MAX_TOKEN_LENGTH)
-                token = trimmed
-                if (trimmed.isNotBlank()) onTokenChange(trimmed)
-            },
-            label = { Text(prefix) },
-            singleLine = true,
-            trailingIcon = {
-                IconButton(
-                    onClick = {
-                        scope.launch {
-                            val generated = onGenerateSecret() ?: return@launch
-                            token = generated
-                            onTokenChange(generated)
-                        }
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Refresh,
-                        contentDescription = stringResource(R.string.share_view_custom_link_refresh)
-                    )
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
+        CustomLinkTokenField(
+            initialToken = recipient.secret.value ?: "",
+            prefix = prefix,
+            onGenerateSecret = onGenerateSecret,
+            onCommit = onTokenChange
         )
     }
+}
+
+@Composable
+private fun CustomLinkTokenField(
+    initialToken: String,
+    prefix: String,
+    onGenerateSecret: suspend () -> String?,
+    onCommit: (String) -> Unit
+) {
+    val scope = rememberCoroutineScope()
+    var token by remember(initialToken) { mutableStateOf(initialToken) }
+    var committedToken by remember(initialToken) { mutableStateOf(initialToken) }
+    var wasFocused by remember(initialToken) { mutableStateOf(false) }
+
+    fun commit() {
+        if (token == committedToken || token.isBlank()) return
+        committedToken = token
+        onCommit(token)
+    }
+
+    OutlinedTextField(
+        value = token,
+        onValueChange = { newValue -> token = newValue.take(MAX_TOKEN_LENGTH) },
+        label = { Text(prefix) },
+        singleLine = true,
+        trailingIcon = {
+            IconButton(
+                onClick = {
+                    scope.launch {
+                        val generated = onGenerateSecret() ?: return@launch
+                        token = generated
+                        committedToken = generated
+                        onCommit(generated)
+                    }
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Refresh,
+                    contentDescription = stringResource(R.string.share_view_custom_link_refresh)
+                )
+            }
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .onFocusChanged { focusState ->
+                if (wasFocused && !focusState.isFocused) commit()
+                wasFocused = focusState.isFocused
+            }
+    )
 }

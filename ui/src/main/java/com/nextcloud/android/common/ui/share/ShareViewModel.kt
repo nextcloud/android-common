@@ -32,7 +32,6 @@ import com.nextcloud.android.common.ui.share.repository.ShareRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.debounce
@@ -50,7 +49,6 @@ class ShareViewModel(
 
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY = 300L
-        private const val PROPERTY_DEBOUNCE_DELAY = 1000L
     }
 
     private val _state = MutableStateFlow<ShareScreenState>(ShareScreenState.Loading)
@@ -270,7 +268,6 @@ class ShareViewModel(
     fun updateRecipientSecret(shareId: String, recipient: Recipient, secret: String) {
         secretUpdateJob?.cancel()
         secretUpdateJob = viewModelScope.launch(Dispatchers.IO) {
-            delay(PROPERTY_DEBOUNCE_DELAY.milliseconds)
             val request = UpdateShareRecipientSecretRequest(
                 clazz = recipient.clazz,
                 value = recipient.value,
@@ -300,7 +297,6 @@ class ShareViewModel(
             _propertyErrors.update { it - clazz }
         }
         propertyUpdateJobs[clazz] = viewModelScope.launch(Dispatchers.IO) {
-            delay(PROPERTY_DEBOUNCE_DELAY.milliseconds)
             when (val result = repository.updateShareProperty(shareId, UpdateSharePropertyRequest(clazz, value))) {
                 is NetworkResult.Success -> {
                     _propertyErrors.update { it - clazz }
