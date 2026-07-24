@@ -102,6 +102,17 @@ data class Share(
         recipients.firstOrNull { it.secret.updatable }
     }
 
+    val defaultPermissionPresetClass: String? by lazy {
+        val enabledClasses = permissions.filter { it.enabled }.map { it.clazz }.toSet()
+        if (enabledClasses.isEmpty()) {
+            null
+        } else {
+            permissions.flatMap { it.presets }.distinct().firstOrNull { presetClass ->
+                permissions.filter { presetClass in it.presets }.map { it.clazz }.toSet() == enabledClasses
+            }
+        }
+    }
+
     val canSend: Boolean
         get() {
             return sources.isNotEmpty() &&
