@@ -35,6 +35,10 @@ import com.nextcloud.android.common.ui.share.model.api.property.PropertyEnum
 import com.nextcloud.android.common.ui.share.model.api.property.PropertyPassword
 import com.nextcloud.android.common.ui.share.model.api.property.PropertyString
 
+private const val SINGLE_LINE_COUNT = 1
+private const val MULTILINE_MIN_LINES = 1
+private const val MULTILINE_MAX_LINES = 3
+
 @Composable
 fun SharePropertyView(shareId: String, property: Property, viewModel: ShareViewModel) {
     val propertyErrors by viewModel.propertyErrors.collectAsStateWithLifecycle()
@@ -80,18 +84,14 @@ private fun SharePropertyField(
 
         is PropertyString -> ShareTextPropertyField(
             shareId = shareId,
-            clazz = property.clazz,
-            displayName = property.displayName,
-            initialValue = property.value ?: "",
+            property = property,
             isError = isError,
             viewModel = viewModel
         )
 
         is PropertyPassword -> ShareTextPropertyField(
             shareId = shareId,
-            clazz = property.clazz,
-            displayName = property.displayName,
-            initialValue = property.value ?: "",
+            property = property,
             isError = isError,
             viewModel = viewModel,
             visualTransformation = PasswordVisualTransformation()
@@ -114,24 +114,29 @@ private fun SharePropertyField(
 @Composable
 private fun ShareTextPropertyField(
     shareId: String,
-    clazz: String,
-    displayName: String,
-    initialValue: String,
+    property: Property,
     isError: Boolean,
     viewModel: ShareViewModel,
     visualTransformation: VisualTransformation = VisualTransformation.None
 ) {
+    val stringProperty = property as? PropertyString
+    val isMultiline = stringProperty?.isMultiline == true
+    val maxLength = stringProperty?.maxLength
+    val clazz = property.clazz
+    val initialValue = property.value ?: ""
     var value by remember(clazz) { mutableStateOf(initialValue) }
     var committedValue by remember(clazz) { mutableStateOf(initialValue) }
     var wasFocused by remember(clazz) { mutableStateOf(false) }
 
     OutlinedTextField(
         value = value,
-        onValueChange = {
-            value = it
-            viewModel.onPropertyEdited(clazz, it != committedValue)
+        onValueChange = { newValue ->
+            if (maxLength == null || newValue.length <= maxLength) {
+                value = newValue
+                viewModel.onPropertyEdited(clazz, newValue != committedValue)
+            }
         },
-        label = { Text(displayName) },
+        label = { Text(property.displayName) },
         visualTransformation = visualTransformation,
         isError = isError,
         modifier = Modifier
@@ -144,6 +149,8 @@ private fun ShareTextPropertyField(
                 }
                 wasFocused = focusState.isFocused
             },
-        singleLine = true
+        singleLine = !isMultiline,
+        minLines = if (isMultiline) MULTILINE_MIN_LINES else SINGLE_LINE_COUNT,
+        maxLines = if (isMultiline) MULTILINE_MAX_LINES else SINGLE_LINE_COUNT
     )
 }
