@@ -16,4 +16,4 @@ sealed class ShareScreenState {
     data class Loaded(val shares: List<Share>): ShareScreenState()
 }
 
-fun List<Share>.filtered(): List<Share> = filter { it.shareState != ShareState.DRAFT }
+fun List<Share>.activeOnly(): List<Share> = filter { it.shareState == ShareState.ACTIVE }
