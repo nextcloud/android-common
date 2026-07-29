@@ -76,6 +76,8 @@ import com.nextcloud.android.common.ui.share.model.ui.label
 import com.nextcloud.android.common.ui.share.repository.MockShareRepository
 import kotlinx.coroutines.launch
 
+private const val CUSTOM_SELECTION = "custom"
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddOrEditShareBottomSheet(
@@ -90,10 +92,6 @@ fun AddOrEditShareBottomSheet(
     val categories = remember { ShareCategory.entries.toList() }
     var selectedCategory by rememberSaveable(share.id) {
         mutableStateOf(if (share.belongsAnyoneTab) ShareCategory.Anyone else ShareCategory.Invited)
-    }
-    val initialPresetOption = when (entry) {
-        ShareEditorEntry.CUSTOMIZE_PERMISSION -> PermissionPresetOption.Custom
-        else -> null
     }
     var showAdvancedSettings by rememberSaveable(share.id) { mutableStateOf(entry == ShareEditorEntry.SEND_EMAIL) }
     val context = LocalContext.current
@@ -145,7 +143,7 @@ fun AddOrEditShareBottomSheet(
 
                 PermissionsView(
                     share = share,
-                    initialPresetOption = initialPresetOption,
+                    entry = entry,
                     permissionPresets = permissionPresets,
                     viewModel = viewModel
                 )
@@ -218,20 +216,30 @@ private fun ShareCategorySelector(
 @Composable
 private fun PermissionsView(
     share: Share,
-    initialPresetOption: PermissionPresetOption?,
+    entry: ShareEditorEntry,
     permissionPresets: List<PermissionPreset>,
     viewModel: ShareViewModel
 ) {
-    var selectedPreset by rememberSaveable(share.id) {
-        val default = share.getDefaultPermissionPresetOption(permissionPresets).presetClass
-        mutableStateOf(initialPresetOption?.presetClass ?: share.permissionPreset ?: default)
+    // Null follows the preset the backend reports, which is only known once the draft has a source.
+    // Anything else is the user's explicit pick and wins from then on, so staying on "Can…" is sticky
+    // even when the toggles they flip happen to add up to a preset.
+    var userSelection by rememberSaveable(share.id) {
+        mutableStateOf(
+            if (entry == ShareEditorEntry.CUSTOMIZE_PERMISSION) CUSTOM_SELECTION else null
+        )
+    }
+
+    val selectedPreset = when (userSelection) {
+        null -> share.permissionPreset
+        CUSTOM_SELECTION -> null
+        else -> userSelection
     }
 
     PermissionPresetDropdown(
         options = PermissionPresetOption.optionsFor(share, permissionPresets),
         selectedOption = PermissionPresetOption.from(selectedPreset, permissionPresets),
         onOptionSelected = { option ->
-            selectedPreset = option.presetClass
+            userSelection = option.presetClass ?: CUSTOM_SELECTION
             option.presetClass?.let { viewModel.updatePermissionPreset(share.id, it, true) }
         }
     )
@@ -240,7 +248,9 @@ private fun PermissionsView(
 
     share.permissions.forEach { permission ->
         key(permission.clazz) {
-            var checked by remember { mutableStateOf(permission.enabled) }
+            var checked by remember(permission.clazz, permission.enabled) {
+                mutableStateOf(permission.enabled)
+            }
             ShareSwitch(
                 label = permission.displayName,
                 checked = checked,
