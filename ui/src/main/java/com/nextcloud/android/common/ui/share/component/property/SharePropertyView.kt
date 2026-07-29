@@ -127,7 +127,10 @@ private fun ShareTextPropertyField(
 
     OutlinedTextField(
         value = value,
-        onValueChange = { value = it },
+        onValueChange = {
+            value = it
+            viewModel.onPropertyEdited(clazz, it != committedValue)
+        },
         label = { Text(displayName) },
         visualTransformation = visualTransformation,
         isError = isError,

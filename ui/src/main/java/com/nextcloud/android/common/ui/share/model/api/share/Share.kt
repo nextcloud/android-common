@@ -117,6 +117,10 @@ data class Share(
     val invitedRecipients: List<Recipient>
         get() = recipients.filterNot { it.clazz == Recipient.TOKEN_RECIPIENT_CLASS }
 
+    val hasUnsentInput: Boolean
+        get() = shareState == ShareState.DRAFT &&
+            (invitedRecipients.isNotEmpty() || properties.any { it.isFilledIn })
+
     val canSend: Boolean
         get() {
             return sources.isNotEmpty() &&

@@ -32,6 +32,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -42,6 +43,7 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -59,6 +61,7 @@ import com.nextcloud.android.common.ui.share.component.CollapsibleShareSection
 import com.nextcloud.android.common.ui.share.component.CustomLink
 import com.nextcloud.android.common.ui.share.component.SelectRecipientField
 import com.nextcloud.android.common.ui.share.component.ShareSwitch
+import com.nextcloud.android.common.ui.share.component.dialog.DiscardShareConfirmationDialog
 import com.nextcloud.android.common.ui.share.component.property.SharePropertyView
 import com.nextcloud.android.common.ui.share.model.api.permission.Permission
 import com.nextcloud.android.common.ui.share.model.api.permission.PermissionPreset
@@ -88,7 +91,22 @@ fun AddOrEditShareBottomSheet(
     entry: ShareEditorEntry = ShareEditorEntry.EDIT,
     onDismissDraft: (Share) -> Unit = {}
 ) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val unsavedProperties by viewModel.unsavedProperties.collectAsStateWithLifecycle()
+
+    val hasUnsavedWork by rememberUpdatedState(share.hasUnsentInput || unsavedProperties.isNotEmpty())
+    var showDiscardConfirmation by rememberSaveable(share.id) { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true,
+        confirmValueChange = { value ->
+            val blocked = value == SheetValue.Hidden && hasUnsavedWork
+            if (blocked) {
+                showDiscardConfirmation = true
+            }
+            !blocked
+        }
+    )
     val categories = remember { ShareCategory.entries.toList() }
     var selectedCategory by rememberSaveable(share.id) {
         mutableStateOf(if (share.belongsAnyoneTab) ShareCategory.Anyone else ShareCategory.Invited)
@@ -106,10 +124,14 @@ fun AddOrEditShareBottomSheet(
     ) {
         ModalBottomSheet(
             onDismissRequest = {
-                if (share.shareState == ShareState.DRAFT) {
-                    onDismissDraft(share)
-                } else {
-                    viewModel.setActiveShare(null)
+                when {
+                    hasUnsavedWork -> {
+                        showDiscardConfirmation = true
+                        scope.launch { sheetState.show() }
+                    }
+
+                    share.shareState == ShareState.DRAFT -> onDismissDraft(share)
+                    else -> viewModel.setActiveShare(null)
                 }
             },
             sheetState = sheetState,
@@ -181,6 +203,19 @@ fun AddOrEditShareBottomSheet(
                     )
                 }
             }
+        }
+
+        if (showDiscardConfirmation) {
+            val isDraft = share.shareState == ShareState.DRAFT
+
+            DiscardShareConfirmationDialog(
+                isDraft = isDraft,
+                onConfirm = {
+                    showDiscardConfirmation = false
+                    if (isDraft) onDismissDraft(share) else viewModel.setActiveShare(null)
+                },
+                onDismiss = { showDiscardConfirmation = false }
+            )
         }
     }
 }
