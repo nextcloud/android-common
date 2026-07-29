@@ -22,4 +22,8 @@ data class Source(
     val displayName: String,
 
     val icon: Icon? = null
-)
+) {
+    companion object {
+        const val NODE_SOURCE_CLASS = """OCA\Files\Sharing\Source\NodeShareSourceType"""
+    }
+}

@@ -10,7 +10,6 @@ package com.nextcloud.android.common.ui.share.component.property
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,28 +45,37 @@ fun SharePropertyView(shareId: String, property: Property, viewModel: ShareViewM
         null
     }
 
+    Column {
+        SharePropertyField(
+            shareId = shareId,
+            property = property,
+            isError = errorMessage != null,
+            viewModel = viewModel
+        )
+
+        SharePropertyMessage(errorMessage = errorMessage, hint = property.hint)
+    }
+}
+
+@Composable
+private fun SharePropertyField(
+    shareId: String,
+    property: Property,
+    isError: Boolean,
+    viewModel: ShareViewModel
+) {
     when (property) {
         is PropertyBoolean -> {
             var checkedValue by remember(property.clazz) { mutableStateOf(property.isTrue()) }
 
-            Column {
-                ShareSwitch(
-                    label = property.displayName,
-                    checked = checkedValue,
-                    onCheckedChange = { isChecked ->
-                        checkedValue = isChecked
-                        viewModel.updateProperty(shareId, property.clazz, isChecked.toString())
-                    }
-                )
-                if (errorMessage != null) {
-                    Text(
-                        text = errorMessage,
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)
-                    )
+            ShareSwitch(
+                label = property.displayName,
+                checked = checkedValue,
+                onCheckedChange = { isChecked ->
+                    checkedValue = isChecked
+                    viewModel.updateProperty(shareId, property.clazz, isChecked.toString())
                 }
-            }
+            )
         }
 
         is PropertyString -> ShareTextPropertyField(
@@ -75,7 +83,7 @@ fun SharePropertyView(shareId: String, property: Property, viewModel: ShareViewM
             clazz = property.clazz,
             displayName = property.displayName,
             initialValue = property.value ?: "",
-            errorMessage = errorMessage,
+            isError = isError,
             viewModel = viewModel
         )
 
@@ -84,25 +92,22 @@ fun SharePropertyView(shareId: String, property: Property, viewModel: ShareViewM
             clazz = property.clazz,
             displayName = property.displayName,
             initialValue = property.value ?: "",
-            errorMessage = errorMessage,
+            isError = isError,
             viewModel = viewModel,
-            hint = property.hint,
             visualTransformation = PasswordVisualTransformation()
         )
 
-        is PropertyDate -> {
-            ShareDatePicker(property, errorMessage = errorMessage, onDateSelected = { dateValue ->
-                viewModel.updateProperty(shareId, property.clazz, dateValue)
-            })
-        }
+        is PropertyDate -> ShareDatePicker(
+            property = property,
+            isError = isError,
+            onDateSelected = { dateValue -> viewModel.updateProperty(shareId, property.clazz, dateValue) }
+        )
 
-        is PropertyEnum -> {
-            SharePropertyEnumField(
-                property = property,
-                errorMessage = errorMessage,
-                onValueSelected = { value -> viewModel.updateProperty(shareId, property.clazz, value) }
-            )
-        }
+        is PropertyEnum -> SharePropertyEnumField(
+            property = property,
+            isError = isError,
+            onValueSelected = { value -> viewModel.updateProperty(shareId, property.clazz, value) }
+        )
     }
 }
 
@@ -112,9 +117,8 @@ private fun ShareTextPropertyField(
     clazz: String,
     displayName: String,
     initialValue: String,
-    errorMessage: String?,
+    isError: Boolean,
     viewModel: ShareViewModel,
-    hint: String? = null,
     visualTransformation: VisualTransformation = VisualTransformation.None
 ) {
     var value by remember(clazz) { mutableStateOf(initialValue) }
@@ -125,10 +129,8 @@ private fun ShareTextPropertyField(
         value = value,
         onValueChange = { value = it },
         label = { Text(displayName) },
-        placeholder = hint?.let { { Text(it) } },
         visualTransformation = visualTransformation,
-        isError = errorMessage != null,
-        supportingText = errorMessage?.let { { Text(it) } },
+        isError = isError,
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)

@@ -48,6 +48,10 @@ data class Share(
     @SerialName("permission_preset")
     val permissionPreset: String? = null
 ) {
+    companion object {
+        private const val LABEL_PROPERTY_CLASS = "label"
+    }
+
     val basicProperties: List<Property> by lazy {
         properties.filterNot { it.advanced }.sortedBy { it.priority }
     }
@@ -71,14 +75,12 @@ data class Share(
     }
 
     fun getClipEntry(internalLink: String, category: ShareCategory): ClipEntry? {
-        val recipient = recipients.firstOrNull() ?: return null
-
-        return if (category == ShareCategory.Anyone) {
-            val link = recipient.secret.url ?: return null
-            ClipData.newPlainText(recipient.displayName, link).toClipEntry()
-        } else {
-            ClipData.newPlainText(recipient.displayName, internalLink).toClipEntry()
+        if (category == ShareCategory.Anyone) {
+            val recipient = customLinkRecipient ?: return null
+            return recipient.secret.url?.let { ClipData.newPlainText(recipient.displayName, it).toClipEntry() }
         }
+
+        return recipients.firstOrNull()?.let { ClipData.newPlainText(it.displayName, internalLink).toClipEntry() }
     }
 
     fun getHeadline(context: Context, shares: List<Share>): String {
@@ -86,14 +88,24 @@ data class Share(
             return recipients.firstOrNull()?.displayName ?: ""
         }
 
-        val publicLinks = shares.filter { it.belongsAnyoneTab }
-        return if (publicLinks.size <= 1) {
-            context.getString(R.string.share_view_public_link)
-        } else {
-            val position = publicLinks.sortedBy { it.lastUpdated }.indexOfFirst { it.id == id } + 1
-            context.getString(R.string.share_view_public_link_numbered, position)
-        }
+        return label ?: publicLinkHeadline(context, shares)
     }
+
+    private fun publicLinkHeadline(context: Context, shares: List<Share>): String {
+        val publicLinks = shares.filter { it.belongsAnyoneTab }
+        if (publicLinks.size <= 1) {
+            return context.getString(R.string.share_view_public_link)
+        }
+
+        val position = publicLinks.sortedBy { it.lastUpdated }.indexOfFirst { it.id == id } + 1
+        return context.getString(R.string.share_view_public_link_numbered, position)
+    }
+
+    val label: String?
+        get() = properties
+            .firstOrNull { it.clazz.contains(LABEL_PROPERTY_CLASS, ignoreCase = true) }
+            ?.value
+            ?.takeIf { it.isNotBlank() }
 
     val belongsAnyoneTab: Boolean
         get() {
@@ -103,6 +115,9 @@ data class Share(
     val customLinkRecipient: Recipient? by lazy {
         recipients.firstOrNull { it.secret.updatable }
     }
+
+    val invitedRecipients: List<Recipient>
+        get() = recipients.filterNot { it.clazz == Recipient.TOKEN_RECIPIENT_CLASS }
 
     // The preset matching the enabled permissions dictated by the server admin:
     // only the read permission -> "Can view", every permission -> "Can edit", any other subset -> "Can ...".

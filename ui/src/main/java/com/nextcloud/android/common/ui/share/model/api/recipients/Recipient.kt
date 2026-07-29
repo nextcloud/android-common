@@ -34,4 +34,7 @@ data class Recipient(
     companion object {
         const val TOKEN_RECIPIENT_CLASS = """OC\Core\Sharing\Recipient\TokenShareRecipientType"""
     }
+
+    fun isSameAs(other: Recipient): Boolean =
+        clazz == other.clazz && value == other.value && instance == other.instance
 }
