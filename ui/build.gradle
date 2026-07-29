@@ -59,6 +59,12 @@ dependencies {
     implementation("androidx.compose.material:material-icons-core")
     // endregion
 
+    // region lifecycle
+    api "androidx.lifecycle:lifecycle-viewmodel:$lifecycleVersion"
+    api "androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-runtime-compose:$lifecycleVersion"
+    // endregion
+
     implementation("io.coil-kt.coil3:coil-compose:3.5.0")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.5.0")
     implementation("io.coil-kt.coil3:coil-svg:3.5.0")

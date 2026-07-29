@@ -24,16 +24,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.svg.SvgDecoder
@@ -96,9 +96,9 @@ private fun SelectedRecipient(recipient: Recipient, onClear: () -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun RecipientSearch(share: Share, viewModel: ShareViewModel) {
-    var query by remember { mutableStateOf("") }
-    var expanded by remember { mutableStateOf(false) }
-    val results by viewModel.recipientSearchResults.collectAsState()
+    val query by viewModel.searchQuery.collectAsStateWithLifecycle()
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    val results by viewModel.recipientSearchResults.collectAsStateWithLifecycle()
 
     ExposedDropdownMenuBox(
         modifier = Modifier
@@ -110,7 +110,6 @@ private fun RecipientSearch(share: Share, viewModel: ShareViewModel) {
         OutlinedTextField(
             value = query,
             onValueChange = {
-                query = it
                 expanded = true
                 viewModel.onSearchQueryChanged(it)
             },
@@ -130,7 +129,7 @@ private fun RecipientSearch(share: Share, viewModel: ShareViewModel) {
                     results = results,
                     onSelect = { recipient ->
                         viewModel.addRecipient(share.id, recipient.clazz, recipient.value)
-                        query = ""
+                        viewModel.onSearchQueryChanged("")
                         expanded = false
                     }
                 )

@@ -35,12 +35,12 @@ import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboard
@@ -49,6 +49,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.share.ShareViewModel
 import com.nextcloud.android.common.ui.share.component.CollapsibleShareSection
@@ -84,17 +86,17 @@ fun AddOrEditShareBottomSheet(
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val categories = remember { ShareCategory.entries.toList() }
-    var selectedCategory by remember(share.id) {
+    var selectedCategory by rememberSaveable(share.id) {
         mutableStateOf(if (share.belongsAnyoneTab) ShareCategory.Anyone else ShareCategory.Invited)
     }
     val initialPresetOption = when (entry) {
         ShareEditorEntry.CUSTOMIZE_PERMISSION -> PermissionPresetOption.Custom
         else -> null
     }
-    var showAdvancedSettings by remember(share.id) { mutableStateOf(entry == ShareEditorEntry.SEND_EMAIL) }
+    var showAdvancedSettings by rememberSaveable(share.id) { mutableStateOf(entry == ShareEditorEntry.SEND_EMAIL) }
     val context = LocalContext.current
-    val propertyErrors by viewModel.propertyErrors.collectAsState()
-    val pendingProperties by viewModel.pendingProperties.collectAsState()
+    val propertyErrors by viewModel.propertyErrors.collectAsStateWithLifecycle()
+    val pendingProperties by viewModel.pendingProperties.collectAsStateWithLifecycle()
     val hasPropertyErrors = propertyErrors.isNotEmpty()
     val sendEnabled = !hasPropertyErrors && pendingProperties.isEmpty()
 
@@ -218,7 +220,7 @@ private fun PermissionsView(
     permissionPresets: List<PermissionPreset>,
     viewModel: ShareViewModel
 ) {
-    var selectedPreset by remember(share.id) {
+    var selectedPreset by rememberSaveable(share.id) {
         val default = share.getDefaultPermissionPresetOption(permissionPresets).presetClass
         mutableStateOf(initialPresetOption?.presetClass ?: share.permissionPreset ?: default)
     }
@@ -458,7 +460,7 @@ private fun AddOrEditShareBottomSheetPreview() {
         AddOrEditShareBottomSheet(
             share = previewShare,
             internalLink = "internal_link",
-            viewModel = ShareViewModel(MockShareRepository())
+            viewModel = ShareViewModel(MockShareRepository(), SavedStateHandle())
         )
     }
 }
