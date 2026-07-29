@@ -91,7 +91,6 @@ import com.nextcloud.android.common.ui.share.model.ui.ShareEditorEntry
 import com.nextcloud.android.common.ui.share.model.ui.ShareItemOverlayState
 import com.nextcloud.android.common.ui.share.model.ui.ShareItemType
 import com.nextcloud.android.common.ui.share.model.ui.ShareScreenState
-import com.nextcloud.android.common.ui.share.model.ui.filtered
 import com.nextcloud.android.common.ui.share.model.ui.label
 import com.nextcloud.android.common.ui.share.repository.ShareRemoteRepository
 
@@ -149,7 +148,7 @@ private fun ShareScreen(
             )
 
             is ShareScreenState.Loaded -> ShareList(
-                shares = state.shares.filtered(),
+                shares = state.shares,
                 permissionPresets = permissionPresets,
                 paddingValues = paddingValues,
                 viewModel = viewModel

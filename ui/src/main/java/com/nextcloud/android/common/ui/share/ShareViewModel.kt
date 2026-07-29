@@ -29,7 +29,7 @@ import com.nextcloud.android.common.ui.share.model.ui.ActiveShareState
 import com.nextcloud.android.common.ui.share.model.ui.ShareCategory
 import com.nextcloud.android.common.ui.share.model.ui.ShareEditorEntry
 import com.nextcloud.android.common.ui.share.model.ui.ShareScreenState
-import com.nextcloud.android.common.ui.share.model.ui.filtered
+import com.nextcloud.android.common.ui.share.model.ui.activeOnly
 import com.nextcloud.android.common.ui.share.repository.ShareRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -174,10 +174,7 @@ class ShareViewModel(
         _errorMessageId.update { null }
 
         val fetched = fetchAllShares() ?: return
-        _state.update {
-            if (fetched.filtered().isEmpty()) ShareScreenState.Empty
-            else ShareScreenState.Loaded(fetched)
-        }
+        publishShares(fetched.activeOnly())
     }
 
     // The server pages drafts and active shares together while the list only renders active ones,
@@ -219,7 +216,6 @@ class ShareViewModel(
 
             updateEditorEntry(ShareEditorEntry.EDIT)
             updateActiveShare(draft.toActiveShare())
-            _state.update { ShareScreenState.Loaded(listOf(draft) + currentShares) }
 
             applySource(draft.id, sourceId)
         }
@@ -409,11 +405,7 @@ class ShareViewModel(
             val result = repository.deleteShare(id)
             result.dataOrElse { _errorMessageId.update { R.string.share_view_delete_error_message } } ?: return@launch
 
-            val remaining = currentShares.filterNot { it.id == id }
-            _state.update {
-                if (remaining.filtered().isEmpty()) ShareScreenState.Empty
-                else ShareScreenState.Loaded(remaining)
-            }
+            publishShares(currentShares.filterNot { it.id == id })
 
             val editingShare = _activeShare.value
             if (editingShare is ActiveShareState.Editing && editingShare.share.id == id) {
@@ -454,9 +446,27 @@ class ShareViewModel(
         updateActiveShare(value)
     }
 
+    // The list only ever holds active shares, so a draft being edited never reaches it and an
+    // activated one is inserted rather than silently dropped.
     private fun replaceInList(updated: Share) {
-        val shares = currentShares.ifEmpty { return }
-        _state.update { ShareScreenState.Loaded(shares.map { if (it.id == updated.id) updated else it }) }
+        val current = currentShares
+        val index = current.indexOfFirst { it.id == updated.id }
+        val isActive = updated.shareState == ShareState.ACTIVE
+
+        val shares = when {
+            index >= 0 && isActive -> current.toMutableList().apply { this[index] = updated }
+            index >= 0 -> current.filterNot { it.id == updated.id }
+            isActive -> listOf(updated) + current
+            else -> return
+        }
+
+        publishShares(shares)
+    }
+
+    private fun publishShares(shares: List<Share>) {
+        _state.update {
+            if (shares.isEmpty()) ShareScreenState.Empty else ShareScreenState.Loaded(shares)
+        }
     }
     // endregion
 }
