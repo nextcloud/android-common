@@ -23,6 +23,7 @@ import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareProper
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareRecipientSecretRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareStateRequest
 import com.nextcloud.android.common.ui.share.model.api.share.Share
+import com.nextcloud.android.common.ui.share.model.api.source.Source
 import com.nextcloud.android.common.ui.share.model.api.state.ShareState
 import com.nextcloud.android.common.ui.share.model.ui.ActiveShareState
 import com.nextcloud.android.common.ui.share.model.ui.ShareCategory
@@ -69,6 +70,12 @@ class ShareViewModel(
 
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing
+
+    private val _isPreparingLink = MutableStateFlow(false)
+    val isPreparingLink: StateFlow<Boolean> = _isPreparingLink
+
+    private val _shareReadyToCopy = MutableStateFlow<Share?>(null)
+    val shareReadyToCopy: StateFlow<Share?> = _shareReadyToCopy
 
     private val _activeShare = MutableStateFlow<ActiveShareState>(ActiveShareState.None)
     val activeShare: StateFlow<ActiveShareState> = _activeShare
@@ -165,7 +172,11 @@ class ShareViewModel(
     private suspend fun loadShares() {
         _errorMessageId.update { null }
 
-        val result = repository.fetchShares(filterSourceTypeValue = sourceId, limit = SHARES_PAGE_SIZE)
+        val result = repository.fetchShares(
+            filterSourceTypeValue = sourceId,
+            limit = SHARES_PAGE_SIZE,
+            filterSourceTypeClass = Source.NODE_SOURCE_CLASS
+        )
         val fetched = result.dataOrElse { _errorMessageId.update { R.string.share_view_fetch_error_message } }
             ?: return
         _state.update {
@@ -194,30 +205,49 @@ class ShareViewModel(
     // endregion
 
     // region state
-    fun updateState(id: String, shareState: ShareState, updateAndDontDismiss: Boolean = false) {
+    fun updateState(id: String, shareState: ShareState) {
         viewModelScope.launch(Dispatchers.IO) {
-            val result = repository.updateShareState(id, UpdateShareStateRequest(shareState))
-            val updated = result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
-                ?: return@launch
+            val updated = applyState(id, shareState) ?: return@launch
+
             if (shareState == ShareState.ACTIVE) {
-                if (updateAndDontDismiss) {
-                    refreshActiveShare(ActiveShareState.Activating(updated))
-                } else {
-                    updateActiveShare(ActiveShareState.None)
-                }
+                updateActiveShare(ActiveShareState.None)
             } else {
                 refreshActiveShare(updated.toActiveShare())
             }
             replaceInList(updated)
         }
     }
+
+    fun prepareLinkForCopy(id: String) {
+        if (_isPreparingLink.value) return
+
+        viewModelScope.launch(Dispatchers.IO) {
+            _isPreparingLink.update { true }
+
+            val updated = applyState(id, ShareState.ACTIVE)
+            if (updated != null) {
+                refreshActiveShare(ActiveShareState.Activating(updated))
+                replaceInList(updated)
+                _shareReadyToCopy.update { updated }
+            }
+
+            _isPreparingLink.update { false }
+        }
+    }
+
+    fun onLinkCopied() {
+        _shareReadyToCopy.update { null }
+    }
+
+    private suspend fun applyState(id: String, shareState: ShareState): Share? {
+        val result = repository.updateShareState(id, UpdateShareStateRequest(shareState))
+        return result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
+    }
     // endregion
 
     // region sources
     private suspend fun applySource(id: String, value: String) {
-        // TODO pass from the clients this may vary depends on the client so notes and files for now uses this
-        val clazz = "OCA\\Files\\Sharing\\Source\\NodeShareSourceType"
-        val result = repository.addShareSource(id, AddSourceRequest(clazz, value))
+        val result = repository.addShareSource(id, AddSourceRequest(Source.NODE_SOURCE_CLASS, value))
         val updated = result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
             ?: return
         refreshActiveShare(updated.toActiveShare())
@@ -379,6 +409,7 @@ class ShareViewModel(
     fun setActiveShare(value: Share?, entry: ShareEditorEntry = ShareEditorEntry.EDIT) {
         _propertyErrors.update { emptyMap() }
         _pendingProperties.update { emptySet() }
+        _shareReadyToCopy.update { null }
         updateEditorEntry(entry)
         updateActiveShare(value?.toActiveShare() ?: ActiveShareState.None)
     }

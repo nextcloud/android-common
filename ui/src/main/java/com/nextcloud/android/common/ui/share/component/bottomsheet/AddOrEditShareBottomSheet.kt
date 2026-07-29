@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
@@ -35,6 +36,7 @@ import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -361,35 +363,34 @@ private fun ActionButtons(
     sendEnabled: Boolean,
     viewModel: ShareViewModel
 ) {
+    val localClipboard = LocalClipboard.current
+    val scope = rememberCoroutineScope()
+    val isPreparingLink by viewModel.isPreparingLink.collectAsStateWithLifecycle()
+    val shareReadyToCopy by viewModel.shareReadyToCopy.collectAsStateWithLifecycle()
+
+    LaunchedEffect(shareReadyToCopy) {
+        val ready = shareReadyToCopy ?: return@LaunchedEffect
+        ready.getClipEntry(internalLink, category)?.let { localClipboard.setClipEntry(it) }
+        viewModel.onLinkCopied()
+    }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        val localClipboard = LocalClipboard.current
-        val scope = rememberCoroutineScope()
-
         Button(
             onClick = {
-                scope.launch {
-                    share.getClipEntry(internalLink, category)?.let {
-                        if (category == ShareCategory.Anyone) {
-
-                            // recompose ActionButtons
-                            viewModel.updateState(share.id, ShareState.ACTIVE, updateAndDontDismiss = true)
-
-                            // share object is updated active share
-                            if (share.shareState == ShareState.ACTIVE) {
-                                localClipboard.setClipEntry(it)
-                            }
-                        } else {
-                            localClipboard.setClipEntry(it)
-                        }
+                if (category == ShareCategory.Anyone) {
+                    viewModel.prepareLinkForCopy(share.id)
+                } else {
+                    scope.launch {
+                        share.getClipEntry(internalLink, category)?.let { localClipboard.setClipEntry(it) }
                     }
                 }
             },
-            enabled = category != ShareCategory.Anyone || sendEnabled,
+            enabled = !isPreparingLink && (category != ShareCategory.Anyone || sendEnabled),
             modifier = Modifier.weight(1f),
             shape = RoundedCornerShape(10.dp),
             colors = ButtonDefaults.buttonColors(
@@ -397,11 +398,19 @@ private fun ActionButtons(
                 contentColor = MaterialTheme.colorScheme.onSurface,
             ),
         ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_link),
-                contentDescription = null,
-                modifier = Modifier.size(20.dp),
-            )
+            if (isPreparingLink) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(20.dp),
+                    strokeWidth = 2.dp,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            } else {
+                Icon(
+                    painter = painterResource(R.drawable.ic_link),
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp),
+                )
+            }
             Text(
                 text = stringResource(category.copyLinkTitleId),
                 modifier = Modifier.padding(start = 8.dp),

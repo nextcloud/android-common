@@ -29,7 +29,7 @@ import com.nextcloud.android.common.ui.share.model.api.property.PropertyEnum
 @Composable
 fun SharePropertyEnumField(
     property: PropertyEnum,
-    errorMessage: String?,
+    isError: Boolean,
     onValueSelected: (String) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -49,8 +49,7 @@ fun SharePropertyEnumField(
             singleLine = true,
             label = { Text(property.displayName) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            isError = errorMessage != null,
-            supportingText = errorMessage?.let { { Text(it) } },
+            isError = isError,
             modifier = Modifier
                 .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true)
                 .fillMaxWidth()
