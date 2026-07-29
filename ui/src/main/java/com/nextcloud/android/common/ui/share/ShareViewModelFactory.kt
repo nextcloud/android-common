@@ -15,6 +15,7 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import com.nextcloud.android.common.ui.share.repository.ShareRepository
 
 class ShareViewModelFactory(
+    private val sourceId: String,
     private val repositoryProvider: () -> ShareRepository
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
@@ -27,6 +28,6 @@ class ShareViewModelFactory(
         }
 
         val savedStateHandle: SavedStateHandle = extras.createSavedStateHandle()
-        return ShareViewModel(repositoryProvider(), savedStateHandle) as T
+        return ShareViewModel(repositoryProvider(), sourceId, savedStateHandle) as T
     }
 }

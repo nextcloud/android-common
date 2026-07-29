@@ -324,18 +324,15 @@ class MockShareRepository : ShareRepository {
     }
 
     override suspend fun fetchShares(
+        filterSourceTypeValue: String,
+        limit: Int,
         filterSourceTypeClass: String?,
-        filterSourceTypeValue: String?,
-        lastShareID: String?,
-        limit: Int
+        lastShareID: String?
     ): NetworkResult<List<Share>> {
-        var result = mockShares.toList()
-
-        if (filterSourceTypeClass != null) {
-            result = result.filter { share ->
-                share.sources.any {
-                    it.clazz == filterSourceTypeClass && (filterSourceTypeValue == null || it.value == filterSourceTypeValue)
-                }
+        var result = mockShares.filter { share ->
+            share.sources.any {
+                it.value == filterSourceTypeValue &&
+                    (filterSourceTypeClass == null || it.clazz == filterSourceTypeClass)
             }
         }
 
