@@ -13,14 +13,12 @@ import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.toClipEntry
 import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.share.model.api.permission.Permission
-import com.nextcloud.android.common.ui.share.model.api.permission.PermissionPreset
 import com.nextcloud.android.common.ui.share.model.api.property.Property
 import com.nextcloud.android.common.ui.share.model.api.recipients.Recipient
 import com.nextcloud.android.common.ui.share.model.api.source.Source
 import com.nextcloud.android.common.ui.share.model.api.state.ShareState
 import com.nextcloud.android.common.ui.share.model.api.user.User
 import com.nextcloud.android.common.ui.share.model.ui.ActiveShareState
-import com.nextcloud.android.common.ui.share.model.ui.PermissionPresetOption
 import com.nextcloud.android.common.ui.share.model.ui.ShareCategory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -118,20 +116,6 @@ data class Share(
 
     val invitedRecipients: List<Recipient>
         get() = recipients.filterNot { it.clazz == Recipient.TOKEN_RECIPIENT_CLASS }
-
-    // The preset matching the enabled permissions dictated by the server admin:
-    // only the read permission -> "Can view", every permission -> "Can edit", any other subset -> "Can ...".
-    fun getDefaultPermissionPresetOption(permissionPresets: List<PermissionPreset>): PermissionPresetOption {
-        val presetControlled = permissions.filter { it.presets.isNotEmpty() }
-        val enabledClasses = presetControlled.filter { it.enabled }.map { it.clazz }.toSet()
-        if (enabledClasses.isEmpty()) return PermissionPresetOption.Custom
-
-        val matchingPreset = permissionPresets.firstOrNull { preset ->
-            presetControlled.filter { preset.clazz in it.presets }.map { it.clazz }.toSet() == enabledClasses
-        }
-
-        return matchingPreset?.let { PermissionPresetOption.Preset(it) } ?: PermissionPresetOption.Custom
-    }
 
     val canSend: Boolean
         get() {
