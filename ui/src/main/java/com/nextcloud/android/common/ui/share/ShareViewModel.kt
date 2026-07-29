@@ -17,7 +17,6 @@ import com.nextcloud.android.common.ui.share.model.api.permission.PermissionPres
 import com.nextcloud.android.common.ui.share.model.api.recipients.Recipient
 import com.nextcloud.android.common.ui.share.model.api.request.AddRecipientRequest
 import com.nextcloud.android.common.ui.share.model.api.request.AddSourceRequest
-import com.nextcloud.android.common.ui.share.model.api.request.GetShareRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePermissionPresetRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePermissionRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePropertyRequest
@@ -51,6 +50,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 class ShareViewModel(
     private val repository: ShareRepository,
+    private val sourceId: String,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -66,6 +66,9 @@ class ShareViewModel(
 
     private val _state = MutableStateFlow<ShareScreenState>(ShareScreenState.Loading)
     val state: StateFlow<ShareScreenState> = _state
+
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing
 
     private val _activeShare = MutableStateFlow<ActiveShareState>(ActiveShareState.None)
     val activeShare: StateFlow<ActiveShareState> = _activeShare
@@ -149,27 +152,20 @@ class ShareViewModel(
     // endregion
 
     // region shares list
-    fun fetchShares(
-        filterSourceTypeClass: String? = null,
-        filterSourceTypeValue: String? = null,
-        lastShareID: String? = null,
-        limit: Int = SHARES_PAGE_SIZE
-    ) {
+    fun refreshShares() {
+        if (_isRefreshing.value) return
+
         viewModelScope.launch(Dispatchers.IO) {
-            loadShares(filterSourceTypeClass, filterSourceTypeValue, lastShareID, limit)
+            _isRefreshing.update { true }
+            loadShares()
+            _isRefreshing.update { false }
         }
     }
 
-    private suspend fun loadShares(
-        filterSourceTypeClass: String? = null,
-        filterSourceTypeValue: String? = null,
-        lastShareID: String? = null,
-        limit: Int = SHARES_PAGE_SIZE
-    ) {
-        _state.update { ShareScreenState.Loading }
+    private suspend fun loadShares() {
         _errorMessageId.update { null }
 
-        val result = repository.fetchShares(filterSourceTypeClass, filterSourceTypeValue, lastShareID, limit)
+        val result = repository.fetchShares(filterSourceTypeValue = sourceId, limit = SHARES_PAGE_SIZE)
         val fetched = result.dataOrElse { _errorMessageId.update { R.string.share_view_fetch_error_message } }
             ?: return
         _state.update {
@@ -177,23 +173,10 @@ class ShareViewModel(
             else ShareScreenState.Loaded(fetched)
         }
     }
-
-    fun fetchShare(id: String, request: GetShareRequest = GetShareRequest()) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _errorMessageId.update { null }
-
-            val result = repository.fetchShare(id, request)
-            val share = result.dataOrElse { _errorMessageId.update { R.string.share_view_fetch_error_message } }
-                ?: return@launch
-
-            updateActiveShare(share.toActiveShare())
-            replaceInList(share)
-        }
-    }
     // endregion
 
     // region create
-    fun createDraftShare(sourceValue: String) {
+    fun createDraftShare() {
         viewModelScope.launch(Dispatchers.IO) {
             _errorMessageId.update { null }
 
@@ -205,7 +188,7 @@ class ShareViewModel(
             updateActiveShare(draft.toActiveShare())
             _state.update { ShareScreenState.Loaded(listOf(draft) + currentShares) }
 
-            applySource(draft.id, sourceValue)
+            applySource(draft.id, sourceId)
         }
     }
     // endregion
@@ -231,12 +214,6 @@ class ShareViewModel(
     // endregion
 
     // region sources
-    fun addSource(id: String, value: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            applySource(id, value)
-        }
-    }
-
     private suspend fun applySource(id: String, value: String) {
         // TODO pass from the clients this may vary depends on the client so notes and files for now uses this
         val clazz = "OCA\\Files\\Sharing\\Source\\NodeShareSourceType"
@@ -245,16 +222,6 @@ class ShareViewModel(
             ?: return
         refreshActiveShare(updated.toActiveShare())
         replaceInList(updated)
-    }
-
-    fun removeSource(id: String, clazz: String, value: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val result = repository.removeShareSource(id, clazz, value)
-            val updated = result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
-                ?: return@launch
-            refreshActiveShare(updated.toActiveShare())
-            replaceInList(updated)
-        }
     }
     // endregion
 

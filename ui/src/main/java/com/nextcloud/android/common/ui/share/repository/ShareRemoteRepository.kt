@@ -92,15 +92,15 @@ class ShareRemoteRepository(
         ) { }
 
     override suspend fun fetchShares(
+        filterSourceTypeValue: String,
+        limit: Int,
         filterSourceTypeClass: String?,
-        filterSourceTypeValue: String?,
-        lastShareID: String?,
-        limit: Int
+        lastShareID: String?
     ): NetworkResult<List<Share>> {
         val queryParams = buildString {
             append("?limit=$limit")
+            append("&filterSourceTypeValue=${filterSourceTypeValue.urlEncoded()}")
             filterSourceTypeClass?.let { append("&filterSourceTypeClass=${it.urlEncoded()}") }
-            filterSourceTypeValue?.let { append("&filterSourceTypeValue=${it.urlEncoded()}") }
             lastShareID?.let { append("&lastShareID=${it.urlEncoded()}") }
         }
         return client.executeRequest(
