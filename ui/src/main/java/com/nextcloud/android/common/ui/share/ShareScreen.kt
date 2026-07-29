@@ -11,6 +11,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -33,6 +34,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -44,6 +46,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -92,9 +95,11 @@ import com.nextcloud.android.common.ui.share.model.ui.filtered
 import com.nextcloud.android.common.ui.share.model.ui.label
 import com.nextcloud.android.common.ui.share.repository.ShareRemoteRepository
 
+private val FIRST_ITEM_TOP_SPACING = 16.dp
+private val ITEM_SPACING = 2.dp
+
 @Composable
 private fun ShareScreen(
-    sourceId: String,
     internalLink: String,
     viewModel: ShareViewModel
 ) {
@@ -105,7 +110,6 @@ private fun ShareScreen(
     val editorEntry by viewModel.editorEntry.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val resources = LocalResources.current
-    val context = LocalContext.current
 
     LaunchedEffect(errorMessageId) {
         errorMessageId?.let {
@@ -117,7 +121,7 @@ private fun ShareScreen(
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { viewModel.createDraftShare(sourceId) },
+                onClick = { viewModel.createDraftShare() },
             ) {
                 Icon(painterResource(R.drawable.ic_person_add), contentDescription = "Add")
             }
@@ -137,53 +141,19 @@ private fun ShareScreen(
                 }
             }
 
-            is ShareScreenState.Empty -> {
-                ContentUnavailableView(
-                    iconId = R.drawable.ic_person_add,
-                    title = stringResource(R.string.share_view_empty_title),
-                )
-            }
+            is ShareScreenState.Empty -> ShareList(
+                shares = emptyList(),
+                permissionPresets = permissionPresets,
+                paddingValues = paddingValues,
+                viewModel = viewModel
+            )
 
-            is ShareScreenState.Loaded -> {
-                LazyColumn(
-                    modifier = Modifier
-                        .padding(paddingValues)
-                        .fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    val shares = state.shares.filtered()
-                    itemsIndexed(shares, key = { _, share -> share.id }) { index, share ->
-                        val type = ShareItemType.type(index, shares.lastIndex)
-                        val title = share.getHeadline(context, shares)
-
-                        if (index == 0) {
-                            Spacer(modifier = Modifier.height(16.dp))
-                        } else {
-                            Spacer(modifier = Modifier.height(2.dp))
-                        }
-
-                        ShareItem(
-                            share = share,
-                            title = title,
-                            type = type,
-                            permissionPresets = permissionPresets,
-                            onSelectShare = { selected ->
-                                viewModel.setActiveShare(selected, ShareEditorEntry.EDIT)
-                            },
-                            onCustomizeShare = { selected ->
-                                viewModel.setActiveShare(selected, ShareEditorEntry.CUSTOMIZE_PERMISSION)
-                            },
-                            onChangePreset = { selected, preset ->
-                                viewModel.updatePermissionPreset(selected.id, preset, updateActiveShare = false)
-                            },
-                            onDeleteShare = { viewModel.deleteShare(it.id) },
-                            onSendEmail = { selected ->
-                                viewModel.setActiveShare(selected, ShareEditorEntry.SEND_EMAIL)
-                            }
-                        )
-                    }
-                }
-            }
+            is ShareScreenState.Loaded -> ShareList(
+                shares = state.shares.filtered(),
+                permissionPresets = permissionPresets,
+                paddingValues = paddingValues,
+                viewModel = viewModel
+            )
         }
     }
 
@@ -199,6 +169,66 @@ private fun ShareScreen(
                 viewModel.setActiveShare(null)
             }
         )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ShareList(
+    shares: List<Share>,
+    permissionPresets: List<PermissionPreset>,
+    paddingValues: PaddingValues,
+    viewModel: ShareViewModel
+) {
+    val context = LocalContext.current
+    val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
+
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = viewModel::refreshShares,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)
+    ) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (shares.isEmpty()) {
+                item {
+                    Box(modifier = Modifier.fillParentMaxSize()) {
+                        ContentUnavailableView(
+                            iconId = R.drawable.ic_person_add,
+                            title = stringResource(R.string.share_view_empty_title),
+                        )
+                    }
+                }
+            }
+
+            itemsIndexed(shares, key = { _, share -> share.id }) { index, share ->
+                Spacer(modifier = Modifier.height(if (index == 0) FIRST_ITEM_TOP_SPACING else ITEM_SPACING))
+
+                ShareItem(
+                    share = share,
+                    title = share.getHeadline(context, shares),
+                    type = ShareItemType.type(index, shares.lastIndex),
+                    permissionPresets = permissionPresets,
+                    onSelectShare = { selected ->
+                        viewModel.setActiveShare(selected, ShareEditorEntry.EDIT)
+                    },
+                    onCustomizeShare = { selected ->
+                        viewModel.setActiveShare(selected, ShareEditorEntry.CUSTOMIZE_PERMISSION)
+                    },
+                    onChangePreset = { selected, preset ->
+                        viewModel.updatePermissionPreset(selected.id, preset, updateActiveShare = false)
+                    },
+                    onDeleteShare = { viewModel.deleteShare(it.id) },
+                    onSendEmail = { selected ->
+                        viewModel.setActiveShare(selected, ShareEditorEntry.SEND_EMAIL)
+                    }
+                )
+            }
+        }
     }
 }
 
@@ -396,7 +426,7 @@ fun ComposeView.initShareScreen(
     credentials: ServerCredentials,
     colorScheme: ColorScheme
 ) {
-    val factory = ShareViewModelFactory {
+    val factory = ShareViewModelFactory(sourceId) {
         ShareRemoteRepository(NextcloudHttpClient.create(credentials))
     }
     val viewModel = ViewModelProvider.create(viewModelStoreOwner, factory)[ShareViewModel::class]
@@ -411,7 +441,7 @@ fun ComposeView.initShareScreen(
         MaterialTheme(
             colorScheme = colorScheme,
             content = {
-                ShareScreen(sourceId, internalLink, viewModel)
+                ShareScreen(internalLink, viewModel)
             }
         )
     }

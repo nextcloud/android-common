@@ -38,10 +38,10 @@ interface ShareRepository {
     suspend fun deleteShare(id: String): NetworkResult<Unit>
 
     suspend fun fetchShares(
+        filterSourceTypeValue: String,
+        limit: Int,
         filterSourceTypeClass: String? = null,
-        filterSourceTypeValue: String? = null,
-        lastShareID: String? = null,
-        limit: Int
+        lastShareID: String? = null
     ): NetworkResult<List<Share>>
 
     suspend fun updateShareState(

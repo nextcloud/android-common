@@ -460,7 +460,7 @@ private fun AddOrEditShareBottomSheetPreview() {
         AddOrEditShareBottomSheet(
             share = previewShare,
             internalLink = "internal_link",
-            viewModel = ShareViewModel(MockShareRepository(), SavedStateHandle())
+            viewModel = ShareViewModel(MockShareRepository(), "preview-source", SavedStateHandle())
         )
     }
 }
