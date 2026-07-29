@@ -60,7 +60,8 @@ class ShareViewModel(
         private const val SEARCH_SUBSCRIPTION_TIMEOUT = 5_000L
         private const val RECIPIENT_SEARCH_LIMIT = 10
         private const val RECIPIENT_SEARCH_OFFSET = 0
-        private const val SHARES_PAGE_SIZE = 50
+        private const val SHARES_PAGE_SIZE = 100
+        private const val MAX_SHARE_PAGES = 20
     }
 
     private val savedState = ShareSavedState(savedStateHandle)
@@ -172,17 +173,38 @@ class ShareViewModel(
     private suspend fun loadShares() {
         _errorMessageId.update { null }
 
-        val result = repository.fetchShares(
-            filterSourceTypeValue = sourceId,
-            limit = SHARES_PAGE_SIZE,
-            filterSourceTypeClass = Source.NODE_SOURCE_CLASS
-        )
-        val fetched = result.dataOrElse { _errorMessageId.update { R.string.share_view_fetch_error_message } }
-            ?: return
+        val fetched = fetchAllShares() ?: return
         _state.update {
             if (fetched.filtered().isEmpty()) ShareScreenState.Empty
             else ShareScreenState.Loaded(fetched)
         }
+    }
+
+    // The server pages drafts and active shares together while the list only renders active ones,
+    // so a file with a page worth of abandoned drafts would otherwise hide every real share.
+    private suspend fun fetchAllShares(): List<Share>? {
+        val shares = mutableListOf<Share>()
+        var cursor: String? = null
+        var page = 0
+
+        while (page < MAX_SHARE_PAGES) {
+            val result = repository.fetchShares(
+                filterSourceTypeValue = sourceId,
+                limit = SHARES_PAGE_SIZE,
+                filterSourceTypeClass = Source.NODE_SOURCE_CLASS,
+                lastShareID = cursor
+            )
+            val fetched = result.dataOrElse { _errorMessageId.update { R.string.share_view_fetch_error_message } }
+                ?: return null
+
+            shares += fetched
+            if (fetched.size < SHARES_PAGE_SIZE) break
+
+            cursor = fetched.last().id
+            page++
+        }
+
+        return shares
     }
     // endregion
 
