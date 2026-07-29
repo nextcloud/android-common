@@ -8,7 +8,11 @@
 package com.nextcloud.android.common.ui.share.component
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -19,7 +23,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.InputChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -43,67 +47,79 @@ import com.nextcloud.android.common.ui.share.model.api.icon.Icon
 import com.nextcloud.android.common.ui.share.model.api.recipients.Recipient
 import com.nextcloud.android.common.ui.share.model.api.share.Share
 
+private val FIELD_PADDING = 12.dp
+private val CHIP_SPACING = 8.dp
+private val CHIP_AVATAR_SIZE = 20.dp
+private val CHIP_CLOSE_ICON_SIZE = 18.dp
+private val RESULT_ICON_SIZE = 20.dp
+
 @Composable
 fun SelectRecipientField(
     share: Share,
     viewModel: ShareViewModel
 ) {
-    val selectedRecipient = share.recipients.firstOrNull { it.clazz != Recipient.TOKEN_RECIPIENT_CLASS }
+    val selected = share.invitedRecipients
 
-    if (selectedRecipient == null) {
-        RecipientSearch(share, viewModel)
-        return
-    }
-
-    SelectedRecipient(
-        recipient = selectedRecipient,
-        onClear = {
-            viewModel.removeRecipient(
-                id = share.id,
-                clazz = selectedRecipient.clazz,
-                value = selectedRecipient.value,
-                instance = selectedRecipient.instance
-            )
-        }
-    )
-}
-
-@Composable
-private fun SelectedRecipient(recipient: Recipient, onClear: () -> Unit) {
-    OutlinedTextField(
-        value = recipient.displayName,
-        onValueChange = {},
-        readOnly = true,
-        singleLine = true,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(12.dp),
-        label = { Text(stringResource(R.string.share_view_select_recipient_label)) },
-        leadingIcon = {
-            recipient.icon?.let { RecipientIcon(icon = it, modifier = Modifier.size(24.dp)) }
-        },
-        trailingIcon = {
-            IconButton(onClick = onClear) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = stringResource(R.string.share_view_select_recipient_clear)
+    Column(modifier = Modifier.fillMaxWidth()) {
+        RecipientChips(
+            recipients = selected,
+            onRemove = { recipient ->
+                viewModel.removeRecipient(
+                    id = share.id,
+                    clazz = recipient.clazz,
+                    value = recipient.value,
+                    instance = recipient.instance
                 )
             }
+        )
+
+        RecipientSearch(share = share, selected = selected, viewModel = viewModel)
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun RecipientChips(recipients: List<Recipient>, onRemove: (Recipient) -> Unit) {
+    if (recipients.isEmpty()) return
+
+    FlowRow(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = FIELD_PADDING),
+        horizontalArrangement = Arrangement.spacedBy(CHIP_SPACING)
+    ) {
+        recipients.forEach { recipient ->
+            InputChip(
+                selected = false,
+                onClick = { onRemove(recipient) },
+                label = { Text(recipient.displayName) },
+                avatar = {
+                    recipient.icon?.let { RecipientIcon(icon = it, modifier = Modifier.size(CHIP_AVATAR_SIZE)) }
+                },
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = stringResource(R.string.share_view_select_recipient_clear),
+                        modifier = Modifier.size(CHIP_CLOSE_ICON_SIZE)
+                    )
+                }
+            )
         }
-    )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun RecipientSearch(share: Share, viewModel: ShareViewModel) {
+private fun RecipientSearch(share: Share, selected: List<Recipient>, viewModel: ShareViewModel) {
     val query by viewModel.searchQuery.collectAsStateWithLifecycle()
     var expanded by rememberSaveable { mutableStateOf(false) }
     val results by viewModel.recipientSearchResults.collectAsStateWithLifecycle()
+    val suggestions = results.filterNot { result -> selected.any { it.isSameAs(result) } }
 
     ExposedDropdownMenuBox(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(12.dp),
+            .padding(FIELD_PADDING),
         expanded = expanded && query.isNotBlank(),
         onExpandedChange = { expanded = it }
     ) {
@@ -126,9 +142,9 @@ private fun RecipientSearch(share: Share, viewModel: ShareViewModel) {
                 onDismissRequest = { expanded = false }
             ) {
                 RecipientDropdownContent(
-                    results = results,
+                    results = suggestions,
                     onSelect = { recipient ->
-                        viewModel.addRecipient(share.id, recipient.clazz, recipient.value)
+                        viewModel.addRecipient(share.id, recipient.clazz, recipient.value, recipient.instance)
                         viewModel.onSearchQueryChanged("")
                         expanded = false
                     }
@@ -162,7 +178,7 @@ private fun RecipientDropdownContent(
                     recipient.icon?.let {
                         RecipientIcon(
                             icon = it,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(RESULT_ICON_SIZE)
                         )
                     }
                 },
