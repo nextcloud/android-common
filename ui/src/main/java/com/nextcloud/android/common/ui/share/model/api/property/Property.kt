@@ -96,4 +96,11 @@ data class PropertyString(
     override val value: String? = null,
     @SerialName("min_length") val minLength: Int? = null,
     @SerialName("max_length") val maxLength: Int? = null
-) : Property()
+) : Property() {
+    companion object {
+        private const val SINGLE_LINE_MAX_LENGTH = 255
+    }
+
+    val isMultiline: Boolean
+        get() = maxLength == null || maxLength > SINGLE_LINE_MAX_LENGTH
+}
