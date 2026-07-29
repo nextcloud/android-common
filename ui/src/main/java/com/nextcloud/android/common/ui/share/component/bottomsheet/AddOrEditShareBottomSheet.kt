@@ -220,9 +220,6 @@ private fun PermissionsView(
     permissionPresets: List<PermissionPreset>,
     viewModel: ShareViewModel
 ) {
-    // Null follows the preset the backend reports, which is only known once the draft has a source.
-    // Anything else is the user's explicit pick and wins from then on, so staying on "Can…" is sticky
-    // even when the toggles they flip happen to add up to a preset.
     var userSelection by rememberSaveable(share.id) {
         mutableStateOf(
             if (entry == ShareEditorEntry.CUSTOMIZE_PERMISSION) CUSTOM_SELECTION else null
