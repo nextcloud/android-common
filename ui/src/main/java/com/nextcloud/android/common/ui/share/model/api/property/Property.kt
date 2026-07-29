@@ -23,6 +23,9 @@ sealed class Property {
     abstract val required: Boolean
     abstract val advanced: Boolean
     abstract val value: String?
+
+    open val isFilledIn: Boolean
+        get() = !value.isNullOrBlank()
 }
 
 @Serializable
@@ -37,6 +40,9 @@ data class PropertyBoolean(
     override val value: String? = null
 ) : Property() {
     fun isTrue(): Boolean = value == "true"
+
+    override val isFilledIn: Boolean
+        get() = isTrue()
 }
 
 @Serializable

@@ -106,6 +106,9 @@ class ShareViewModel(
     private val _pendingProperties = MutableStateFlow<Set<String>>(emptySet())
     val pendingProperties: StateFlow<Set<String>> = _pendingProperties
 
+    private val _unsavedProperties = MutableStateFlow<Set<String>>(emptySet())
+    val unsavedProperties: StateFlow<Set<String>> = _unsavedProperties
+
     private val propertyUpdateJobs = mutableMapOf<String, Job>()
 
     private var secretUpdateJob: Job? = null
@@ -345,9 +348,14 @@ class ShareViewModel(
     // endregion
 
     // region properties
+    fun onPropertyEdited(clazz: String, unsaved: Boolean) {
+        _unsavedProperties.update { if (unsaved) it + clazz else it - clazz }
+    }
+
     fun updateProperty(shareId: String, clazz: String, value: String?) {
         propertyUpdateJobs[clazz]?.cancel()
         _pendingProperties.update { it + clazz }
+        _unsavedProperties.update { it - clazz }
         if (value.isNullOrEmpty()) {
             _propertyErrors.update { it - clazz }
         }
@@ -423,6 +431,7 @@ class ShareViewModel(
     fun setActiveShare(value: Share?, entry: ShareEditorEntry = ShareEditorEntry.EDIT) {
         _propertyErrors.update { emptyMap() }
         _pendingProperties.update { emptySet() }
+        _unsavedProperties.update { emptySet() }
         _shareReadyToCopy.update { null }
         updateEditorEntry(entry)
         updateActiveShare(value?.toActiveShare() ?: ActiveShareState.None)
