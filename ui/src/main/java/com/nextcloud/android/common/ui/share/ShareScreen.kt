@@ -46,11 +46,10 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -67,6 +66,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.ImageLoader
 import coil3.compose.setSingletonImageLoaderFactory
 import coil3.svg.SvgDecoder
@@ -89,7 +91,6 @@ import com.nextcloud.android.common.ui.share.model.ui.ShareScreenState
 import com.nextcloud.android.common.ui.share.model.ui.filtered
 import com.nextcloud.android.common.ui.share.model.ui.label
 import com.nextcloud.android.common.ui.share.repository.ShareRemoteRepository
-import kotlinx.coroutines.launch
 
 @Composable
 private fun ShareScreen(
@@ -97,14 +98,13 @@ private fun ShareScreen(
     internalLink: String,
     viewModel: ShareViewModel
 ) {
-    val errorMessageId by viewModel.errorMessageId.collectAsState()
-    val screenState by viewModel.state.collectAsState()
-    val activeShare by viewModel.activeShare.collectAsState()
-    val permissionPresets by viewModel.permissionPresets.collectAsState()
-    val scope = rememberCoroutineScope()
+    val errorMessageId by viewModel.errorMessageId.collectAsStateWithLifecycle()
+    val screenState by viewModel.state.collectAsStateWithLifecycle()
+    val activeShare by viewModel.activeShare.collectAsStateWithLifecycle()
+    val permissionPresets by viewModel.permissionPresets.collectAsStateWithLifecycle()
+    val editorEntry by viewModel.editorEntry.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val resources = LocalResources.current
-    var editorEntry by remember { mutableStateOf(ShareEditorEntry.EDIT) }
     val context = LocalContext.current
 
     LaunchedEffect(errorMessageId) {
@@ -117,13 +117,7 @@ private fun ShareScreen(
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                onClick = {
-                    scope.launch {
-                        viewModel.createDraftShare()?.let {
-                            viewModel.addSource(it.id, sourceId)
-                        }
-                    }
-                },
+                onClick = { viewModel.createDraftShare(sourceId) },
             ) {
                 Icon(painterResource(R.drawable.ic_person_add), contentDescription = "Add")
             }
@@ -174,20 +168,17 @@ private fun ShareScreen(
                             type = type,
                             permissionPresets = permissionPresets,
                             onSelectShare = { selected ->
-                                editorEntry = ShareEditorEntry.EDIT
-                                viewModel.setActiveShare(selected)
+                                viewModel.setActiveShare(selected, ShareEditorEntry.EDIT)
                             },
                             onCustomizeShare = { selected ->
-                                editorEntry = ShareEditorEntry.CUSTOMIZE_PERMISSION
-                                viewModel.setActiveShare(selected)
+                                viewModel.setActiveShare(selected, ShareEditorEntry.CUSTOMIZE_PERMISSION)
                             },
                             onChangePreset = { selected, preset ->
                                 viewModel.updatePermissionPreset(selected.id, preset, updateActiveShare = false)
                             },
                             onDeleteShare = { viewModel.deleteShare(it.id) },
                             onSendEmail = { selected ->
-                                editorEntry = ShareEditorEntry.SEND_EMAIL
-                                viewModel.setActiveShare(selected)
+                                viewModel.setActiveShare(selected, ShareEditorEntry.SEND_EMAIL)
                             }
                         )
                     }
@@ -223,13 +214,13 @@ private fun ShareItem(
     onDeleteShare: (Share) -> Unit,
     onSendEmail: (Share) -> Unit
 ) {
-    var overlayState by remember { mutableStateOf<ShareItemOverlayState>(ShareItemOverlayState.None) }
+    var overlayState by rememberSaveable(share.id) { mutableStateOf(ShareItemOverlayState.None) }
     val haptics = LocalHapticFeedback.current
     val presetOptions = PermissionPresetOption.optionsFor(share, permissionPresets)
     val selectedPresetOption = PermissionPresetOption.from(share.permissionPreset, permissionPresets)
 
     when (overlayState) {
-        is ShareItemOverlayState.QuickShare -> {
+        ShareItemOverlayState.QuickShare -> {
             QuickSharePermissionBottomSheet(
                 options = presetOptions,
                 selectedOption = selectedPresetOption,
@@ -246,7 +237,7 @@ private fun ShareItem(
             )
         }
 
-        is ShareItemOverlayState.DeleteConfirmation -> {
+        ShareItemOverlayState.DeleteConfirmation -> {
             DeleteShareConfirmationDialog(
                 onConfirm = {
                     overlayState = ShareItemOverlayState.None
@@ -399,13 +390,16 @@ private fun ShareItem(
 }
 
 fun ComposeView.initShareScreen(
+    viewModelStoreOwner: ViewModelStoreOwner,
     sourceId: String,
     internalLink: String,
     credentials: ServerCredentials,
     colorScheme: ColorScheme
 ) {
-    val nextcloudHttpClient = NextcloudHttpClient.create(credentials)
-    val viewModel = ShareViewModel(repository = ShareRemoteRepository(nextcloudHttpClient))
+    val factory = ShareViewModelFactory {
+        ShareRemoteRepository(NextcloudHttpClient.create(credentials))
+    }
+    val viewModel = ViewModelProvider.create(viewModelStoreOwner, factory)[ShareViewModel::class]
 
     setContent {
         setSingletonImageLoaderFactory { context ->
