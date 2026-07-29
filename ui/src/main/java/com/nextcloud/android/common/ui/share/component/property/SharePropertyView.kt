@@ -14,7 +14,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.share.ShareViewModel
 import com.nextcloud.android.common.ui.share.component.ShareSwitch
@@ -38,7 +38,7 @@ import com.nextcloud.android.common.ui.share.model.api.property.PropertyString
 
 @Composable
 fun SharePropertyView(shareId: String, property: Property, viewModel: ShareViewModel) {
-    val propertyErrors by viewModel.propertyErrors.collectAsState()
+    val propertyErrors by viewModel.propertyErrors.collectAsStateWithLifecycle()
     val fallbackError = stringResource(R.string.share_view_update_error_message)
     val errorMessage = if (propertyErrors.containsKey(property.clazz)) {
         propertyErrors[property.clazz] ?: fallbackError
