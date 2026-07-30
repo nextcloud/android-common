@@ -193,17 +193,6 @@ fun AddOrEditShareBottomSheet(
                     viewModel = viewModel
                 )
 
-                if (hasPropertyErrors) {
-                    Text(
-                        text = stringResource(R.string.share_view_property_error_warning),
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 4.dp)
-                    )
-                }
-
                 if (share.canSend) {
                     ActionButtons(
                         share = share,
