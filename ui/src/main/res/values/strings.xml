@@ -39,13 +39,6 @@
     <string name="share_view_delete_confirm_title">Delete share?</string>
     <string name="share_view_delete_confirm_message">This share will be permanently removed.</string>
 
-    <string name="share_view_discard_draft_title">Discard this share?</string>
-    <string name="share_view_discard_draft_message">It has not been shared yet, so everything you entered will be lost.</string>
-    <string name="share_view_discard_changes_title">Discard your changes?</string>
-    <string name="share_view_discard_changes_message">What you updated has not been saved yet and will be lost.</string>
-    <string name="share_view_discard_confirm_action">Discard</string>
-    <string name="share_view_discard_keep_editing_action">Keep editing</string>
-
     <string name="share_view_fetch_error_message">Failed to fetch shares.</string>
     <string name="share_view_delete_error_message">Failed to delete share.</string>
     <string name="share_view_create_error_message">Failed to create share.</string>
