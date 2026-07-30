@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -27,8 +29,10 @@ import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -43,14 +47,15 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.SavedStateHandle
@@ -61,7 +66,6 @@ import com.nextcloud.android.common.ui.share.component.CollapsibleShareSection
 import com.nextcloud.android.common.ui.share.component.CustomLink
 import com.nextcloud.android.common.ui.share.component.SelectRecipientField
 import com.nextcloud.android.common.ui.share.component.ShareSwitch
-import com.nextcloud.android.common.ui.share.component.dialog.DiscardShareConfirmationDialog
 import com.nextcloud.android.common.ui.share.component.property.SharePropertyView
 import com.nextcloud.android.common.ui.share.model.api.permission.Permission
 import com.nextcloud.android.common.ui.share.model.api.permission.PermissionPreset
@@ -91,21 +95,11 @@ fun AddOrEditShareBottomSheet(
     entry: ShareEditorEntry = ShareEditorEntry.EDIT,
     onDismissDraft: (Share) -> Unit = {}
 ) {
-    val unsavedProperties by viewModel.unsavedProperties.collectAsStateWithLifecycle()
-
-    val hasUnsavedWork by rememberUpdatedState(share.hasUnsentInput || unsavedProperties.isNotEmpty())
-    var showDiscardConfirmation by rememberSaveable(share.id) { mutableStateOf(false) }
+    var dismissAllowed by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
-
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true,
-        confirmValueChange = { value ->
-            val blocked = value == SheetValue.Hidden && hasUnsavedWork
-            if (blocked) {
-                showDiscardConfirmation = true
-            }
-            !blocked
-        }
+        confirmValueChange = { value -> dismissAllowed || value != SheetValue.Hidden }
     )
     val categories = remember { ShareCategory.entries.toList() }
     var selectedCategory by rememberSaveable(share.id) {
@@ -123,18 +117,10 @@ fun AddOrEditShareBottomSheet(
             .fillMaxSize()
     ) {
         ModalBottomSheet(
-            onDismissRequest = {
-                when {
-                    hasUnsavedWork -> {
-                        showDiscardConfirmation = true
-                        scope.launch { sheetState.show() }
-                    }
-
-                    share.shareState == ShareState.DRAFT -> onDismissDraft(share)
-                    else -> viewModel.setActiveShare(null)
-                }
-            },
+            onDismissRequest = {},
             sheetState = sheetState,
+            dragHandle = null,
+            properties = ModalBottomSheetProperties(shouldDismissOnBackPress = false),
             containerColor = MaterialTheme.colorScheme.surface,
         ) {
             Column(
@@ -142,12 +128,37 @@ fun AddOrEditShareBottomSheet(
                     .fillMaxWidth()
                     .verticalScroll(rememberScrollState())
             ) {
-                Text(
-                    text = share.title(context),
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(16.dp)
-                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 4.dp, top = 12.dp, bottom = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = share.title(context),
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    IconButton(onClick = {
+                        dismissAllowed = true
+                        scope.launch {
+                            sheetState.hide()
+                            if (share.shareState == ShareState.DRAFT) onDismissDraft(share) else viewModel.setActiveShare(
+                                null
+                            )
+                        }
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "close bottom sheet",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
 
                 ShareCategorySelector(
                     share = share,
@@ -204,19 +215,6 @@ fun AddOrEditShareBottomSheet(
                 }
             }
         }
-
-        if (showDiscardConfirmation) {
-            val isDraft = share.shareState == ShareState.DRAFT
-
-            DiscardShareConfirmationDialog(
-                isDraft = isDraft,
-                onConfirm = {
-                    showDiscardConfirmation = false
-                    if (isDraft) onDismissDraft(share) else viewModel.setActiveShare(null)
-                },
-                onDismiss = { showDiscardConfirmation = false }
-            )
-        }
     }
 }
 
@@ -231,7 +229,11 @@ private fun ShareCategorySelector(
     // only allow user to select between taps if it is draft share
     if (share.shareState != ShareState.DRAFT) return
 
-    SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+    SingleChoiceSegmentedButtonRow(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
         categories.forEachIndexed { index, category ->
             SegmentedButton(
                 selected = selectedCategory == category,
@@ -346,7 +348,11 @@ private fun BasicSettingsSection(
         return
     }
 
-    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+    ) {
         share.basicProperties.forEach { property ->
             key(property.clazz) {
                 SharePropertyView(
