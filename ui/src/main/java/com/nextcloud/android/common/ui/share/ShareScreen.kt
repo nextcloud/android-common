@@ -93,6 +93,8 @@ import com.nextcloud.android.common.ui.share.model.ui.ShareItemType
 import com.nextcloud.android.common.ui.share.model.ui.ShareScreenState
 import com.nextcloud.android.common.ui.share.model.ui.label
 import com.nextcloud.android.common.ui.share.repository.ShareRemoteRepository
+import com.nextcloud.android.common.ui.share.viewmodel.ShareViewModel
+import com.nextcloud.android.common.ui.share.viewmodel.ShareViewModelFactory
 
 private val FIRST_ITEM_TOP_SPACING = 16.dp
 private val ITEM_SPACING = 2.dp
