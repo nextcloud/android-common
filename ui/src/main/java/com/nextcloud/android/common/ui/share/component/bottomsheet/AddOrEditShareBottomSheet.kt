@@ -61,7 +61,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nextcloud.android.common.ui.R
-import com.nextcloud.android.common.ui.share.ShareViewModel
+import com.nextcloud.android.common.ui.share.viewmodel.ShareViewModel
 import com.nextcloud.android.common.ui.share.component.CollapsibleShareSection
 import com.nextcloud.android.common.ui.share.component.CustomLink
 import com.nextcloud.android.common.ui.share.component.SelectRecipientField
