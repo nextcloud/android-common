@@ -93,9 +93,9 @@ fun AddOrEditShareBottomSheet(
     internalLink: String,
     viewModel: ShareViewModel,
     permissionPresets: List<PermissionPreset> = emptyList(),
-    entry: ShareEditorEntry = ShareEditorEntry.EDIT,
     onDismissDraft: (Share) -> Unit = {}
 ) {
+    val entry by viewModel.editorEntry.collectAsStateWithLifecycle()
     var dismissAllowed by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(
