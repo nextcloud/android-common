@@ -117,10 +117,6 @@ data class Share(
     val invitedRecipients: List<Recipient>
         get() = recipients.filterNot { it.clazz == Recipient.TOKEN_RECIPIENT_CLASS }
 
-    val hasUnsentInput: Boolean
-        get() = shareState == ShareState.DRAFT &&
-            (invitedRecipients.isNotEmpty() || properties.any { it.isFilledIn })
-
     val canSend: Boolean
         get() {
             return sources.isNotEmpty() &&
@@ -130,10 +126,7 @@ data class Share(
         }
 
     fun title(context: Context): String {
-        return if (shareState == ShareState.DRAFT) {
-            context.getString(R.string.share_view_bottom_sheet_new_title)
-        } else {
-            context.getString(R.string.share_view_bottom_sheet_edit_title, sources.firstOrNull()?.displayName)
-        }
+        val firstRecipient = sources.firstOrNull()?.displayName ?: "..."
+        return context.getString(R.string.share_view_bottom_sheet_title, firstRecipient)
     }
 }
