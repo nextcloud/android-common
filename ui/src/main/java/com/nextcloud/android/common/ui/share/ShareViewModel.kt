@@ -162,21 +162,22 @@ class ShareViewModel(
         if (state.refreshing) return
 
         viewModelScope.launch(Dispatchers.IO) {
-            _state.update {
-                state.copy(refreshing = true)
-            }
+            setRefreshing(true)
             loadShares()
-            _state.update {
-                state.copy(refreshing = false)
-            }
+            setRefreshing(false)
+        }
+    }
+
+    private fun setRefreshing(refreshing: Boolean) {
+        _state.update {
+            if (it is ShareScreenState.Loaded) it.copy(refreshing = refreshing) else it
         }
     }
 
     private suspend fun loadShares() {
         _errorMessageId.update { null }
-
-        val fetched = fetchAllShares() ?: return
-        publishShares(fetched.activeOnly())
+        val fetched = fetchAllShares()
+        publishShares(fetched?.activeOnly() ?: currentShares)
     }
 
     // The server pages drafts and active shares together while the list only renders active ones,
