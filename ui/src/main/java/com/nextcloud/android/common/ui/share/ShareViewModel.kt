@@ -72,9 +72,6 @@ class ShareViewModel(
     private val _isPreparingLink = MutableStateFlow(false)
     val isPreparingLink: StateFlow<Boolean> = _isPreparingLink
 
-    private val _shareReadyToCopy = MutableStateFlow<Share?>(null)
-    val shareReadyToCopy: StateFlow<Share?> = _shareReadyToCopy
-
     private val _activeShare = MutableStateFlow<ActiveShareState>(ActiveShareState.None)
     val activeShare: StateFlow<ActiveShareState> = _activeShare
 
@@ -249,7 +246,6 @@ class ShareViewModel(
             if (updated != null) {
                 refreshActiveShare(ActiveShareState.Activating(updated))
                 replaceInList(updated)
-                _shareReadyToCopy.update { updated }
             }
 
             _isPreparingLink.update { false }
@@ -257,7 +253,8 @@ class ShareViewModel(
     }
 
     fun onLinkCopied() {
-        _shareReadyToCopy.update { null }
+        val activating = _activeShare.value as? ActiveShareState.Activating ?: return
+        updateActiveShare(ActiveShareState.Editing(activating.share))
     }
 
     private suspend fun applyState(id: String, shareState: ShareState): Share? {
@@ -426,7 +423,6 @@ class ShareViewModel(
     fun setActiveShare(value: Share?, entry: ShareEditorEntry = ShareEditorEntry.EDIT) {
         _propertyErrors.update { emptyMap() }
         _pendingProperties.update { emptySet() }
-        _shareReadyToCopy.update { null }
         updateEditorEntry(entry)
         updateActiveShare(value?.toActiveShare() ?: ActiveShareState.None)
     }

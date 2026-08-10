@@ -76,6 +76,7 @@ import com.nextcloud.android.common.ui.share.model.api.share.Share
 import com.nextcloud.android.common.ui.share.model.api.source.Source
 import com.nextcloud.android.common.ui.share.model.api.state.ShareState
 import com.nextcloud.android.common.ui.share.model.api.user.User
+import com.nextcloud.android.common.ui.share.model.ui.ActiveShareState
 import com.nextcloud.android.common.ui.share.model.ui.PermissionPresetOption
 import com.nextcloud.android.common.ui.share.model.ui.ShareCategory
 import com.nextcloud.android.common.ui.share.model.ui.ShareEditorEntry
@@ -403,10 +404,10 @@ private fun ActionButtons(
     val localClipboard = LocalClipboard.current
     val scope = rememberCoroutineScope()
     val isPreparingLink by viewModel.isPreparingLink.collectAsStateWithLifecycle()
-    val shareReadyToCopy by viewModel.shareReadyToCopy.collectAsStateWithLifecycle()
+    val activeShare by viewModel.activeShare.collectAsStateWithLifecycle()
 
-    LaunchedEffect(shareReadyToCopy) {
-        val ready = shareReadyToCopy ?: return@LaunchedEffect
+    LaunchedEffect(activeShare) {
+        val ready = (activeShare as? ActiveShareState.Activating)?.share ?: return@LaunchedEffect
         ready.getClipEntry(internalLink, category)?.let { localClipboard.setClipEntry(it) }
         viewModel.onLinkCopied()
     }
