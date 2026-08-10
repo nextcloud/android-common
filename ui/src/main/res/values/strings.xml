@@ -12,8 +12,7 @@
     <string name="share_view_public_link">Share link</string>
     <string name="share_view_public_link_numbered">Share link (%1$d)</string>
 
-    <string name="share_view_bottom_sheet_new_title">Create a new share</string>
-    <string name="share_view_bottom_sheet_edit_title">Share %s</string>
+    <string name="share_view_bottom_sheet_title">Share "%s"</string>
 
     <string name="share_view_advanced_settings">Settings</string>
 
