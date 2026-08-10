@@ -69,9 +69,6 @@ class ShareViewModel(
     private val _state = MutableStateFlow<ShareScreenState>(ShareScreenState.Loading)
     val state: StateFlow<ShareScreenState> = _state
 
-    private val _isRefreshing = MutableStateFlow(false)
-    val isRefreshing: StateFlow<Boolean> = _isRefreshing
-
     private val _isPreparingLink = MutableStateFlow(false)
     val isPreparingLink: StateFlow<Boolean> = _isPreparingLink
 
@@ -105,9 +102,6 @@ class ShareViewModel(
 
     private val _pendingProperties = MutableStateFlow<Set<String>>(emptySet())
     val pendingProperties: StateFlow<Set<String>> = _pendingProperties
-
-    private val _unsavedProperties = MutableStateFlow<Set<String>>(emptySet())
-    val unsavedProperties: StateFlow<Set<String>> = _unsavedProperties
 
     private val propertyUpdateJobs = mutableMapOf<String, Job>()
 
@@ -164,12 +158,17 @@ class ShareViewModel(
 
     // region shares list
     fun refreshShares() {
-        if (_isRefreshing.value) return
+        val state = _state.value as? ShareScreenState.Loaded ?: return
+        if (state.refreshing) return
 
         viewModelScope.launch(Dispatchers.IO) {
-            _isRefreshing.update { true }
+            _state.update {
+                state.copy(refreshing = true)
+            }
             loadShares()
-            _isRefreshing.update { false }
+            _state.update {
+                state.copy(refreshing = false)
+            }
         }
     }
 
@@ -348,14 +347,9 @@ class ShareViewModel(
     // endregion
 
     // region properties
-    fun onPropertyEdited(clazz: String, unsaved: Boolean) {
-        _unsavedProperties.update { if (unsaved) it + clazz else it - clazz }
-    }
-
     fun updateProperty(shareId: String, clazz: String, value: String?) {
         propertyUpdateJobs[clazz]?.cancel()
         _pendingProperties.update { it + clazz }
-        _unsavedProperties.update { it - clazz }
         if (value.isNullOrEmpty()) {
             _propertyErrors.update { it - clazz }
         }
@@ -431,7 +425,6 @@ class ShareViewModel(
     fun setActiveShare(value: Share?, entry: ShareEditorEntry = ShareEditorEntry.EDIT) {
         _propertyErrors.update { emptyMap() }
         _pendingProperties.update { emptySet() }
-        _unsavedProperties.update { emptySet() }
         _shareReadyToCopy.update { null }
         updateEditorEntry(entry)
         updateActiveShare(value?.toActiveShare() ?: ActiveShareState.None)
@@ -474,7 +467,7 @@ class ShareViewModel(
 
     private fun publishShares(shares: List<Share>) {
         _state.update {
-            if (shares.isEmpty()) ShareScreenState.Empty else ShareScreenState.Loaded(shares)
+            if (shares.isEmpty()) ShareScreenState.Empty else ShareScreenState.Loaded(shares, false)
         }
     }
     // endregion

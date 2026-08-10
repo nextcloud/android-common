@@ -133,7 +133,6 @@ private fun ShareTextPropertyField(
         onValueChange = { newValue ->
             if (maxLength == null || newValue.length <= maxLength) {
                 value = newValue
-                viewModel.onPropertyEdited(clazz, newValue != committedValue)
             }
         },
         label = { Text(property.displayName) },
