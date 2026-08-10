@@ -78,16 +78,6 @@ class ShareViewModel(
     private val _editorEntry = MutableStateFlow(savedState.editorEntry)
     val editorEntry: StateFlow<ShareEditorEntry> = _editorEntry
 
-    val searchQuery: StateFlow<String> = savedState.searchQuery
-
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    val recipientSearchResults: StateFlow<List<Recipient>> = searchQuery
-        .debounce(SEARCH_DEBOUNCE_DELAY.milliseconds)
-        .distinctUntilChanged()
-        .filter { it.isNotBlank() }
-        .mapLatest { query -> searchRecipients(query) }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(SEARCH_SUBSCRIPTION_TIMEOUT), emptyList())
-
     private val _permissionPresets = MutableStateFlow<List<PermissionPreset>>(emptyList())
     val permissionPresets: StateFlow<List<PermissionPreset>> = _permissionPresets
 
@@ -100,12 +90,22 @@ class ShareViewModel(
     private val _pendingProperties = MutableStateFlow<Set<String>>(emptySet())
     val pendingProperties: StateFlow<Set<String>> = _pendingProperties
 
-    private val propertyUpdateJobs = mutableMapOf<String, Job>()
-
-    private var secretUpdateJob: Job? = null
-
     private val currentShares: List<Share>
         get() = (_state.value as? ShareScreenState.Loaded)?.shares ?: emptyList()
+
+    private val propertyUpdateJobs = mutableMapOf<String, Job>()
+
+    val searchQuery: StateFlow<String> = savedState.searchQuery
+
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    val recipientSearchResults: StateFlow<List<Recipient>> = searchQuery
+        .debounce(SEARCH_DEBOUNCE_DELAY.milliseconds)
+        .distinctUntilChanged()
+        .filter { it.isNotBlank() }
+        .mapLatest { query -> searchRecipients(query) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(SEARCH_SUBSCRIPTION_TIMEOUT), emptyList())
+
+    private var secretUpdateJob: Job? = null
 
     init {
         loadInitialData()
