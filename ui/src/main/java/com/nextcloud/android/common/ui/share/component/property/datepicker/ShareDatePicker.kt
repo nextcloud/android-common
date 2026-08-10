@@ -7,18 +7,20 @@
 
 package com.nextcloud.android.common.ui.share.component.property.datepicker
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +33,7 @@ import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.share.component.property.datepicker.util.NoPastSelectableDates
 import com.nextcloud.android.common.ui.share.component.property.datepicker.util.ShareDateFormatter
 import com.nextcloud.android.common.ui.share.model.api.property.PropertyDate
+import com.nextcloud.android.common.ui.util.extensions.Strings
 
 @Composable
 fun ShareDatePicker(property: PropertyDate, isError: Boolean, onDateSelected: (String) -> Unit) {
@@ -38,36 +41,53 @@ fun ShareDatePicker(property: PropertyDate, isError: Boolean, onDateSelected: (S
     var showDatePicker by remember { mutableStateOf(false) }
     var dateValue by remember(property.clazz) { mutableStateOf(formatter.formatIsoForDisplay(property.value)) }
 
-    Box(modifier = Modifier.fillMaxWidth()) {
-        OutlinedTextField(
-            value = dateValue,
-            onValueChange = {},
-            readOnly = true,
-            enabled = true,
-            isError = isError,
-            modifier = Modifier.fillMaxWidth(),
-            label = { Text(formatter.getDisplayName(property)) },
-            trailingIcon = {
+    val interactionSource = remember { MutableInteractionSource() }
+    LaunchedEffect(interactionSource) {
+        interactionSource.interactions.collect { interaction ->
+            if (interaction is PressInteraction.Release) {
+                showDatePicker = true
+            }
+        }
+    }
+
+    OutlinedTextField(
+        value = dateValue,
+        onValueChange = {},
+        readOnly = true,
+        enabled = true,
+        isError = isError,
+        modifier = Modifier.fillMaxWidth(),
+        interactionSource = interactionSource,
+        label = { Text(formatter.getDisplayName(property)) },
+        trailingIcon = {
+            val isDateBlank = dateValue.isBlank()
+            val iconId = if (isDateBlank) {
+                R.drawable.ic_calendar
+            } else {
+                R.drawable.ic_cancel
+            }
+            IconButton(onClick = {
+                if (isDateBlank) {
+                    showDatePicker = true
+                } else {
+                    dateValue = Strings.EMPTY
+                    onDateSelected(Strings.EMPTY)
+                }
+            }) {
                 Icon(
-                    painter = painterResource(R.drawable.ic_calendar),
+                    painter = painterResource(iconId),
                     contentDescription = null
                 )
             }
-        )
-
-        Box(
-            modifier = Modifier
-                .matchParentSize()
-                .clickable { showDatePicker = true }
-        )
-    }
+        }
+    )
 
     if (showDatePicker) {
         DatePickerModal(
             formatter = formatter,
             onDateSelected = { displayDate, isoDate ->
-                dateValue = displayDate ?: ""
-                onDateSelected(isoDate ?: "")
+                dateValue = displayDate ?: Strings.EMPTY
+                onDateSelected(isoDate ?: Strings.EMPTY)
             },
             onDismiss = { showDatePicker = false }
         )
