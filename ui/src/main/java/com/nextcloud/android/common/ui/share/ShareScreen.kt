@@ -106,7 +106,6 @@ private fun ShareScreen(
     val screenState by viewModel.state.collectAsStateWithLifecycle()
     val activeShare by viewModel.activeShare.collectAsStateWithLifecycle()
     val permissionPresets by viewModel.permissionPresets.collectAsStateWithLifecycle()
-    val editorEntry by viewModel.editorEntry.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val resources = LocalResources.current
 
@@ -164,7 +163,6 @@ private fun ShareScreen(
             internalLink = internalLink,
             viewModel = viewModel,
             permissionPresets = permissionPresets,
-            entry = editorEntry,
             onDismissDraft = { draftShare ->
                 viewModel.deleteShare(draftShare.id)
                 viewModel.setActiveShare(null)
