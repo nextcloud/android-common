@@ -141,6 +141,7 @@ private fun ShareScreen(
             }
 
             is ShareScreenState.Empty -> ShareList(
+                isRefreshing = false,
                 shares = emptyList(),
                 permissionPresets = permissionPresets,
                 paddingValues = paddingValues,
@@ -148,6 +149,7 @@ private fun ShareScreen(
             )
 
             is ShareScreenState.Loaded -> ShareList(
+                isRefreshing = state.refreshing,
                 shares = state.shares,
                 permissionPresets = permissionPresets,
                 paddingValues = paddingValues,
@@ -174,13 +176,13 @@ private fun ShareScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ShareList(
+    isRefreshing: Boolean,
     shares: List<Share>,
     permissionPresets: List<PermissionPreset>,
     paddingValues: PaddingValues,
     viewModel: ShareViewModel
 ) {
     val context = LocalContext.current
-    val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
 
     PullToRefreshBox(
         isRefreshing = isRefreshing,
