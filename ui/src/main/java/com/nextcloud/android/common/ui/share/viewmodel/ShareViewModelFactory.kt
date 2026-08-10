@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-package com.nextcloud.android.common.ui.share
+package com.nextcloud.android.common.ui.share.viewmodel
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel

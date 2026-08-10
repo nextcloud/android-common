@@ -25,7 +25,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nextcloud.android.common.ui.R
-import com.nextcloud.android.common.ui.share.ShareViewModel
+import com.nextcloud.android.common.ui.share.viewmodel.ShareViewModel
 import com.nextcloud.android.common.ui.share.component.ShareSwitch
 import com.nextcloud.android.common.ui.share.component.property.datepicker.ShareDatePicker
 import com.nextcloud.android.common.ui.share.model.api.property.Property
