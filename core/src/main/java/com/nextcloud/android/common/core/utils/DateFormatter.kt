@@ -62,10 +62,11 @@ class DateFormatter(
 
             // less than 1h
             span < ONE_HOUR_IN_MILLIS -> {
-                context.getString(
-                    R.string.date_formatting_relative_minutes,
-                    span / ONE_MINUTE_IN_MILLIS
-                )
+                context.resources
+                    .getQuantityString(
+                        R.plurals.date_formatting_relative_minutes,
+                        span.toInt() / ONE_MINUTE_IN_MILLIS
+                    )
             }
 
             // less than 1d
