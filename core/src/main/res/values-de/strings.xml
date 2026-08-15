@@ -8,10 +8,15 @@
 <resources>
     <!-- relative time less than 1 minute using the term: Now -->
     <string name="date_formatting_now">Jetzt</string>
+    <!-- relative time in minutes, less than 1 hour, i.e. 1m, 5m, 59m -->
+    <plurals name="date_formatting_relative_minutes">
+        <item quantity="one">%d Min.</item>
+        <item quantity="other">%d Min.</item>
+    </plurals>
     <!-- relative time in hours, less than 1 day, i.e. 1h, 5h, 23h -->
     <plurals name="date_formatting_relative_hours">
-        <item quantity="one">%dh</item>
-        <item quantity="other">%dh</item>
+        <item quantity="one">%d Std.</item>
+        <item quantity="other">%d Std.</item>
     </plurals>
 
     <string name="ecosystem_null_account">Konto fehlt. Die App kann nicht geöffnet werden.</string>
