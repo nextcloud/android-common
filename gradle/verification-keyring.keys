@@ -1757,7 +1757,7 @@ hN0x6m3QjnijzvokolnfxsAb
 -----END PGP PUBLIC KEY BLOCK-----
 
 pub    F067A2FD751AE3E4
-uid    David Burstr?m <david.burstrom@gmail.com>
+uid    David Burström <david.burstrom@gmail.com>
 
 sub    28CFDE1EB61BB6AA
 -----BEGIN PGP PUBLIC KEY BLOCK-----
@@ -2390,7 +2390,7 @@ xV+8+asS+ID6jUp5FJ4izH6U90j4iiBfqIu+UEw+0gvD+TVqpqcj5pNlgU45HA==
 -----END PGP PUBLIC KEY BLOCK-----
 
 pub    15C71C0A4E0B8EDD
-uid    Matthias Bl?sing <mblaesing@doppel-helix.eu>
+uid    Matthias Bläsing <mblaesing@doppel-helix.eu>
 
 sub    891E4C2D471515FE
 -----BEGIN PGP PUBLIC KEY BLOCK-----
@@ -2915,6 +2915,21 @@ qEVfV/jQYAREDj9vpxlBcfRpTiUlrdFQf4uOQT1G/nXY1KITmq/hNqUdhpUjCoMC
 OvdyVwwfG12cTWeQiDQofGqJSptQmsUvegmfF5byUPDbgjCi4tEpWOncOeehs/Hd
 ZgMBzI+v/ingWOyKpKqhpZR/50PHA0o23zw8P1BGeQOlr4kFNA==
 =jR+6
+-----END PGP PUBLIC KEY BLOCK-----
+
+pub    340B090F727518D8
+uid    Thomas Ball <tball@google.com>
+
+sub    6EAC8515E0EBB87E
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+xjMEaJzwtxYJKwYBBAHaRw8BAQdAmw8gRfE8mqvum1kG2Zlm6t46bkXFvJIHRVBZ
+OctVLVe0HlRob21hcyBCYWxsIDx0YmFsbEBnb29nbGUuY29tPs44BGic8LcSCisG
+AQQBl1UBBQEBB0A+DJUNDeULyBrFpk3P07SXnEAch7KoDYah6j0PxgnNQgMBCAfC
+fgQYFgoAJhYhBMMlnSDa7ErObVfMgzQLCQ9ydRjYBQJonPC3AhsMBQkFo5qAAAoJ
+EDQLCQ9ydRjY3/MA/38kMom8Qy8gO3AH31GqVqguYruG848SaIJugavlTT4sAP9D
+EfbsFU4kymcgABRT9CyDsNAmI/lxRNEB+pxiNp1/DA==
+=FAP2
 -----END PGP PUBLIC KEY BLOCK-----
 
 pub    34918B7D3969D2F5
@@ -3512,6 +3527,21 @@ TkXNOSowlAbFwVXHh3dI2+Rbf8KgjeZo9gu2PDSe1JnLc9FvGsFaHHDD/y0puIKW
 VPqpelEi+SOEo9tvgUEUUDwigvpiT7WzKit5B0Icbg+moRvY6a0FZPSvsZZx8V2J
 AGg2/CyrKszDpsR8R04jHL/ZAxrodA4Awc3BTpNxQDPfdRPc8w==
 =SIQO
+-----END PGP PUBLIC KEY BLOCK-----
+
+pub    530AA5F25C25011F
+uid    Gary Gregory <ggregory@apache.org>
+
+sub    7DFE92929805E309
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+xjMEaP9I0xYJKwYBBAHaRw8BAQdAOUBgNeJu8Xe4w2IE+22aMEiVvJRcY6Gwx8s/
+mfadmLq0IkdhcnkgR3JlZ29yeSA8Z2dyZWdvcnlAYXBhY2hlLm9yZz7OOARo/0jT
+EgorBgEEAZdVAQUBAQdAyPaT/8w88+/NA4o6ovcnWTqveOIhA3IIVYOlys0o7A8D
+AQgHwngEGBYKACAWIQT03VnJAUi9xSvrkKRTCqXyXCUBHwUCaP9I0wIbDAAKCRBT
+CqXyXCUBHySfAPwPXyiSs7i0yaZetG2b+UgRcTJ9mp2BSshgHyFHTHouJgD/WCbr
+Assv7MmNDjfS39AgWpkpr2dbNFIVY5cQlbXHNgo=
+=5yuW
 -----END PGP PUBLIC KEY BLOCK-----
 
 pub    55C7E5E701832382

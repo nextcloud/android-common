@@ -8,8 +8,6 @@
 <resources>
     <!-- relative time less than 1 minute using the term: Now -->
     <string name="date_formatting_now">اکنون</string>
-    <!-- relative time in minutes, less than 1 hour, i.e. 1m, 5m, 59m -->
-    <string name="date_formatting_relative_minutes">m%d</string>
     <string name="ecosystem_null_account">حساب کاربری یافت نشد. نمی‌توان برنامه را باز کرد.</string>
     <string name="ecosystem_wrong_intent">نمی‌توان عمل را کامل کرد: داده‌های غیرمنتظره‌ای دریافت شد</string>
     <string name="ecosystem_received_account_invalid">حساب دریافتی نامعتبر است.</string>
