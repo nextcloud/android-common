@@ -98,8 +98,8 @@ class ShareRemoteRepository(
         lastShareID: String?
     ): NetworkResult<List<Share>> {
         val queryParams = buildString {
-            append("?limit=$limit")
-            append("&filterSourceTypeValue=${filterSourceTypeValue.urlEncoded()}")
+            append("?filterSourceTypeValue=${filterSourceTypeValue.urlEncoded()}")
+            limit?.let { append("&limit=$it") }
             filterSourceTypeClass?.let { append("&filterSourceTypeClass=${it.urlEncoded()}") }
             lastShareID?.let { append("&lastShareID=${it.urlEncoded()}") }
         }
