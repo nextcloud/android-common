@@ -70,6 +70,8 @@ class ShareViewModel(
     private val _isPreparingLink = MutableStateFlow(false)
     val isPreparingLink: StateFlow<Boolean> = _isPreparingLink
 
+    private val isCreatingDraft = MutableStateFlow(false)
+
     private val _activeShare = MutableStateFlow<ActiveShareState>(ActiveShareState.None)
     val activeShare: StateFlow<ActiveShareState> = _activeShare
 
@@ -183,17 +185,23 @@ class ShareViewModel(
 
     // region create
     fun createDraftShare() {
+        if (!isCreatingDraft.compareAndSet(expect = false, update = true)) return
+
         viewModelScope.launch(Dispatchers.IO) {
-            _errorMessageId.update { null }
+            try {
+                _errorMessageId.update { null }
 
-            val result = repository.createDraftShare()
-            val draft = result.dataOrElse { _errorMessageId.update { R.string.share_view_create_error_message } }
-                ?: return@launch
+                val result = repository.createDraftShare()
+                val draft = result.dataOrElse { _errorMessageId.update { R.string.share_view_create_error_message } }
+                    ?: return@launch
 
-            updateEditorEntry(ShareEditorEntry.EDIT)
-            updateActiveShare(draft.toActiveShare())
+                updateEditorEntry(ShareEditorEntry.EDIT)
+                updateActiveShare(draft.toActiveShare())
 
-            applySource(draft.id, sourceId)
+                applySource(draft.id, sourceId)
+            } finally {
+                isCreatingDraft.value = false
+            }
         }
     }
     // endregion
@@ -394,6 +402,16 @@ class ShareViewModel(
     // region ui helpers
     fun updateErrorMessage(value: Int?) {
         _errorMessageId.update { value }
+    }
+
+    fun dismissActiveShare(id: String) {
+        val active = _activeShare.value.shareOrNull ?: return
+        if (active.id != id) return
+
+        if (active.shareState == ShareState.DRAFT) {
+            deleteShare(id)
+        }
+        setActiveShare(null)
     }
 
     fun setActiveShare(value: Share?, entry: ShareEditorEntry = ShareEditorEntry.EDIT) {

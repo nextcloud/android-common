@@ -164,11 +164,7 @@ private fun ShareScreen(
             share = activeShareObject,
             internalLink = internalLink,
             viewModel = viewModel,
-            permissionPresets = permissionPresets,
-            onDismissDraft = { draftShare ->
-                viewModel.deleteShare(draftShare.id)
-                viewModel.setActiveShare(null)
-            }
+            permissionPresets = permissionPresets
         )
     }
 }

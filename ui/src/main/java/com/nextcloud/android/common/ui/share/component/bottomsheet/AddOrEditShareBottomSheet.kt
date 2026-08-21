@@ -36,7 +36,6 @@ import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -49,6 +48,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboard
@@ -82,6 +82,7 @@ import com.nextcloud.android.common.ui.share.model.ui.ShareCategory
 import com.nextcloud.android.common.ui.share.model.ui.ShareEditorEntry
 import com.nextcloud.android.common.ui.share.model.ui.label
 import com.nextcloud.android.common.ui.share.repository.MockShareRepository
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 private const val CUSTOM_SELECTION = "custom"
@@ -92,16 +93,12 @@ fun AddOrEditShareBottomSheet(
     share: Share,
     internalLink: String,
     viewModel: ShareViewModel,
-    permissionPresets: List<PermissionPreset> = emptyList(),
-    onDismissDraft: (Share) -> Unit = {}
+    permissionPresets: List<PermissionPreset> = emptyList()
 ) {
     val entry by viewModel.editorEntry.collectAsStateWithLifecycle()
-    var dismissAllowed by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true,
-        confirmValueChange = { value -> dismissAllowed || value != SheetValue.Hidden }
-    )
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val dismissSheet = { viewModel.dismissActiveShare(share.id) }
     val categories = remember { ShareCategory.entries.toList() }
     var selectedCategory by rememberSaveable(share.id) {
         mutableStateOf(if (share.belongsAnyoneTab) ShareCategory.Anyone else ShareCategory.Invited)
@@ -113,15 +110,22 @@ fun AddOrEditShareBottomSheet(
     val hasPropertyErrors = propertyErrors.isNotEmpty()
     val sendEnabled = !hasPropertyErrors && pendingProperties.isEmpty()
 
+    LaunchedEffect(sheetState, share.id) {
+        snapshotFlow { sheetState.isVisible }.first { it }
+        snapshotFlow { sheetState.isVisible }.first { !it }
+        dismissSheet()
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
     ) {
         ModalBottomSheet(
-            onDismissRequest = {},
+            onDismissRequest = dismissSheet,
             sheetState = sheetState,
+            sheetGesturesEnabled = false,
             dragHandle = null,
-            properties = ModalBottomSheetProperties(shouldDismissOnBackPress = false),
+            properties = ModalBottomSheetProperties(shouldDismissOnClickOutside = false),
             containerColor = MaterialTheme.colorScheme.surface,
         ) {
             Column(
@@ -146,13 +150,7 @@ fun AddOrEditShareBottomSheet(
                     )
 
                     IconButton(onClick = {
-                        dismissAllowed = true
-                        scope.launch {
-                            sheetState.hide()
-                            if (share.shareState == ShareState.DRAFT) onDismissDraft(share) else viewModel.setActiveShare(
-                                null
-                            )
-                        }
+                        scope.launch { sheetState.hide() }.invokeOnCompletion { dismissSheet() }
                     }) {
                         Icon(
                             imageVector = Icons.Default.Close,
