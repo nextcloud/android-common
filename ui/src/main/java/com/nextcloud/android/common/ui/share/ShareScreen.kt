@@ -101,6 +101,7 @@ private val ITEM_SPACING = 2.dp
 
 @Composable
 private fun ShareScreen(
+    filename: String,
     internalLink: String,
     viewModel: ShareViewModel
 ) {
@@ -142,6 +143,7 @@ private fun ShareScreen(
             }
 
             is ShareScreenState.Empty -> ShareList(
+                filename = filename,
                 isRefreshing = false,
                 shares = emptyList(),
                 permissionPresets = permissionPresets,
@@ -150,6 +152,7 @@ private fun ShareScreen(
             )
 
             is ShareScreenState.Loaded -> ShareList(
+                filename = filename,
                 isRefreshing = state.refreshing,
                 shares = state.shares,
                 permissionPresets = permissionPresets,
@@ -176,6 +179,7 @@ private fun ShareScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ShareList(
+    filename: String,
     isRefreshing: Boolean,
     shares: List<Share>,
     permissionPresets: List<PermissionPreset>,
@@ -201,6 +205,7 @@ private fun ShareList(
                         ContentUnavailableView(
                             iconId = R.drawable.ic_person_add,
                             title = stringResource(R.string.share_view_empty_title),
+                            description = stringResource(R.string.share_view_empty_description, filename)
                         )
                     }
                 }
@@ -423,6 +428,7 @@ private fun ShareItem(
 fun ComposeView.initShareScreen(
     viewModelStoreOwner: ViewModelStoreOwner,
     sourceId: String,
+    filename: String,
     internalLink: String,
     credentials: ServerCredentials,
     colorScheme: ColorScheme
@@ -442,7 +448,7 @@ fun ComposeView.initShareScreen(
         MaterialTheme(
             colorScheme = colorScheme,
             content = {
-                ShareScreen(internalLink, viewModel)
+                ShareScreen(filename, internalLink, viewModel)
             }
         )
     }
