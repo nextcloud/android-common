@@ -139,8 +139,9 @@ fun AddOrEditShareBottomSheet(
                         text = share.title(context),
                         style = MaterialTheme.typography.headlineSmall,
                         color = MaterialTheme.colorScheme.onSurface,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                        softWrap = false,
+                        overflow = TextOverflow.MiddleEllipsis,
                         modifier = Modifier.weight(1f)
                     )
 
