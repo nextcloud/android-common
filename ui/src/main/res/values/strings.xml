@@ -39,6 +39,7 @@
     <string name="share_view_delete_confirm_message">This share will be permanently removed.</string>
 
     <string name="share_view_fetch_error_message">Failed to fetch shares.</string>
+    <string name="share_view_fetch_error_description">Pull down to try again.</string>
     <string name="share_view_delete_error_message">Failed to delete share.</string>
     <string name="share_view_create_error_message">Failed to create share.</string>
     <string name="share_view_update_error_message">Failed to update share.</string>

@@ -88,8 +88,8 @@ import com.nextcloud.android.common.ui.share.model.api.permission.PermissionPres
 import com.nextcloud.android.common.ui.share.model.api.share.Share
 import com.nextcloud.android.common.ui.share.model.ui.PermissionPresetOption
 import com.nextcloud.android.common.ui.share.model.ui.ShareEditorEntry
-import com.nextcloud.android.common.ui.share.model.ui.ShareItemOverlayState
 import com.nextcloud.android.common.ui.share.model.ui.ShareItemType
+import com.nextcloud.android.common.ui.share.model.ui.ShareOverlay
 import com.nextcloud.android.common.ui.share.model.ui.ShareScreenState
 import com.nextcloud.android.common.ui.share.model.ui.label
 import com.nextcloud.android.common.ui.share.repository.ShareRemoteRepository
@@ -110,6 +110,9 @@ private fun ShareScreen(
     val permissionPresets by viewModel.permissionPresets.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val resources = LocalResources.current
+    var overlay by rememberSaveable(stateSaver = ShareOverlay.Saver) {
+        mutableStateOf<ShareOverlay>(ShareOverlay.None)
+    }
 
     LaunchedEffect(errorMessageId) {
         errorMessageId?.let {
@@ -130,31 +133,21 @@ private fun ShareScreen(
         containerColor = Color.Transparent
     ) { paddingValues ->
         when (val state = screenState) {
-            is ShareScreenState.Loading -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
+            is ShareScreenState.Loading -> Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
             }
 
-            is ShareScreenState.Empty -> ShareList(
-                isRefreshing = false,
-                shares = emptyList(),
+            else -> ShareList(
+                state = state,
                 permissionPresets = permissionPresets,
                 paddingValues = paddingValues,
-                viewModel = viewModel
-            )
-
-            is ShareScreenState.Loaded -> ShareList(
-                isRefreshing = state.refreshing,
-                shares = state.shares,
-                permissionPresets = permissionPresets,
-                paddingValues = paddingValues,
-                viewModel = viewModel
+                viewModel = viewModel,
+                onShowOverlay = { overlay = it }
             )
         }
     }
@@ -167,18 +160,66 @@ private fun ShareScreen(
             permissionPresets = permissionPresets
         )
     }
+
+    ShareItemOverlay(
+        overlay = overlay,
+        shares = (screenState as? ShareScreenState.Loaded)?.shares.orEmpty(),
+        permissionPresets = permissionPresets,
+        onDismiss = { overlay = ShareOverlay.None },
+        viewModel = viewModel
+    )
+}
+
+@Composable
+private fun ShareItemOverlay(
+    overlay: ShareOverlay,
+    shares: List<Share>,
+    permissionPresets: List<PermissionPreset>,
+    onDismiss: () -> Unit,
+    viewModel: ShareViewModel
+) {
+    val share = overlay.shareId?.let { id -> shares.firstOrNull { it.id == id } } ?: return
+
+    when (overlay) {
+        is ShareOverlay.QuickShare -> QuickSharePermissionBottomSheet(
+            options = PermissionPresetOption.optionsFor(share, permissionPresets),
+            selectedOption = PermissionPresetOption.from(share.permissionPreset, permissionPresets),
+            onOptionSelected = { option ->
+                onDismiss()
+                val presetClass = option.presetClass
+                if (presetClass != null) {
+                    viewModel.updatePermissionPreset(share.id, presetClass, updateActiveShare = false)
+                } else {
+                    viewModel.setActiveShare(share, ShareEditorEntry.CUSTOMIZE_PERMISSION)
+                }
+            },
+            onDismiss = onDismiss
+        )
+
+        is ShareOverlay.DeleteConfirmation -> DeleteShareConfirmationDialog(
+            onConfirm = {
+                onDismiss()
+                viewModel.deleteShare(share.id)
+            },
+            onDismiss = onDismiss
+        )
+
+        ShareOverlay.None -> Unit
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ShareList(
-    isRefreshing: Boolean,
-    shares: List<Share>,
+    state: ShareScreenState,
     permissionPresets: List<PermissionPreset>,
     paddingValues: PaddingValues,
-    viewModel: ShareViewModel
+    viewModel: ShareViewModel,
+    onShowOverlay: (ShareOverlay) -> Unit
 ) {
     val context = LocalContext.current
+    val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
+    val shares = (state as? ShareScreenState.Loaded)?.shares.orEmpty()
 
     PullToRefreshBox(
         isRefreshing = isRefreshing,
@@ -194,10 +235,7 @@ private fun ShareList(
             if (shares.isEmpty()) {
                 item {
                     Box(modifier = Modifier.fillParentMaxSize()) {
-                        ContentUnavailableView(
-                            iconId = R.drawable.ic_person_add,
-                            title = stringResource(R.string.share_view_empty_title)
-                        )
+                        SharePlaceholder(state)
                     }
                 }
             }
@@ -209,20 +247,15 @@ private fun ShareList(
                     share = share,
                     title = share.getHeadline(context, shares),
                     type = ShareItemType.type(index, shares.lastIndex),
-                    permissionPresets = permissionPresets,
+                    presetOptions = PermissionPresetOption.optionsFor(share, permissionPresets),
+                    selectedPresetOption = PermissionPresetOption.from(share.permissionPreset, permissionPresets),
                     onSelectShare = { selected ->
                         viewModel.setActiveShare(selected, ShareEditorEntry.EDIT)
                     },
-                    onCustomizeShare = { selected ->
-                        viewModel.setActiveShare(selected, ShareEditorEntry.CUSTOMIZE_PERMISSION)
-                    },
-                    onChangePreset = { selected, preset ->
-                        viewModel.updatePermissionPreset(selected.id, preset, updateActiveShare = false)
-                    },
-                    onDeleteShare = { viewModel.deleteShare(it.id) },
                     onSendEmail = { selected ->
                         viewModel.setActiveShare(selected, ShareEditorEntry.SEND_EMAIL)
-                    }
+                    },
+                    onShowOverlay = onShowOverlay
                 )
             }
         }
@@ -230,52 +263,34 @@ private fun ShareList(
 }
 
 @Composable
+private fun SharePlaceholder(state: ShareScreenState) {
+    if (state is ShareScreenState.Error) {
+        ContentUnavailableView(
+            title = stringResource(R.string.share_view_fetch_error_message),
+            description = stringResource(R.string.share_view_fetch_error_description)
+        )
+        return
+    }
+
+    ContentUnavailableView(
+        iconId = R.drawable.ic_person_add,
+        title = stringResource(R.string.share_view_empty_title)
+    )
+}
+
+@Composable
 private fun ShareItem(
     share: Share,
     title: String,
     type: ShareItemType,
-    permissionPresets: List<PermissionPreset>,
+    presetOptions: List<PermissionPresetOption>,
+    selectedPresetOption: PermissionPresetOption,
     onSelectShare: (Share) -> Unit,
-    onCustomizeShare: (Share) -> Unit,
-    onChangePreset: (Share, String) -> Unit,
-    onDeleteShare: (Share) -> Unit,
-    onSendEmail: (Share) -> Unit
+    onSendEmail: (Share) -> Unit,
+    onShowOverlay: (ShareOverlay) -> Unit
 ) {
-    var overlayState by rememberSaveable(share.id) { mutableStateOf(ShareItemOverlayState.None) }
+    var contextMenuExpanded by remember { mutableStateOf(false) }
     val haptics = LocalHapticFeedback.current
-    val presetOptions = PermissionPresetOption.optionsFor(share, permissionPresets)
-    val selectedPresetOption = PermissionPresetOption.from(share.permissionPreset, permissionPresets)
-
-    when (overlayState) {
-        ShareItemOverlayState.QuickShare -> {
-            QuickSharePermissionBottomSheet(
-                options = presetOptions,
-                selectedOption = selectedPresetOption,
-                onOptionSelected = { option ->
-                    overlayState = ShareItemOverlayState.None
-                    val presetClass = option.presetClass
-                    if (presetClass != null) {
-                        onChangePreset(share, presetClass)
-                    } else {
-                        onCustomizeShare(share)
-                    }
-                },
-                onDismiss = { overlayState = ShareItemOverlayState.None }
-            )
-        }
-
-        ShareItemOverlayState.DeleteConfirmation -> {
-            DeleteShareConfirmationDialog(
-                onConfirm = {
-                    overlayState = ShareItemOverlayState.None
-                    onDeleteShare(share)
-                },
-                onDismiss = { overlayState = ShareItemOverlayState.None }
-            )
-        }
-
-        else -> Unit
-    }
 
     ListItem(
         modifier = Modifier
@@ -285,7 +300,7 @@ private fun ShareItem(
                 onClick = { onSelectShare(share) },
                 onLongClick = {
                     haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                    overlayState = ShareItemOverlayState.ContextMenu
+                    contextMenuExpanded = true
                 }
             )
             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
@@ -318,7 +333,7 @@ private fun ShareItem(
                 modifier = Modifier
                     .offset(x = -chipHorizontalPadding)
                     .clip(RoundedCornerShape(percent = 50))
-                    .clickable { overlayState = ShareItemOverlayState.QuickShare }
+                    .clickable { onShowOverlay(ShareOverlay.QuickShare(share.id)) }
                     .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.08f))
                     .padding(horizontal = chipHorizontalPadding, vertical = 2.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -355,13 +370,13 @@ private fun ShareItem(
         },
         trailingContent = {
             Box {
-                IconButton(onClick = { overlayState = ShareItemOverlayState.ContextMenu }) {
+                IconButton(onClick = { contextMenuExpanded = true }) {
                     Icon(Icons.Default.MoreVert, contentDescription = "More options")
                 }
 
                 DropdownMenu(
-                    expanded = overlayState == ShareItemOverlayState.ContextMenu,
-                    onDismissRequest = { overlayState = ShareItemOverlayState.None }
+                    expanded = contextMenuExpanded,
+                    onDismissRequest = { contextMenuExpanded = false }
                 ) {
                     DropdownMenuItem(
                         leadingIcon = {
@@ -372,7 +387,7 @@ private fun ShareItem(
                         },
                         text = { Text(stringResource(R.string.share_view_list_item_edit)) },
                         onClick = {
-                            overlayState = ShareItemOverlayState.None
+                            contextMenuExpanded = false
                             onSelectShare(share)
                         }
                     )
@@ -386,8 +401,8 @@ private fun ShareItem(
                         },
                         text = { Text(stringResource(R.string.share_view_list_item_send_email)) },
                         onClick = {
+                            contextMenuExpanded = false
                             onSendEmail(share)
-                            overlayState = ShareItemOverlayState.None
                         }
                     )
                     HorizontalDivider()
@@ -406,7 +421,8 @@ private fun ShareItem(
                             )
                         },
                         onClick = {
-                            overlayState = ShareItemOverlayState.DeleteConfirmation
+                            contextMenuExpanded = false
+                            onShowOverlay(ShareOverlay.DeleteConfirmation(share.id))
                         }
                     )
                 }
