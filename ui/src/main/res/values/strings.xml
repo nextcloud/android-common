@@ -20,11 +20,9 @@
     <string name="share_view_select_recipient_clear">Clear recipient</string>
 
     <string name="share_view_custom_link_title">Custom link</string>
-    <string name="share_view_custom_link_description">The link can be changed to be easy to remember, but do not set it to something that is easy to guess.</string>
     <string name="share_view_custom_link_refresh">Refresh link</string>
 
     <string name="share_view_empty_title">No shares yet</string>
-    <string name="share_view_empty_description">Use + button to share %s</string>
     <string name="share_view_recipient_search_field_empty_result">No result</string>
 
     <string name="share_view_copy_to_clipboard_label">Copied</string>
