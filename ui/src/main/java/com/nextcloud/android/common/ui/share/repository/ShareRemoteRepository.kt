@@ -93,7 +93,7 @@ class ShareRemoteRepository(
 
     override suspend fun fetchShares(
         filterSourceTypeValue: String,
-        limit: Int,
+        limit: Int?,
         filterSourceTypeClass: String?,
         lastShareID: String?
     ): NetworkResult<List<Share>> {

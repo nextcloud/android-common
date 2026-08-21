@@ -39,7 +39,7 @@ interface ShareRepository {
 
     suspend fun fetchShares(
         filterSourceTypeValue: String,
-        limit: Int,
+        limit: Int? = null,
         filterSourceTypeClass: String? = null,
         lastShareID: String? = null
     ): NetworkResult<List<Share>>
