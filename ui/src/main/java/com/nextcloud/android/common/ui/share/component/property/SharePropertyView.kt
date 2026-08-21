@@ -23,9 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nextcloud.android.common.ui.R
-import com.nextcloud.android.common.ui.share.viewmodel.ShareViewModel
 import com.nextcloud.android.common.ui.share.component.ShareSwitch
 import com.nextcloud.android.common.ui.share.component.property.datepicker.ShareDatePicker
 import com.nextcloud.android.common.ui.share.model.api.property.Property
@@ -40,21 +38,23 @@ private const val MULTILINE_MIN_LINES = 1
 private const val MULTILINE_MAX_LINES = 3
 
 @Composable
-fun SharePropertyView(shareId: String, property: Property, viewModel: ShareViewModel) {
-    val propertyErrors by viewModel.propertyErrors.collectAsStateWithLifecycle()
+fun propertyErrorMessage(propertyErrors: Map<String, String?>, clazz: String): String? {
     val fallbackError = stringResource(R.string.share_view_update_error_message)
-    val errorMessage = if (propertyErrors.containsKey(property.clazz)) {
-        propertyErrors[property.clazz] ?: fallbackError
-    } else {
-        null
-    }
+    if (!propertyErrors.containsKey(clazz)) return null
+    return propertyErrors[clazz] ?: fallbackError
+}
 
+@Composable
+fun SharePropertyView(
+    property: Property,
+    errorMessage: String?,
+    onValueChange: (String?) -> Unit
+) {
     Column {
         SharePropertyField(
-            shareId = shareId,
             property = property,
             isError = errorMessage != null,
-            viewModel = viewModel
+            onValueChange = onValueChange
         )
 
         SharePropertyMessage(errorMessage = errorMessage, hint = property.hint)
@@ -63,10 +63,9 @@ fun SharePropertyView(shareId: String, property: Property, viewModel: ShareViewM
 
 @Composable
 private fun SharePropertyField(
-    shareId: String,
     property: Property,
     isError: Boolean,
-    viewModel: ShareViewModel
+    onValueChange: (String?) -> Unit
 ) {
     when (property) {
         is PropertyBoolean -> {
@@ -77,46 +76,43 @@ private fun SharePropertyField(
                 checked = checkedValue,
                 onCheckedChange = { isChecked ->
                     checkedValue = isChecked
-                    viewModel.updateProperty(shareId, property.clazz, isChecked.toString())
+                    onValueChange(isChecked.toString())
                 }
             )
         }
 
         is PropertyString -> ShareTextPropertyField(
-            shareId = shareId,
             property = property,
             isError = isError,
-            viewModel = viewModel
+            onValueChange = onValueChange
         )
 
         is PropertyPassword -> ShareTextPropertyField(
-            shareId = shareId,
             property = property,
             isError = isError,
-            viewModel = viewModel,
+            onValueChange = onValueChange,
             visualTransformation = PasswordVisualTransformation()
         )
 
         is PropertyDate -> ShareDatePicker(
             property = property,
             isError = isError,
-            onDateSelected = { dateValue -> viewModel.updateProperty(shareId, property.clazz, dateValue) }
+            onDateSelected = onValueChange
         )
 
         is PropertyEnum -> SharePropertyEnumField(
             property = property,
             isError = isError,
-            onValueSelected = { value -> viewModel.updateProperty(shareId, property.clazz, value) }
+            onValueSelected = onValueChange
         )
     }
 }
 
 @Composable
 private fun ShareTextPropertyField(
-    shareId: String,
     property: Property,
     isError: Boolean,
-    viewModel: ShareViewModel,
+    onValueChange: (String?) -> Unit,
     visualTransformation: VisualTransformation = VisualTransformation.None
 ) {
     val stringProperty = property as? PropertyString
@@ -144,7 +140,7 @@ private fun ShareTextPropertyField(
             .onFocusChanged { focusState ->
                 if (wasFocused && !focusState.isFocused && value != committedValue) {
                     committedValue = value
-                    viewModel.updateProperty(shareId, clazz, value)
+                    onValueChange(value)
                 }
                 wasFocused = focusState.isFocused
             },

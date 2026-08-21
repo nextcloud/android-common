@@ -11,7 +11,6 @@ package com.nextcloud.android.common.ui.share.component.bottomsheet
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -67,6 +66,7 @@ import com.nextcloud.android.common.ui.share.component.CustomLink
 import com.nextcloud.android.common.ui.share.component.SelectRecipientField
 import com.nextcloud.android.common.ui.share.component.ShareSwitch
 import com.nextcloud.android.common.ui.share.component.property.SharePropertyView
+import com.nextcloud.android.common.ui.share.component.property.propertyErrorMessage
 import com.nextcloud.android.common.ui.share.model.api.permission.Permission
 import com.nextcloud.android.common.ui.share.model.api.permission.PermissionPreset
 import com.nextcloud.android.common.ui.share.model.api.property.PropertyString
@@ -116,92 +116,89 @@ fun AddOrEditShareBottomSheet(
         dismissSheet()
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
+    ModalBottomSheet(
+        onDismissRequest = dismissSheet,
+        sheetState = sheetState,
+        sheetGesturesEnabled = false,
+        dragHandle = null,
+        properties = ModalBottomSheetProperties(shouldDismissOnClickOutside = false),
+        containerColor = MaterialTheme.colorScheme.surface,
     ) {
-        ModalBottomSheet(
-            onDismissRequest = dismissSheet,
-            sheetState = sheetState,
-            sheetGesturesEnabled = false,
-            dragHandle = null,
-            properties = ModalBottomSheetProperties(shouldDismissOnClickOutside = false),
-            containerColor = MaterialTheme.colorScheme.surface,
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
         ) {
-            Column(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .verticalScroll(rememberScrollState())
+                    .padding(start = 16.dp, end = 4.dp, top = 12.dp, bottom = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 16.dp, end = 4.dp, top = 12.dp, bottom = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = share.title(context),
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        maxLines = 1,
-                        softWrap = false,
-                        overflow = TextOverflow.MiddleEllipsis,
-                        modifier = Modifier.weight(1f)
-                    )
-
-                    IconButton(onClick = {
-                        scope.launch { sheetState.hide() }.invokeOnCompletion { dismissSheet() }
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "close bottom sheet",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-
-                ShareCategorySelector(
-                    share = share,
-                    categories = categories,
-                    selectedCategory = selectedCategory,
-                    onCategorySelected = { category ->
-                        selectedCategory = category
-                        viewModel.selectCategory(category, share)
-                    }
+                Text(
+                    text = share.title(context),
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    softWrap = false,
+                    overflow = TextOverflow.MiddleEllipsis,
+                    modifier = Modifier.weight(1f)
                 )
 
-                if (selectedCategory == ShareCategory.Invited) {
-                    SelectRecipientField(share, viewModel)
-                }
-
-                PermissionsView(
-                    share = share,
-                    entry = entry,
-                    permissionPresets = permissionPresets,
-                    viewModel = viewModel
-                )
-
-                BasicSettingsSection(
-                    share = share,
-                    viewModel = viewModel
-                )
-
-                AdvancedSettingsSection(
-                    share = share,
-                    isExpanded = showAdvancedSettings,
-                    onToggle = { showAdvancedSettings = !showAdvancedSettings },
-                    viewModel = viewModel
-                )
-
-                if (share.canSend) {
-                    ActionButtons(
-                        share = share,
-                        internalLink = internalLink,
-                        category = selectedCategory,
-                        sendEnabled = sendEnabled,
-                        viewModel = viewModel
+                IconButton(onClick = {
+                    scope.launch { sheetState.hide() }.invokeOnCompletion { dismissSheet() }
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "close bottom sheet",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
+            }
+
+            ShareCategorySelector(
+                share = share,
+                categories = categories,
+                selectedCategory = selectedCategory,
+                onCategorySelected = { category ->
+                    selectedCategory = category
+                    viewModel.selectCategory(category, share)
+                }
+            )
+
+            if (selectedCategory == ShareCategory.Invited) {
+                SelectRecipientField(share, viewModel)
+            }
+
+            PermissionsView(
+                share = share,
+                entry = entry,
+                permissionPresets = permissionPresets,
+                viewModel = viewModel
+            )
+
+            BasicSettingsSection(
+                share = share,
+                propertyErrors = propertyErrors,
+                viewModel = viewModel
+            )
+
+            AdvancedSettingsSection(
+                share = share,
+                isExpanded = showAdvancedSettings,
+                onToggle = { showAdvancedSettings = !showAdvancedSettings },
+                propertyErrors = propertyErrors,
+                viewModel = viewModel
+            )
+
+            if (share.canSend) {
+                ActionButtons(
+                    share = share,
+                    internalLink = internalLink,
+                    category = selectedCategory,
+                    sendEnabled = sendEnabled,
+                    viewModel = viewModel
+                )
             }
         }
     }
@@ -331,6 +328,7 @@ private fun PermissionPresetDropdown(
 @Composable
 private fun BasicSettingsSection(
     share: Share,
+    propertyErrors: Map<String, String?>,
     viewModel: ShareViewModel
 ) {
     if (!share.isBasicSectionAvailable) {
@@ -345,9 +343,9 @@ private fun BasicSettingsSection(
         share.basicProperties.forEach { property ->
             key(property.clazz) {
                 SharePropertyView(
-                    shareId = share.id,
                     property = property,
-                    viewModel = viewModel
+                    errorMessage = propertyErrorMessage(propertyErrors, property.clazz),
+                    onValueChange = { value -> viewModel.updateProperty(share.id, property.clazz, value) }
                 )
             }
         }
@@ -359,6 +357,7 @@ private fun AdvancedSettingsSection(
     share: Share,
     isExpanded: Boolean,
     onToggle: () -> Unit,
+    propertyErrors: Map<String, String?>,
     viewModel: ShareViewModel
 ) {
     if (!share.isAdvancedSectionAvailable) {
@@ -373,9 +372,9 @@ private fun AdvancedSettingsSection(
         share.advancedProperties.forEach { property ->
             key(property.clazz) {
                 SharePropertyView(
-                    shareId = share.id,
                     property = property,
-                    viewModel = viewModel
+                    errorMessage = propertyErrorMessage(propertyErrors, property.clazz),
+                    onValueChange = { value -> viewModel.updateProperty(share.id, property.clazz, value) }
                 )
             }
         }
