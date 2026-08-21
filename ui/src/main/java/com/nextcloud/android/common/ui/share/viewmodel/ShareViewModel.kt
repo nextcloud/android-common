@@ -31,13 +31,15 @@ import com.nextcloud.android.common.ui.share.model.ui.ShareEditorEntry
 import com.nextcloud.android.common.ui.share.model.ui.ShareScreenState
 import com.nextcloud.android.common.ui.share.model.ui.activeOnly
 import com.nextcloud.android.common.ui.share.repository.ShareRepository
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -45,7 +47,6 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.UUID
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -65,30 +66,33 @@ class ShareViewModel(
     private val savedState = ShareSavedState(savedStateHandle)
 
     private val _state = MutableStateFlow<ShareScreenState>(ShareScreenState.Loading)
-    val state: StateFlow<ShareScreenState> = _state
+    val state: StateFlow<ShareScreenState> = _state.asStateFlow()
+
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 
     private val _isPreparingLink = MutableStateFlow(false)
-    val isPreparingLink: StateFlow<Boolean> = _isPreparingLink
+    val isPreparingLink: StateFlow<Boolean> = _isPreparingLink.asStateFlow()
 
     private val isCreatingDraft = MutableStateFlow(false)
 
     private val _activeShare = MutableStateFlow<ActiveShareState>(ActiveShareState.None)
-    val activeShare: StateFlow<ActiveShareState> = _activeShare
+    val activeShare: StateFlow<ActiveShareState> = _activeShare.asStateFlow()
 
     private val _editorEntry = MutableStateFlow(savedState.editorEntry)
-    val editorEntry: StateFlow<ShareEditorEntry> = _editorEntry
+    val editorEntry: StateFlow<ShareEditorEntry> = _editorEntry.asStateFlow()
 
     private val _permissionPresets = MutableStateFlow<List<PermissionPreset>>(emptyList())
-    val permissionPresets: StateFlow<List<PermissionPreset>> = _permissionPresets
+    val permissionPresets: StateFlow<List<PermissionPreset>> = _permissionPresets.asStateFlow()
 
     private val _errorMessageId = MutableStateFlow<Int?>(null)
-    val errorMessageId: StateFlow<Int?> = _errorMessageId
+    val errorMessageId: StateFlow<Int?> = _errorMessageId.asStateFlow()
 
     private val _propertyErrors = MutableStateFlow<Map<String, String?>>(emptyMap())
-    val propertyErrors: StateFlow<Map<String, String?>> = _propertyErrors
+    val propertyErrors: StateFlow<Map<String, String?>> = _propertyErrors.asStateFlow()
 
     private val _pendingProperties = MutableStateFlow<Set<String>>(emptySet())
-    val pendingProperties: StateFlow<Set<String>> = _pendingProperties
+    val pendingProperties: StateFlow<Set<String>> = _pendingProperties.asStateFlow()
 
     private val currentShares: List<Share>
         get() = (_state.value as? ShareScreenState.Loaded)?.shares ?: emptyList()
@@ -111,8 +115,15 @@ class ShareViewModel(
         loadInitialData()
     }
 
+    override fun onCleared() {
+        super.onCleared()
+
+        val draft = _activeShare.value.shareOrNull?.takeIf { it.shareState == ShareState.DRAFT } ?: return
+        CoroutineScope(SupervisorJob()).launch { repository.deleteShare(draft.id) }
+    }
+
     private fun loadInitialData() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             launch { loadSharingCapabilities() }
             launch { restoreActiveShare() }
             loadShares()
@@ -155,19 +166,14 @@ class ShareViewModel(
 
     // region shares list
     fun refreshShares() {
-        val state = _state.value as? ShareScreenState.Loaded ?: return
-        if (state.refreshing) return
+        if (!_isRefreshing.compareAndSet(expect = false, update = true)) return
 
-        viewModelScope.launch(Dispatchers.IO) {
-            setRefreshing(true)
-            loadShares()
-            setRefreshing(false)
-        }
-    }
-
-    private fun setRefreshing(refreshing: Boolean) {
-        _state.update {
-            if (it is ShareScreenState.Loaded) it.copy(refreshing = refreshing) else it
+        viewModelScope.launch {
+            try {
+                loadShares()
+            } finally {
+                _isRefreshing.value = false
+            }
         }
     }
 
@@ -177,8 +183,26 @@ class ShareViewModel(
             filterSourceTypeValue = sourceId,
             filterSourceTypeClass = Source.NODE_SOURCE_CLASS
         )
-        result.dataOrElse { _errorMessageId.update { R.string.share_view_fetch_error_message } }?.let { fetched ->
-            publishShares(fetched.activeOnly())
+        val fetched = result.dataOrElse { _errorMessageId.update { R.string.share_view_fetch_error_message } }
+
+        if (fetched == null) {
+            _state.update { it as? ShareScreenState.Loaded ?: ShareScreenState.Error }
+            return
+        }
+
+        publishShares(fetched.activeOnly())
+        deleteAbandonedDrafts(fetched)
+    }
+
+    private fun deleteAbandonedDrafts(fetched: List<Share>) {
+        if (isCreatingDraft.value) return
+
+        val openShareIds = setOfNotNull(_activeShare.value.shareOrNull?.id, savedState.activeShareId)
+        val abandoned = fetched.filter { it.shareState == ShareState.DRAFT && it.id !in openShareIds }
+        if (abandoned.isEmpty()) return
+
+        viewModelScope.launch {
+            abandoned.forEach { repository.deleteShare(it.id) }
         }
     }
     // endregion
@@ -187,7 +211,7 @@ class ShareViewModel(
     fun createDraftShare() {
         if (!isCreatingDraft.compareAndSet(expect = false, update = true)) return
 
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             try {
                 _errorMessageId.update { null }
 
@@ -208,7 +232,7 @@ class ShareViewModel(
 
     // region state
     fun updateState(id: String, shareState: ShareState) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val updated = applyState(id, shareState) ?: return@launch
 
             if (shareState == ShareState.ACTIVE) {
@@ -223,7 +247,7 @@ class ShareViewModel(
     fun prepareLinkForCopy(id: String) {
         if (_isPreparingLink.value) return
 
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             _isPreparingLink.update { true }
 
             val updated = applyState(id, ShareState.ACTIVE)
@@ -259,7 +283,7 @@ class ShareViewModel(
 
     // region recipients
     fun addRecipient(id: String, clazz: String, value: String, instance: String? = null) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val result = repository.addShareRecipient(id, AddRecipientRequest(clazz, value, instance))
             val updated = result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
                 ?: return@launch
@@ -295,7 +319,7 @@ class ShareViewModel(
     }
 
     fun removeRecipient(id: String, clazz: String, value: String, instance: String? = null) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val result = repository.removeShareRecipient(id, clazz, value, instance)
             val updated = result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
                 ?: return@launch
@@ -306,7 +330,7 @@ class ShareViewModel(
 
     fun updateRecipientSecret(shareId: String, recipient: Recipient, secret: String) {
         secretUpdateJob?.cancel()
-        secretUpdateJob = viewModelScope.launch(Dispatchers.IO) {
+        secretUpdateJob = viewModelScope.launch {
             val request = UpdateShareRecipientSecretRequest(
                 clazz = recipient.clazz,
                 value = recipient.value,
@@ -321,10 +345,10 @@ class ShareViewModel(
         }
     }
 
-    suspend fun generateSecret(): String? = withContext(Dispatchers.IO) {
+    suspend fun generateSecret(): String? {
         _errorMessageId.update { null }
         val result = repository.generateSecret()
-        result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
+        return result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
     }
     // endregion
 
@@ -335,7 +359,7 @@ class ShareViewModel(
         if (value.isNullOrEmpty()) {
             _propertyErrors.update { it - clazz }
         }
-        propertyUpdateJobs[clazz] = viewModelScope.launch(Dispatchers.IO) {
+        propertyUpdateJobs[clazz] = viewModelScope.launch {
             when (val result = repository.updateShareProperty(shareId, UpdateSharePropertyRequest(clazz, value))) {
                 is NetworkResult.Success -> {
                     _propertyErrors.update { it - clazz }
@@ -362,16 +386,17 @@ class ShareViewModel(
 
     // region permissions
     fun updatePermission(id: String, clazz: String, enabled: Boolean) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val result = repository.updateSharePermission(id, UpdateSharePermissionRequest(clazz, enabled))
             val updated = result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
                 ?: return@launch
+            refreshActiveShare(updated.toActiveShare())
             replaceInList(updated)
         }
     }
 
     fun updatePermissionPreset(id: String, presetClass: String, updateActiveShare: Boolean) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val result = repository.updateSharePermissionPreset(id, UpdateSharePermissionPresetRequest(presetClass))
             val updated = result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
                 ?: return@launch
@@ -385,7 +410,7 @@ class ShareViewModel(
 
     // region delete
     fun deleteShare(id: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val result = repository.deleteShare(id)
             result.dataOrElse { _errorMessageId.update { R.string.share_view_delete_error_message } } ?: return@launch
 
@@ -458,7 +483,7 @@ class ShareViewModel(
 
     private fun publishShares(shares: List<Share>) {
         _state.update {
-            if (shares.isEmpty()) ShareScreenState.Empty else ShareScreenState.Loaded(shares, false)
+            if (shares.isEmpty()) ShareScreenState.Empty else ShareScreenState.Loaded(shares)
         }
     }
     // endregion
