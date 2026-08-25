@@ -8,6 +8,21 @@
 <resources>
     <!-- relative time less than 1 minute using the term: Now -->
     <string name="date_formatting_now">Зараз</string>
+    <!-- relative time in minutes, less than 1 hour, i.e. 1m, 5m, 59m -->
+    <plurals name="date_formatting_relative_minutes">
+        <item quantity="one">%dхв.</item>
+        <item quantity="few">%dхв.</item>
+        <item quantity="many">%dхв.</item>
+        <item quantity="other">%dхв.</item>
+    </plurals>
+    <!-- relative time in hours, less than 1 day, i.e. 1h, 5h, 23h -->
+    <plurals name="date_formatting_relative_hours">
+        <item quantity="one">%dг</item>
+        <item quantity="few">%dг</item>
+        <item quantity="many">%dг</item>
+        <item quantity="other">%dг</item>
+    </plurals>
+
     <string name="ecosystem_null_account">Відсутній обліковий запис. Неможливо відкрити застосунок.</string>
     <string name="ecosystem_wrong_intent">Неможливо виконати дію: отримано неочікувані дані</string>
     <string name="ecosystem_received_account_invalid">Отримано недійсний обліковий запис.</string>
