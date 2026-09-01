@@ -18,6 +18,7 @@ import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareProper
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareRecipientSecretRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareStateRequest
 import com.nextcloud.android.common.ui.share.model.api.share.Share
+import com.nextcloud.android.common.ui.share.model.api.state.ShareState
 
 interface ShareRepository {
 
@@ -41,6 +42,7 @@ interface ShareRepository {
         filterSourceTypeValue: String,
         limit: Int? = null,
         filterSourceTypeClass: String? = null,
+        filterState: ShareState? = null,
         lastShareID: String? = null
     ): NetworkResult<List<Share>>
 

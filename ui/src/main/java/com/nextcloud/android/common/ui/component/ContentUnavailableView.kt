@@ -41,8 +41,6 @@ fun ContentUnavailableView(title: String, description: String? = null, iconId: I
             )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
         Text(
             text = title,
             style = MaterialTheme.typography.headlineMedium,
@@ -57,8 +55,8 @@ fun ContentUnavailableView(title: String, description: String? = null, iconId: I
                 style = MaterialTheme.typography.headlineSmall,
                 textAlign = TextAlign.Center
             )
-        }
 
-        Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(32.dp))
+        }
     }
 }

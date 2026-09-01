@@ -23,7 +23,9 @@ import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePermis
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePropertyRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareRecipientSecretRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareStateRequest
+import com.nextcloud.android.common.ui.share.model.api.apiValue
 import com.nextcloud.android.common.ui.share.model.api.share.Share
+import com.nextcloud.android.common.ui.share.model.api.state.ShareState
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonObject
@@ -95,12 +97,14 @@ class ShareRemoteRepository(
         filterSourceTypeValue: String,
         limit: Int?,
         filterSourceTypeClass: String?,
+        filterState: ShareState?,
         lastShareID: String?
     ): NetworkResult<List<Share>> {
         val queryParams = buildString {
             append("?filterSourceTypeValue=${filterSourceTypeValue.urlEncoded()}")
             limit?.let { append("&limit=$it") }
             filterSourceTypeClass?.let { append("&filterSourceTypeClass=${it.urlEncoded()}") }
+            filterState?.let { append("&filterState=${it.apiValue().urlEncoded()}") }
             lastShareID?.let { append("&lastShareID=${it.urlEncoded()}") }
         }
         return client.executeRequest(
