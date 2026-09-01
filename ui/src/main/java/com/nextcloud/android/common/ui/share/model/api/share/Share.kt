@@ -17,6 +17,7 @@ import com.nextcloud.android.common.ui.share.model.api.property.Property
 import com.nextcloud.android.common.ui.share.model.api.recipients.Recipient
 import com.nextcloud.android.common.ui.share.model.api.source.Source
 import com.nextcloud.android.common.ui.share.model.api.state.ShareState
+import com.nextcloud.android.common.ui.share.model.api.state.ShareUserStatus
 import com.nextcloud.android.common.ui.share.model.api.user.User
 import com.nextcloud.android.common.ui.share.model.ui.ActiveShareState
 import com.nextcloud.android.common.ui.share.model.ui.ShareCategory
@@ -34,6 +35,9 @@ data class Share(
 
     @SerialName("state")
     val shareState: ShareState,
+
+    @SerialName("user_status")
+    val userStatus: ShareUserStatus? = null,
 
     val sources: List<Source>,
 

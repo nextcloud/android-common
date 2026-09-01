@@ -273,7 +273,7 @@ private fun SharePlaceholder(state: ShareScreenState) {
     }
 
     ContentUnavailableView(
-        iconId = R.drawable.ic_person_add,
+        iconId = R.drawable.ic_person_add_filled,
         title = stringResource(R.string.share_view_empty_title)
     )
 }

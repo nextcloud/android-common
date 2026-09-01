@@ -29,7 +29,6 @@ import com.nextcloud.android.common.ui.share.model.ui.ActiveShareState
 import com.nextcloud.android.common.ui.share.model.ui.ShareCategory
 import com.nextcloud.android.common.ui.share.model.ui.ShareEditorEntry
 import com.nextcloud.android.common.ui.share.model.ui.ShareScreenState
-import com.nextcloud.android.common.ui.share.model.ui.activeOnly
 import com.nextcloud.android.common.ui.share.repository.ShareRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -179,10 +178,7 @@ class ShareViewModel(
 
     private suspend fun loadShares() {
         _errorMessageId.update { null }
-        val result = repository.fetchShares(
-            filterSourceTypeValue = sourceId,
-            filterSourceTypeClass = Source.NODE_SOURCE_CLASS
-        )
+        val result = fetchShares(ShareState.ACTIVE)
         val fetched = result.dataOrElse { _errorMessageId.update { R.string.share_view_fetch_error_message } }
 
         if (fetched == null) {
@@ -190,20 +186,22 @@ class ShareViewModel(
             return
         }
 
-        publishShares(fetched.activeOnly())
-        deleteAbandonedDrafts(fetched)
+        publishShares(fetched)
+        viewModelScope.launch { deleteAbandonedDrafts() }
     }
 
-    private fun deleteAbandonedDrafts(fetched: List<Share>) {
+    private suspend fun fetchShares(filterState: ShareState): NetworkResult<List<Share>> = repository.fetchShares(
+        filterSourceTypeValue = sourceId,
+        filterSourceTypeClass = Source.NODE_SOURCE_CLASS,
+        filterState = filterState
+    )
+
+    private suspend fun deleteAbandonedDrafts() {
         if (isCreatingDraft.value) return
 
+        val drafts = (fetchShares(ShareState.DRAFT) as? NetworkResult.Success)?.data ?: return
         val openShareIds = setOfNotNull(_activeShare.value.shareOrNull?.id, savedState.activeShareId)
-        val abandoned = fetched.filter { it.shareState == ShareState.DRAFT && it.id !in openShareIds }
-        if (abandoned.isEmpty()) return
-
-        viewModelScope.launch {
-            abandoned.forEach { repository.deleteShare(it.id) }
-        }
+        drafts.filterNot { it.id in openShareIds }.forEach { repository.deleteShare(it.id) }
     }
     // endregion
 

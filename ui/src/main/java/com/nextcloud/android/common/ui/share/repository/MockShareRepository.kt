@@ -327,13 +327,15 @@ class MockShareRepository : ShareRepository {
         filterSourceTypeValue: String,
         limit: Int?,
         filterSourceTypeClass: String?,
+        filterState: ShareState?,
         lastShareID: String?
     ): NetworkResult<List<Share>> {
         val result = mockShares.filter { share ->
-            share.sources.any {
-                it.value == filterSourceTypeValue &&
-                    (filterSourceTypeClass == null || it.clazz == filterSourceTypeClass)
-            }
+            (filterState == null || share.shareState == filterState) &&
+                share.sources.any {
+                    it.value == filterSourceTypeValue &&
+                        (filterSourceTypeClass == null || it.clazz == filterSourceTypeClass)
+                }
         }
 
         return NetworkResult.Success(result)
