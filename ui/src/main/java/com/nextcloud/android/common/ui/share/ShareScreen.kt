@@ -111,7 +111,7 @@ private fun ShareScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val resources = LocalResources.current
     var overlay by rememberSaveable(stateSaver = ShareOverlay.Saver) {
-        mutableStateOf<ShareOverlay>(ShareOverlay.None)
+        mutableStateOf(ShareOverlay.None)
     }
 
     LaunchedEffect(errorMessageId) {
