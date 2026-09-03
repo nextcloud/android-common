@@ -5,6 +5,8 @@
  * SPDX-License-Identifier: MIT
  */
 
+@file:Suppress("FunctionNaming", "LongMethod")
+
 package com.nextcloud.android.common.ui.share
 
 import androidx.compose.foundation.background

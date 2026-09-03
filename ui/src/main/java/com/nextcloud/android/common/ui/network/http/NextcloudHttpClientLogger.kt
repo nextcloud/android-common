@@ -16,6 +16,9 @@ internal class NextcloudHttpClientLogger(private val enabled: Boolean) {
     companion object {
         private const val TAG = "NextcloudHttpClient"
 
+        private val successStatusCodes = 200..299
+        private val redirectStatusCodes = 300..399
+
         private val prettyJson =
             Json {
                 prettyPrint = true
@@ -58,11 +61,12 @@ internal class NextcloudHttpClientLogger(private val enabled: Boolean) {
 
     private fun statusEmojiFor(code: Int, isError: Boolean): String = when {
         isError -> "🔴"
-        code in 200..299 -> "🟢"
-        code in 300..399 -> "🟡"
+        code in successStatusCodes -> "🟢"
+        code in redirectStatusCodes -> "🟡"
         else -> "🔴"
     }
 
+    @Suppress("TooGenericExceptionCaught")
     private fun RequestBody?.readableString(): String {
         if (this == null) return "<none>"
         return try {

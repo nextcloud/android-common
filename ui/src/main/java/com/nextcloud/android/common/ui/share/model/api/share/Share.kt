@@ -66,12 +66,13 @@ data class Share(
     fun toActiveShare(): ActiveShareState = ActiveShareState.Editing(this)
 
     fun getClipEntry(internalLink: String, category: ShareCategory): ClipEntry? {
-        if (category == ShareCategory.Anyone) {
-            val recipient = customLinkRecipient ?: return null
-            return recipient.secret.url?.let { ClipData.newPlainText(recipient.displayName, it).toClipEntry() }
+        if (category != ShareCategory.Anyone) {
+            return recipients.firstOrNull()?.let { ClipData.newPlainText(it.displayName, internalLink).toClipEntry() }
         }
 
-        return recipients.firstOrNull()?.let { ClipData.newPlainText(it.displayName, internalLink).toClipEntry() }
+        return customLinkRecipient?.let { recipient ->
+            recipient.secret.url?.let { ClipData.newPlainText(recipient.displayName, it).toClipEntry() }
+        }
     }
 
     fun getHeadline(context: Context, shares: List<Share>): String {

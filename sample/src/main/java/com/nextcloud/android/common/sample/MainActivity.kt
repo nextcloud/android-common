@@ -31,6 +31,7 @@ import com.nextcloud.android.common.ui.util.extensions.addSystemBarPaddings
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
+    @Suppress("LongMethod")
     override fun onCreate(savedInstanceState: Bundle?) {
         val style = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT)
         enableEdgeToEdge(style, style)

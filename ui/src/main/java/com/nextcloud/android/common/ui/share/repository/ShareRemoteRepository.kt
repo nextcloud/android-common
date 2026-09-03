@@ -35,6 +35,7 @@ import java.net.URLEncoder
 
 private fun String.urlEncoded(): String = URLEncoder.encode(this, Charsets.UTF_8.name())
 
+@Suppress("TooManyFunctions")
 class ShareRemoteRepository(
     private val client: NextcloudHttpClient,
     private val json: kotlinx.serialization.json.Json = OCSSerializer.json

@@ -5,6 +5,8 @@
  * SPDX-License-Identifier: MIT
  */
 
+@file:Suppress("FunctionNaming")
+
 package com.nextcloud.android.common.ui.share.component.property
 
 import androidx.compose.foundation.layout.fillMaxWidth
