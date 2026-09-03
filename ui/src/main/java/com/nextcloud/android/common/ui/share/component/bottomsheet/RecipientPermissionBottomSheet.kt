@@ -11,8 +11,14 @@ package com.nextcloud.android.common.ui.share.component.bottomsheet
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
@@ -31,6 +37,7 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -49,6 +56,8 @@ import com.nextcloud.android.common.ui.share.viewmodel.ShareViewModel
 
 private val SHEET_BOTTOM_PADDING = 32.dp
 private val CONTENT_PADDING = 16.dp
+private val REMOVE_VERTICAL_PADDING = 14.dp
+private val REMOVE_ICON_SIZE = 22.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,6 +82,7 @@ fun RecipientPermissionBottomSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
                 .padding(bottom = SHEET_BOTTOM_PADDING)
         ) {
             Text(
@@ -124,23 +134,28 @@ fun RecipientPermissionBottomSheet(
 
 @Composable
 private fun RemoveRecipientItem(onClick: () -> Unit) {
-    ListItem(
-        modifier = Modifier.clickable { onClick() },
-        headlineContent = {
-            Text(
-                text = stringResource(R.string.share_view_recipient_remove),
-                color = MaterialTheme.colorScheme.error
-            )
-        },
-        leadingContent = {
-            Icon(
-                imageVector = Icons.Default.Delete,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.error
-            )
-        },
-        colors = ListItemDefaults.colors(containerColor = Color.Transparent)
-    )
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+            .padding(horizontal = CONTENT_PADDING, vertical = REMOVE_VERTICAL_PADDING),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Default.Delete,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.error,
+            modifier = Modifier.size(REMOVE_ICON_SIZE)
+        )
+
+        Spacer(modifier = Modifier.width(CONTENT_PADDING))
+
+        Text(
+            text = stringResource(R.string.share_view_recipient_remove),
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.error
+        )
+    }
 }
 
 @Composable
