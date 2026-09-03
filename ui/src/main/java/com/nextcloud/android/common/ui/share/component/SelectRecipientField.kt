@@ -47,7 +47,7 @@ import com.nextcloud.android.common.ui.share.model.api.icon.Icon
 import com.nextcloud.android.common.ui.share.model.api.recipients.Recipient
 import com.nextcloud.android.common.ui.share.model.api.share.Share
 
-private val FIELD_PADDING = 12.dp
+private val FIELD_VERTICAL_PADDING = 12.dp
 private val CHIP_SPACING = 8.dp
 private val CHIP_AVATAR_SIZE = 20.dp
 private val CHIP_CLOSE_ICON_SIZE = 18.dp
@@ -83,9 +83,7 @@ private fun RecipientChips(recipients: List<Recipient>, onRemove: (Recipient) ->
     if (recipients.isEmpty()) return
 
     FlowRow(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = FIELD_PADDING),
+        modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(CHIP_SPACING)
     ) {
         recipients.forEach { recipient ->
@@ -119,7 +117,7 @@ private fun RecipientSearch(share: Share, selected: List<Recipient>, viewModel: 
     ExposedDropdownMenuBox(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(FIELD_PADDING),
+            .padding(vertical = FIELD_VERTICAL_PADDING),
         expanded = expanded && query.isNotBlank(),
         onExpandedChange = { expanded = it }
     ) {

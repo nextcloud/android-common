@@ -87,6 +87,12 @@ import kotlinx.coroutines.launch
 
 private const val CUSTOM_SELECTION = "custom"
 
+private val SHEET_CONTENT_PADDING = 16.dp
+private val CLOSE_BUTTON_END_PADDING = 4.dp
+private val CATEGORY_VERTICAL_PADDING = 8.dp
+private val PRESET_VERTICAL_PADDING = 12.dp
+private val ACTION_BUTTONS_VERTICAL_PADDING = 16.dp
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddOrEditShareBottomSheet(
@@ -129,77 +135,94 @@ fun AddOrEditShareBottomSheet(
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState())
         ) {
-            Row(
+            ShareSheetHeader(
+                title = share.title(context),
+                onClose = { scope.launch { sheetState.hide() }.invokeOnCompletion { dismissSheet() } }
+            )
+
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 16.dp, end = 4.dp, top = 12.dp, bottom = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(horizontal = SHEET_CONTENT_PADDING)
             ) {
-                Text(
-                    text = share.title(context),
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    maxLines = 1,
-                    softWrap = false,
-                    overflow = TextOverflow.MiddleEllipsis,
-                    modifier = Modifier.weight(1f)
+                ShareCategorySelector(
+                    share = share,
+                    categories = categories,
+                    selectedCategory = selectedCategory,
+                    onCategorySelected = { category ->
+                        selectedCategory = category
+                        viewModel.selectCategory(category, share)
+                    }
                 )
 
-                IconButton(onClick = {
-                    scope.launch { sheetState.hide() }.invokeOnCompletion { dismissSheet() }
-                }) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "close bottom sheet",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                if (selectedCategory == ShareCategory.Invited) {
+                    SelectRecipientField(share, viewModel)
+                }
+
+                PermissionsView(
+                    share = share,
+                    entry = entry,
+                    permissionPresets = permissionPresets,
+                    viewModel = viewModel
+                )
+
+                BasicSettingsSection(
+                    share = share,
+                    propertyErrors = propertyErrors,
+                    viewModel = viewModel
+                )
+
+                AdvancedSettingsSection(
+                    share = share,
+                    isExpanded = showAdvancedSettings,
+                    onToggle = { showAdvancedSettings = !showAdvancedSettings },
+                    propertyErrors = propertyErrors,
+                    viewModel = viewModel
+                )
+
+                if (share.canSend) {
+                    ActionButtons(
+                        share = share,
+                        internalLink = internalLink,
+                        category = selectedCategory,
+                        sendEnabled = sendEnabled,
+                        viewModel = viewModel
                     )
                 }
             }
+        }
+    }
+}
 
-            ShareCategorySelector(
-                share = share,
-                categories = categories,
-                selectedCategory = selectedCategory,
-                onCategorySelected = { category ->
-                    selectedCategory = category
-                    viewModel.selectCategory(category, share)
-                }
+@Composable
+private fun ShareSheetHeader(title: String, onClose: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                start = SHEET_CONTENT_PADDING,
+                end = CLOSE_BUTTON_END_PADDING,
+                top = PRESET_VERTICAL_PADDING,
+                bottom = CATEGORY_VERTICAL_PADDING
+            ),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.headlineSmall,
+            color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 1,
+            softWrap = false,
+            overflow = TextOverflow.MiddleEllipsis,
+            modifier = Modifier.weight(1f)
+        )
+
+        IconButton(onClick = onClose) {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = "close bottom sheet",
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
-
-            if (selectedCategory == ShareCategory.Invited) {
-                SelectRecipientField(share, viewModel)
-            }
-
-            PermissionsView(
-                share = share,
-                entry = entry,
-                permissionPresets = permissionPresets,
-                viewModel = viewModel
-            )
-
-            BasicSettingsSection(
-                share = share,
-                propertyErrors = propertyErrors,
-                viewModel = viewModel
-            )
-
-            AdvancedSettingsSection(
-                share = share,
-                isExpanded = showAdvancedSettings,
-                onToggle = { showAdvancedSettings = !showAdvancedSettings },
-                propertyErrors = propertyErrors,
-                viewModel = viewModel
-            )
-
-            if (share.canSend) {
-                ActionButtons(
-                    share = share,
-                    internalLink = internalLink,
-                    category = selectedCategory,
-                    sendEnabled = sendEnabled,
-                    viewModel = viewModel
-                )
-            }
         }
     }
 }
@@ -218,7 +241,7 @@ private fun ShareCategorySelector(
     SingleChoiceSegmentedButtonRow(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(vertical = CATEGORY_VERTICAL_PADDING)
     ) {
         categories.forEachIndexed { index, category ->
             SegmentedButton(
@@ -293,7 +316,9 @@ private fun PermissionPresetDropdown(
     var expanded by remember { mutableStateOf(false) }
 
     ExposedDropdownMenuBox(
-        modifier = Modifier.padding(12.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = PRESET_VERTICAL_PADDING),
         expanded = expanded,
         onExpandedChange = { expanded = it }
     ) {
@@ -335,11 +360,7 @@ private fun BasicSettingsSection(
         return
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-    ) {
+    Column(modifier = Modifier.fillMaxWidth()) {
         share.basicProperties.forEach { property ->
             key(property.clazz) {
                 SharePropertyView(
@@ -413,7 +434,7 @@ private fun ActionButtons(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(vertical = ACTION_BUTTONS_VERTICAL_PADDING),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Button(
