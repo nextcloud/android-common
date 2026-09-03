@@ -43,6 +43,7 @@
     <string name="share_view_delete_error_message">Failed to delete share.</string>
     <string name="share_view_create_error_message">Failed to create share.</string>
     <string name="share_view_update_error_message">Failed to update share.</string>
+    <string name="share_view_rate_limited_message">Please try again in a few seconds.</string>
 
     <string name="share_view_quick_permission_title">Participants</string>
     <string name="share_view_permission_preset_label">Participants</string>

@@ -13,6 +13,7 @@ import androidx.lifecycle.viewModelScope
 import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.network.model.NetworkResult
 import com.nextcloud.android.common.ui.network.model.dataOrElse
+import com.nextcloud.android.common.ui.network.model.isRateLimited
 import com.nextcloud.android.common.ui.share.model.api.permission.PermissionPreset
 import com.nextcloud.android.common.ui.share.model.api.recipients.Recipient
 import com.nextcloud.android.common.ui.share.model.api.request.AddRecipientRequest
@@ -48,6 +49,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.TimeMark
+import kotlin.time.TimeSource
 
 class ShareViewModel(
     private val repository: ShareRepository,
@@ -60,6 +64,8 @@ class ShareViewModel(
         private const val SEARCH_SUBSCRIPTION_TIMEOUT = 5_000L
         private const val RECIPIENT_SEARCH_LIMIT = 10
         private const val RECIPIENT_SEARCH_OFFSET = 0
+
+        private val DRAFT_CREATION_INTERVAL = 5.seconds
     }
 
     private val savedState = ShareSavedState(savedStateHandle)
@@ -109,6 +115,8 @@ class ShareViewModel(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(SEARCH_SUBSCRIPTION_TIMEOUT), emptyList())
 
     private var secretUpdateJob: Job? = null
+
+    private var lastDraftCreation: TimeMark? = null
 
     init {
         loadInitialData()
@@ -207,15 +215,20 @@ class ShareViewModel(
 
     // region create
     fun createDraftShare() {
+        if (isWithinDraftCreationInterval()) {
+            _errorMessageId.update { R.string.share_view_rate_limited_message }
+            return
+        }
+
         if (!isCreatingDraft.compareAndSet(expect = false, update = true)) return
 
         viewModelScope.launch {
             try {
                 _errorMessageId.update { null }
+                lastDraftCreation = TimeSource.Monotonic.markNow()
 
                 val result = repository.createDraftShare()
-                val draft = result.dataOrElse { _errorMessageId.update { R.string.share_view_create_error_message } }
-                    ?: return@launch
+                val draft = result.dataOrElse { onDraftCreationFailed(result) } ?: return@launch
 
                 updateEditorEntry(ShareEditorEntry.EDIT)
                 updateActiveShare(draft.toActiveShare())
@@ -225,6 +238,21 @@ class ShareViewModel(
                 isCreatingDraft.value = false
             }
         }
+    }
+
+    private fun onDraftCreationFailed(result: NetworkResult<Share>) {
+        val messageId = if (result.isRateLimited) {
+            R.string.share_view_rate_limited_message
+        } else {
+            R.string.share_view_create_error_message
+        }
+
+        _errorMessageId.update { messageId }
+    }
+
+    private fun isWithinDraftCreationInterval(): Boolean {
+        val elapsed = lastDraftCreation?.elapsedNow() ?: return false
+        return elapsed < DRAFT_CREATION_INTERVAL
     }
     // endregion
 
