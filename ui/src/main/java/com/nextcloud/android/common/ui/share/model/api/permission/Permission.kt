@@ -17,18 +17,12 @@ import kotlinx.serialization.Serializable
 data class Permission(
     @SerialName("class")
     val clazz: String,
-
     @SerialName("source_class")
     val sourceClass: String? = null,
-
     @SerialName("display_name")
     val displayName: String,
-
     val hint: String? = null,
-
     val priority: Int,
-
     val presets: List<String>,
-
     val enabled: Boolean
 )

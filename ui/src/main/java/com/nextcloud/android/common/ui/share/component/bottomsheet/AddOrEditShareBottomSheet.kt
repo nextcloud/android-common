@@ -5,7 +5,6 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-
 package com.nextcloud.android.common.ui.share.component.bottomsheet
 
 import androidx.compose.foundation.layout.Arrangement
@@ -128,7 +127,7 @@ fun AddOrEditShareBottomSheet(
         sheetGesturesEnabled = false,
         dragHandle = null,
         properties = ModalBottomSheetProperties(shouldDismissOnClickOutside = false),
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = MaterialTheme.colorScheme.surface
     ) {
         Column(
             modifier = Modifier
@@ -351,11 +350,7 @@ private fun PermissionPresetDropdown(
 }
 
 @Composable
-private fun BasicSettingsSection(
-    share: Share,
-    propertyErrors: Map<String, String?>,
-    viewModel: ShareViewModel
-) {
+private fun BasicSettingsSection(share: Share, propertyErrors: Map<String, String?>, viewModel: ShareViewModel) {
     if (!share.isBasicSectionAvailable) {
         return
     }
@@ -435,7 +430,7 @@ private fun ActionButtons(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = ACTION_BUTTONS_VERTICAL_PADDING),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Button(
             onClick = {
@@ -452,8 +447,8 @@ private fun ActionButtons(
             shape = RoundedCornerShape(10.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.onSurface,
-            ),
+                contentColor = MaterialTheme.colorScheme.onSurface
+            )
         ) {
             if (isPreparingLink) {
                 CircularProgressIndicator(
@@ -465,12 +460,12 @@ private fun ActionButtons(
                 Icon(
                     painter = painterResource(R.drawable.ic_link),
                     contentDescription = null,
-                    modifier = Modifier.size(20.dp),
+                    modifier = Modifier.size(20.dp)
                 )
             }
             Text(
                 text = stringResource(category.copyLinkTitleId),
-                modifier = Modifier.padding(start = 8.dp),
+                modifier = Modifier.padding(start = 8.dp)
             )
         }
 
@@ -484,17 +479,17 @@ private fun ActionButtons(
                 shape = RoundedCornerShape(10.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary,
-                ),
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
             ) {
                 Icon(
                     imageVector = category.sendActionIcon,
                     contentDescription = null,
-                    modifier = Modifier.size(20.dp),
+                    modifier = Modifier.size(20.dp)
                 )
                 Text(
                     text = stringResource(category.sendActionTitleId),
-                    modifier = Modifier.padding(start = 8.dp),
+                    modifier = Modifier.padding(start = 8.dp)
                 )
             }
         } else {
@@ -507,12 +502,12 @@ private fun ActionButtons(
                 shape = RoundedCornerShape(10.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onSurface,
-                ),
+                    contentColor = MaterialTheme.colorScheme.onSurface
+                )
             ) {
                 Text(
                     text = stringResource(category.sendActionTitleId),
-                    modifier = Modifier.padding(start = 8.dp),
+                    modifier = Modifier.padding(start = 8.dp)
                 )
             }
         }
@@ -585,4 +580,3 @@ private val previewShare = Share(
     ),
     permissionPreset = null
 )
-

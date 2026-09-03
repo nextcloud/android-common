@@ -26,12 +26,14 @@ sealed class NetworkResult<out T> {
 val NetworkResult<*>.isRateLimited: Boolean
     get() = this is NetworkResult.ServerError && response.ocs.meta.statusCode == HTTP_TOO_MANY_REQUESTS
 
-inline fun <T> NetworkResult<T>.dataOrElse(onError: () -> Unit): T? =
-    when (this) {
-        is NetworkResult.Success -> data
-        is NetworkResult.ServerError,
-        is NetworkResult.NetworkException -> {
-            onError()
-            null
-        }
+inline fun <T> NetworkResult<T>.dataOrElse(onError: () -> Unit): T? = when (this) {
+    is NetworkResult.Success -> {
+        data
     }
+
+    is NetworkResult.ServerError,
+    is NetworkResult.NetworkException -> {
+        onError()
+        null
+    }
+}

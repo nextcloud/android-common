@@ -45,11 +45,7 @@ fun propertyErrorMessage(propertyErrors: Map<String, String?>, clazz: String): S
 }
 
 @Composable
-fun SharePropertyView(
-    property: Property,
-    errorMessage: String?,
-    onValueChange: (String?) -> Unit
-) {
+fun SharePropertyView(property: Property, errorMessage: String?, onValueChange: (String?) -> Unit) {
     Column {
         SharePropertyField(
             property = property,
@@ -62,11 +58,7 @@ fun SharePropertyView(
 }
 
 @Composable
-private fun SharePropertyField(
-    property: Property,
-    isError: Boolean,
-    onValueChange: (String?) -> Unit
-) {
+private fun SharePropertyField(property: Property, isError: Boolean, onValueChange: (String?) -> Unit) {
     when (property) {
         is PropertyBoolean -> {
             var checkedValue by remember(property.clazz) { mutableStateOf(property.isTrue()) }

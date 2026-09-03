@@ -7,8 +7,4 @@
 
 package com.nextcloud.android.common.ui.network.auth
 
-data class ServerCredentials(
-    val baseURL: String,
-    val username: String,
-    val token: String
-)
+data class ServerCredentials(val baseURL: String, val username: String, val token: String)

@@ -9,12 +9,4 @@ package com.nextcloud.android.common.ui.share.model.ui
 
 import com.nextcloud.android.common.ui.share.model.api.share.Share
 
-sealed class ShareScreenState {
-    data object Loading : ShareScreenState()
-
-    data object Empty : ShareScreenState()
-
-    data object Error : ShareScreenState()
-
-    data class Loaded(val shares: List<Share>) : ShareScreenState()
-}
+data class ShareListItemState(val share: Share, val title: String, val type: ShareItemType, val isExpanded: Boolean)

@@ -27,11 +27,7 @@ import com.nextcloud.android.common.ui.share.model.api.property.PropertyEnum
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SharePropertyEnumField(
-    property: PropertyEnum,
-    isError: Boolean,
-    onValueSelected: (String) -> Unit
-) {
+fun SharePropertyEnumField(property: PropertyEnum, isError: Boolean, onValueSelected: (String) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
     var selectedValue by remember(property.clazz) { mutableStateOf(property.value ?: "") }
 

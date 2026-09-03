@@ -22,21 +22,31 @@ enum class ShareItemType {
 
     @Composable
     fun getShape(): RoundedCornerShape = when (this) {
-        Single -> RoundedCornerShape(OUTER_CORNER_RADIUS)
-        Top -> RoundedCornerShape(
-            OUTER_CORNER_RADIUS,
-            OUTER_CORNER_RADIUS,
-            INNER_CORNER_RADIUS,
-            INNER_CORNER_RADIUS
-        )
+        Single -> {
+            RoundedCornerShape(OUTER_CORNER_RADIUS)
+        }
 
-        Mid -> RoundedCornerShape(INNER_CORNER_RADIUS)
-        Bottom -> RoundedCornerShape(
-            INNER_CORNER_RADIUS,
-            INNER_CORNER_RADIUS,
-            OUTER_CORNER_RADIUS,
-            OUTER_CORNER_RADIUS
-        )
+        Top -> {
+            RoundedCornerShape(
+                OUTER_CORNER_RADIUS,
+                OUTER_CORNER_RADIUS,
+                INNER_CORNER_RADIUS,
+                INNER_CORNER_RADIUS
+            )
+        }
+
+        Mid -> {
+            RoundedCornerShape(INNER_CORNER_RADIUS)
+        }
+
+        Bottom -> {
+            RoundedCornerShape(
+                INNER_CORNER_RADIUS,
+                INNER_CORNER_RADIUS,
+                OUTER_CORNER_RADIUS,
+                OUTER_CORNER_RADIUS
+            )
+        }
     }
 
     companion object {

@@ -11,28 +11,19 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class OcsResponse<T>(
-    val ocs: Ocs<T>
-)
+data class OcsResponse<T>(val ocs: Ocs<T>)
 
 @Serializable
-data class Ocs<T>(
-    val meta: Meta,
-    val data: T
-)
+data class Ocs<T>(val meta: Meta, val data: T)
 
 @Serializable
 data class Meta(
     val status: String,
-
     @SerialName("statuscode")
     val statusCode: Int,
-
     val message: String,
-
     @SerialName("totalitems")
     val totalItems: String = "",
-
     @SerialName("itemsperpage")
     val itemsPerPage: String = ""
 )

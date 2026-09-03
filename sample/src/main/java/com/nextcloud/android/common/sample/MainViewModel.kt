@@ -20,29 +20,28 @@ class MainViewModel : ViewModel() {
     val color = MutableLiveData<Int>()
     val apiTestResult = MutableLiveData<String>()
 
-    fun testPredefinedStatuses(
-        baseUrl: String,
-        username: String,
-        token: String
-    ) {
+    fun testPredefinedStatuses(baseUrl: String, username: String, token: String) {
         viewModelScope.launch {
             val credentials = ServerCredentials(baseUrl, username, token)
             val client = NextcloudHttpClient.create(credentials)
             val service = UserStatusRepository(client)
 
             when (val result = service.fetchPredefinedStatuses()) {
-                is NetworkResult.Success ->
+                is NetworkResult.Success -> {
                     apiTestResult.value =
                         "✅ Success (${result.data.size} statuses):\n" +
-                            result.data.joinToString("\n") { "${it.icon} ${it.message}" }
+                        result.data.joinToString("\n") { "${it.icon} ${it.message}" }
+                }
 
-                is NetworkResult.ServerError ->
+                is NetworkResult.ServerError -> {
                     apiTestResult.value =
                         "❌ Error ${result.response.ocs.meta.statusCode}: ${result.response.ocs.meta.message}"
+                }
 
-                is NetworkResult.NetworkException ->
+                is NetworkResult.NetworkException -> {
                     apiTestResult.value =
                         "❌ Exception: ${result.throwable.message}"
+                }
             }
         }
     }

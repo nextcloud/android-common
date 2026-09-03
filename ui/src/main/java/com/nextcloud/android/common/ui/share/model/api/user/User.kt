@@ -15,11 +15,8 @@ import kotlinx.serialization.Serializable
 data class User(
     @SerialName("user_id")
     val userId: String,
-
     val instance: String? = null,
-
     @SerialName("display_name")
     val displayName: String,
-
     val icon: Icon
 )

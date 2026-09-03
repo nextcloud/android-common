@@ -13,10 +13,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 
 @Serializable
-data class GetShareRequest(
-    val secret: String? = null,
-    val arguments: Map<String, JsonElement> = emptyMap()
-)
+data class GetShareRequest(val secret: String? = null, val arguments: Map<String, JsonElement> = emptyMap())
 
 @Serializable
 data class UpdateShareStateRequest(
@@ -28,7 +25,6 @@ data class UpdateShareStateRequest(
 data class AddSourceRequest(
     @SerialName("class")
     val clazz: String,
-
     val value: String
 )
 
@@ -36,9 +32,7 @@ data class AddSourceRequest(
 data class AddRecipientRequest(
     @SerialName("class")
     val clazz: String,
-
     val value: String,
-
     val instance: String? = null
 )
 
@@ -46,7 +40,6 @@ data class AddRecipientRequest(
 data class UpdateSharePropertyRequest(
     @SerialName("class")
     val clazz: String,
-
     val value: String? = null
 )
 
@@ -54,23 +47,26 @@ data class UpdateSharePropertyRequest(
 data class UpdateSharePermissionRequest(
     @SerialName("class")
     val clazz: String,
-
     val enabled: Boolean
 )
 
 @Serializable
-data class UpdateSharePermissionPresetRequest(
-    val permissionPresetClass: String
+data class UpdateShareRecipientPermissionRequest(
+    val recipientClass: String,
+    val recipientValue: String,
+    val recipientInstance: String? = null,
+    val permissionClass: String,
+    val enabled: Boolean
 )
+
+@Serializable
+data class UpdateSharePermissionPresetRequest(val permissionPresetClass: String)
 
 @Serializable
 data class UpdateShareRecipientSecretRequest(
     @SerialName("class")
     val clazz: String,
-
     val value: String,
-
     val instance: String? = null,
-
     val secret: String
 )

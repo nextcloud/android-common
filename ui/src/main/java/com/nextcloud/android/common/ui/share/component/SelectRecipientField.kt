@@ -54,10 +54,7 @@ private val CHIP_CLOSE_ICON_SIZE = 18.dp
 private val RESULT_ICON_SIZE = 20.dp
 
 @Composable
-fun SelectRecipientField(
-    share: Share,
-    viewModel: ShareViewModel
-) {
+fun SelectRecipientField(share: Share, viewModel: ShareViewModel) {
     val selected = share.invitedRecipients
 
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -153,10 +150,7 @@ private fun RecipientSearch(share: Share, selected: List<Recipient>, viewModel: 
 }
 
 @Composable
-private fun RecipientDropdownContent(
-    results: List<Recipient>,
-    onSelect: (Recipient) -> Unit
-) {
+private fun RecipientDropdownContent(results: List<Recipient>, onSelect: (Recipient) -> Unit) {
     if (results.isEmpty()) {
         DropdownMenuItem(
             text = {
@@ -210,7 +204,7 @@ fun RecipientIcon(icon: Icon, modifier: Modifier = Modifier) {
                 .decoderFactory(SvgDecoder.Factory())
                 .build(),
             contentDescription = null,
-            modifier = modifier,
+            modifier = modifier
         )
     } else {
         // reserve the same space even with no image

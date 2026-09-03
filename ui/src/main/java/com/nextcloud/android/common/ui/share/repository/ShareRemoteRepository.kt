@@ -20,6 +20,7 @@ import com.nextcloud.android.common.ui.share.model.api.request.AddSourceRequest
 import com.nextcloud.android.common.ui.share.model.api.request.GetShareRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePermissionPresetRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePermissionRequest
+import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareRecipientPermissionRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePropertyRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareRecipientSecretRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareStateRequest
@@ -38,7 +39,6 @@ class ShareRemoteRepository(
     private val client: NextcloudHttpClient,
     private val json: kotlinx.serialization.json.Json = OCSSerializer.json
 ) : ShareRepository {
-
     private companion object {
         private const val SHARE_ENDPOINT = "/ocs/v2.php/apps/sharing/api/v1/share"
         private const val SHARES_ENDPOINT = "/ocs/v2.php/apps/sharing/api/v1/shares"
@@ -49,8 +49,7 @@ class ShareRemoteRepository(
         private const val NODE_SHARING = "sharing"
     }
 
-    private fun decodeShare(body: String): Share =
-        json.decodeFromString<OcsResponse<Share>>(body).ocs.data
+    private fun decodeShare(body: String): Share = json.decodeFromString<OcsResponse<Share>>(body).ocs.data
 
     override suspend fun fetchRecipients(
         recipientTypeClasses: List<String>?,
@@ -58,10 +57,11 @@ class ShareRemoteRepository(
         limit: Int,
         offset: Int
     ): NetworkResult<List<Recipient>> {
-        val queryParams = buildString {
-            append("?query=${query.urlEncoded()}&limit=$limit&offset=$offset")
-            recipientTypeClasses?.forEach { append("&recipientTypeClasses[]=${it.urlEncoded()}") }
-        }
+        val queryParams =
+            buildString {
+                append("?query=${query.urlEncoded()}&limit=$limit&offset=$offset")
+                recipientTypeClasses?.forEach { append("&recipientTypeClasses[]=${it.urlEncoded()}") }
+            }
         return client.executeRequest(
             endpoint = "$RECIPIENTS_ENDPOINT$queryParams",
             method = HttpMethod.GET
@@ -70,28 +70,22 @@ class ShareRemoteRepository(
         }
     }
 
-    override suspend fun createDraftShare(): NetworkResult<Share> =
-        client.executeRequest(
-            endpoint = SHARE_ENDPOINT,
-            method = HttpMethod.POST,
-            body = ByteArray(0).toRequestBody()
-        ) { decodeShare(it) }
+    override suspend fun createDraftShare(): NetworkResult<Share> = client.executeRequest(
+        endpoint = SHARE_ENDPOINT,
+        method = HttpMethod.POST,
+        body = ByteArray(0).toRequestBody()
+    ) { decodeShare(it) }
 
-    override suspend fun fetchShare(
-        id: String,
-        request: GetShareRequest
-    ): NetworkResult<Share> =
-        client.executeRequest(
-            endpoint = "$SHARE_ENDPOINT/$id",
-            method = HttpMethod.POST,
-            body = json.encodeToString(request).toRequestBody(JSON_CONTENT_TYPE)
-        ) { decodeShare(it) }
+    override suspend fun fetchShare(id: String, request: GetShareRequest): NetworkResult<Share> = client.executeRequest(
+        endpoint = "$SHARE_ENDPOINT/$id",
+        method = HttpMethod.POST,
+        body = json.encodeToString(request).toRequestBody(JSON_CONTENT_TYPE)
+    ) { decodeShare(it) }
 
-    override suspend fun deleteShare(id: String): NetworkResult<Unit> =
-        client.executeRequest(
-            endpoint = "$SHARE_ENDPOINT/$id",
-            method = HttpMethod.DELETE
-        ) { }
+    override suspend fun deleteShare(id: String): NetworkResult<Unit> = client.executeRequest(
+        endpoint = "$SHARE_ENDPOINT/$id",
+        method = HttpMethod.DELETE
+    ) { }
 
     override suspend fun fetchShares(
         filterSourceTypeValue: String,
@@ -100,13 +94,14 @@ class ShareRemoteRepository(
         filterState: ShareState?,
         lastShareID: String?
     ): NetworkResult<List<Share>> {
-        val queryParams = buildString {
-            append("?filterSourceTypeValue=${filterSourceTypeValue.urlEncoded()}")
-            limit?.let { append("&limit=$it") }
-            filterSourceTypeClass?.let { append("&filterSourceTypeClass=${it.urlEncoded()}") }
-            filterState?.let { append("&filterState=${it.apiValue().urlEncoded()}") }
-            lastShareID?.let { append("&lastShareID=${it.urlEncoded()}") }
-        }
+        val queryParams =
+            buildString {
+                append("?filterSourceTypeValue=${filterSourceTypeValue.urlEncoded()}")
+                limit?.let { append("&limit=$it") }
+                filterSourceTypeClass?.let { append("&filterSourceTypeClass=${it.urlEncoded()}") }
+                filterState?.let { append("&filterState=${it.apiValue().urlEncoded()}") }
+                lastShareID?.let { append("&lastShareID=${it.urlEncoded()}") }
+            }
         return client.executeRequest(
             endpoint = "$SHARES_ENDPOINT$queryParams",
             method = HttpMethod.GET
@@ -115,40 +110,27 @@ class ShareRemoteRepository(
         }
     }
 
-    override suspend fun updateShareState(
-        id: String,
-        request: UpdateShareStateRequest
-    ): NetworkResult<Share> =
+    override suspend fun updateShareState(id: String, request: UpdateShareStateRequest): NetworkResult<Share> =
         client.executeRequest(
             endpoint = "$SHARE_ENDPOINT/$id/state",
             method = HttpMethod.PUT,
             body = json.encodeToString(request).toRequestBody(JSON_CONTENT_TYPE)
         ) { decodeShare(it) }
 
-    override suspend fun addShareSource(
-        id: String,
-        request: AddSourceRequest
-    ): NetworkResult<Share> =
+    override suspend fun addShareSource(id: String, request: AddSourceRequest): NetworkResult<Share> =
         client.executeRequest(
             endpoint = "$SHARE_ENDPOINT/$id/source",
             method = HttpMethod.POST,
             body = json.encodeToString(request).toRequestBody(JSON_CONTENT_TYPE)
         ) { decodeShare(it) }
 
-    override suspend fun removeShareSource(
-        id: String,
-        clazz: String,
-        value: String
-    ): NetworkResult<Share> =
+    override suspend fun removeShareSource(id: String, clazz: String, value: String): NetworkResult<Share> =
         client.executeRequest(
             endpoint = "$SHARE_ENDPOINT/$id/source?class=${clazz.urlEncoded()}&value=${value.urlEncoded()}",
             method = HttpMethod.DELETE
         ) { decodeShare(it) }
 
-    override suspend fun addShareRecipient(
-        id: String,
-        request: AddRecipientRequest
-    ): NetworkResult<Share> =
+    override suspend fun addShareRecipient(id: String, request: AddRecipientRequest): NetworkResult<Share> =
         client.executeRequest(
             endpoint = "$SHARE_ENDPOINT/$id/recipient",
             method = HttpMethod.POST,
@@ -161,20 +143,18 @@ class ShareRemoteRepository(
         value: String,
         instance: String?
     ): NetworkResult<Share> {
-        val queryParams = buildString {
-            append("?class=${clazz.urlEncoded()}&value=${value.urlEncoded()}")
-            instance?.let { append("&instance=${it.urlEncoded()}") }
-        }
+        val queryParams =
+            buildString {
+                append("?class=${clazz.urlEncoded()}&value=${value.urlEncoded()}")
+                instance?.let { append("&instance=${it.urlEncoded()}") }
+            }
         return client.executeRequest(
             endpoint = "$SHARE_ENDPOINT/$id/recipient$queryParams",
             method = HttpMethod.DELETE
         ) { decodeShare(it) }
     }
 
-    override suspend fun updateShareProperty(
-        id: String,
-        request: UpdateSharePropertyRequest
-    ): NetworkResult<Share> =
+    override suspend fun updateShareProperty(id: String, request: UpdateSharePropertyRequest): NetworkResult<Share> =
         client.executeRequest(
             endpoint = "$SHARE_ENDPOINT/$id/property",
             method = HttpMethod.PUT,
@@ -184,48 +164,56 @@ class ShareRemoteRepository(
     override suspend fun updateSharePermission(
         id: String,
         request: UpdateSharePermissionRequest
-    ): NetworkResult<Share> =
-        client.executeRequest(
-            endpoint = "$SHARE_ENDPOINT/$id/permission",
-            method = HttpMethod.PUT,
-            body = json.encodeToString(request).toRequestBody(JSON_CONTENT_TYPE)
-        ) { decodeShare(it) }
+    ): NetworkResult<Share> = client.executeRequest(
+        endpoint = "$SHARE_ENDPOINT/$id/permission",
+        method = HttpMethod.PUT,
+        body = json.encodeToString(request).toRequestBody(JSON_CONTENT_TYPE)
+    ) { decodeShare(it) }
+
+    override suspend fun updateShareRecipientPermission(
+        id: String,
+        request: UpdateShareRecipientPermissionRequest
+    ): NetworkResult<Share> = client.executeRequest(
+        endpoint = "$SHARE_ENDPOINT/$id/recipient/permission",
+        method = HttpMethod.PUT,
+        body = json.encodeToString(request).toRequestBody(JSON_CONTENT_TYPE)
+    ) { decodeShare(it) }
 
     override suspend fun updateSharePermissionPreset(
         id: String,
         request: UpdateSharePermissionPresetRequest
-    ): NetworkResult<Share> =
-        client.executeRequest(
-            endpoint = "$SHARE_ENDPOINT/$id/permission/preset",
-            method = HttpMethod.PUT,
-            body = json.encodeToString(request).toRequestBody(JSON_CONTENT_TYPE)
-        ) { decodeShare(it) }
+    ): NetworkResult<Share> = client.executeRequest(
+        endpoint = "$SHARE_ENDPOINT/$id/permission/preset",
+        method = HttpMethod.PUT,
+        body = json.encodeToString(request).toRequestBody(JSON_CONTENT_TYPE)
+    ) { decodeShare(it) }
 
     override suspend fun updateShareRecipientSecret(
         id: String,
         request: UpdateShareRecipientSecretRequest
-    ): NetworkResult<Share> =
-        client.executeRequest(
-            endpoint = "$SHARE_ENDPOINT/$id/recipient/secret",
-            method = HttpMethod.PUT,
-            body = json.encodeToString(request).toRequestBody(JSON_CONTENT_TYPE)
-        ) { decodeShare(it) }
+    ): NetworkResult<Share> = client.executeRequest(
+        endpoint = "$SHARE_ENDPOINT/$id/recipient/secret",
+        method = HttpMethod.PUT,
+        body = json.encodeToString(request).toRequestBody(JSON_CONTENT_TYPE)
+    ) { decodeShare(it) }
 
-    override suspend fun generateSecret(): NetworkResult<String> =
-        client.executeRequest(
-            endpoint = SECRET_ENDPOINT,
-            method = HttpMethod.GET
-        ) { body ->
-            json.decodeFromString<OcsResponse<String>>(body).ocs.data
-        }
+    override suspend fun generateSecret(): NetworkResult<String> = client.executeRequest(
+        endpoint = SECRET_ENDPOINT,
+        method = HttpMethod.GET
+    ) { body ->
+        json.decodeFromString<OcsResponse<String>>(body).ocs.data
+    }
 
-    override suspend fun fetchSharingCapabilities(): NetworkResult<SharingCapabilities> =
-        client.executeRequest(
-            endpoint = CAPABILITIES_ENDPOINT,
-            method = HttpMethod.GET
-        ) { body ->
-            val sharing = json.decodeFromString<OcsResponse<JsonObject>>(body)
-                .ocs.data[NODE_CAPABILITIES]?.jsonObject?.get(NODE_SHARING)
-            sharing?.let { json.decodeFromJsonElement<SharingCapabilities>(it) } ?: SharingCapabilities()
-        }
+    override suspend fun fetchSharingCapabilities(): NetworkResult<SharingCapabilities> = client.executeRequest(
+        endpoint = CAPABILITIES_ENDPOINT,
+        method = HttpMethod.GET
+    ) { body ->
+        val sharing =
+            json
+                .decodeFromString<OcsResponse<JsonObject>>(body)
+                .ocs.data[NODE_CAPABILITIES]
+                ?.jsonObject
+                ?.get(NODE_SHARING)
+        sharing?.let { json.decodeFromJsonElement<SharingCapabilities>(it) } ?: SharingCapabilities()
+    }
 }

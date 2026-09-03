@@ -18,10 +18,7 @@ import androidx.compose.ui.res.stringResource
 import com.nextcloud.android.common.ui.R
 
 @Composable
-fun DeleteShareConfirmationDialog(
-    onConfirm: () -> Unit,
-    onDismiss: () -> Unit
-) {
+fun DeleteShareConfirmationDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.share_view_delete_confirm_title)) },

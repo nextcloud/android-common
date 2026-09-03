@@ -35,11 +35,7 @@ import kotlinx.coroutines.launch
 private const val MAX_TOKEN_LENGTH = 32
 
 @Composable
-fun CustomLink(
-    recipient: Recipient,
-    onGenerateSecret: suspend () -> String?,
-    onTokenChange: (String) -> Unit
-) {
+fun CustomLink(recipient: Recipient, onGenerateSecret: suspend () -> String?, onTokenChange: (String) -> Unit) {
     val prefix = remember(recipient.secret.url, recipient.secret.value) {
         val url = recipient.secret.url.orEmpty()
         val token = recipient.secret.value.orEmpty()

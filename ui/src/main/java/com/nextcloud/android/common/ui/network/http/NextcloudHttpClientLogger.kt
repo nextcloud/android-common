@@ -13,15 +13,15 @@ import okhttp3.RequestBody
 import okio.Buffer
 
 internal class NextcloudHttpClientLogger(private val enabled: Boolean) {
-
     companion object {
         private const val TAG = "NextcloudHttpClient"
 
-        private val prettyJson = Json {
-            prettyPrint = true
-            prettyPrintIndent = "  "
-            ignoreUnknownKeys = true
-        }
+        private val prettyJson =
+            Json {
+                prettyPrint = true
+                prettyPrintIndent = "  "
+                ignoreUnknownKeys = true
+            }
     }
 
     fun logRequest(endpoint: String, method: HttpMethod, body: RequestBody?) {
@@ -37,13 +37,7 @@ internal class NextcloudHttpClientLogger(private val enabled: Boolean) {
         )
     }
 
-    fun logResponse(
-        endpoint: String,
-        method: HttpMethod,
-        code: Int,
-        responseBody: String,
-        isError: Boolean
-    ) {
+    fun logResponse(endpoint: String, method: HttpMethod, code: Int, responseBody: String, isError: Boolean) {
         if (!enabled) return
 
         Log.d(
@@ -84,7 +78,11 @@ internal class NextcloudHttpClientLogger(private val enabled: Boolean) {
         if (this.isBlank() || this == "<none>" || this == "<empty>") return this
         return try {
             val element = Json.parseToJsonElement(this)
-            prettyJson.encodeToString(kotlinx.serialization.json.JsonElement.serializer(), element)
+            prettyJson.encodeToString(
+                kotlinx.serialization.json.JsonElement
+                    .serializer(),
+                element
+            )
         } catch (_: Exception) {
             this
         }

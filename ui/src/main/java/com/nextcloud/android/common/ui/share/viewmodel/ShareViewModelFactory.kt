@@ -14,15 +14,10 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.nextcloud.android.common.ui.share.repository.ShareRepository
 
-class ShareViewModelFactory(
-    private val sourceId: String,
-    private val repositoryProvider: () -> ShareRepository
-) : ViewModelProvider.Factory {
+class ShareViewModelFactory(private val sourceId: String, private val repositoryProvider: () -> ShareRepository) :
+    ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(
-        modelClass: Class<T>,
-        extras: CreationExtras
-    ): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
         require(modelClass.isAssignableFrom(ShareViewModel::class.java)) {
             "ShareViewModelFactory cannot create ${modelClass.name}"
         }

@@ -28,9 +28,7 @@ import java.util.regex.Pattern
  *  - Redirecting to Play Store if app not installed
  *  - Receiving account info from intents with callback support
  */
-class EcosystemManager(
-    private val activity: Activity
-) {
+class EcosystemManager(private val activity: Activity) {
     companion object {
         private const val TAG = "EcosystemManager"
 
@@ -63,10 +61,7 @@ class EcosystemManager(
      *        e.g. "abc@example.cloud.com"
      */
     @Suppress("TooGenericExceptionCaught", "ReturnCount")
-    fun openApp(
-        app: EcosystemApp,
-        accountName: String?
-    ) {
+    fun openApp(app: EcosystemApp, accountName: String?) {
         Log.d(TAG, "open app, package name: ${app.packageNames}, account name: $accountName")
 
         // check account name emptiness
@@ -163,10 +158,7 @@ class EcosystemManager(
      *
      */
     @Suppress("ReturnCount")
-    fun receiveAccount(
-        intent: Intent?,
-        callback: AccountReceiverCallback
-    ) {
+    fun receiveAccount(intent: Intent?, callback: AccountReceiverCallback) {
         Log.d(TAG, "receive account started")
 
         if (intent == null) {

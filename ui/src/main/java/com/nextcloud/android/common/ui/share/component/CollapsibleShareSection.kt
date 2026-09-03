@@ -28,12 +28,7 @@ import androidx.compose.ui.unit.dp
 private val SECTION_VERTICAL_PADDING = 16.dp
 
 @Composable
-fun CollapsibleShareSection(
-    label: String,
-    isExpanded: Boolean,
-    onToggle: () -> Unit,
-    content: @Composable () -> Unit
-) {
+fun CollapsibleShareSection(label: String, isExpanded: Boolean, onToggle: () -> Unit, content: @Composable () -> Unit) {
     Column(modifier = Modifier.fillMaxWidth().padding(vertical = SECTION_VERTICAL_PADDING)) {
         Row(
             modifier = Modifier

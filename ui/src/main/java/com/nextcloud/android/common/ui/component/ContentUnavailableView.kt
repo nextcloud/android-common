@@ -37,7 +37,7 @@ fun ContentUnavailableView(title: String, description: String? = null, iconId: I
             Image(
                 painter = painterResource(iconId),
                 modifier = Modifier.size(48.dp),
-                contentDescription = "",
+                contentDescription = ""
             )
         }
 

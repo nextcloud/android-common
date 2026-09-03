@@ -45,6 +45,40 @@
     <string name="share_view_update_error_message">Failed to update share.</string>
     <string name="share_view_rate_limited_message">Please try again in a few seconds.</string>
 
+    <string name="share_view_recipients_expand">Show recipients</string>
+    <string name="share_view_recipients_collapse">Hide recipients</string>
+    <string name="share_view_recipients_overflow">+%1$d</string>
+    <string name="share_view_recipient_summary_separator">, </string>
+    <string name="share_view_recipient_remove">Remove recipient</string>
+    <string name="share_view_list_item_more_options">More options</string>
+    <string name="share_view_recipient_permission_title">Permissions for %1$s</string>
+    <string name="share_view_recipient_permission_custom_title">Custom permissions</string>
+
+    <plurals name="share_view_recipient_summary_people">
+        <item quantity="one">%1$d person</item>
+        <item quantity="other">%1$d people</item>
+    </plurals>
+    <plurals name="share_view_recipient_summary_groups">
+        <item quantity="one">%1$d group</item>
+        <item quantity="other">%1$d groups</item>
+    </plurals>
+    <plurals name="share_view_recipient_summary_teams">
+        <item quantity="one">%1$d team</item>
+        <item quantity="other">%1$d teams</item>
+    </plurals>
+    <plurals name="share_view_recipient_summary_emails">
+        <item quantity="one">%1$d email</item>
+        <item quantity="other">%1$d emails</item>
+    </plurals>
+    <plurals name="share_view_recipient_summary_links">
+        <item quantity="one">%1$d link</item>
+        <item quantity="other">%1$d links</item>
+    </plurals>
+    <plurals name="share_view_recipient_summary_others">
+        <item quantity="one">%1$d recipient</item>
+        <item quantity="other">%1$d recipients</item>
+    </plurals>
+
     <string name="share_view_quick_permission_title">Participants</string>
     <string name="share_view_permission_preset_label">Participants</string>
     <string name="share_view_permission_preset_custom">Can…</string>

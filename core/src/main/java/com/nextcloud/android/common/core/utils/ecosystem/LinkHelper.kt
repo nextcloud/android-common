@@ -25,11 +25,7 @@ object LinkHelper {
      * @param string packageName or url-encoded search string
      * @param search false -> show app corresponding to packageName; true -> open search for string
      */
-    fun openAppStore(
-        string: String,
-        search: Boolean = false,
-        context: Context
-    ) {
+    fun openAppStore(string: String, search: Boolean = false, context: Context) {
         var suffix = (if (search) "search?q=" else "details?id=") + string
         val intent = Intent(Intent.ACTION_VIEW, "market://$suffix".toUri())
         try {

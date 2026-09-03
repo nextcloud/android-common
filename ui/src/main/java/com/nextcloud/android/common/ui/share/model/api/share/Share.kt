@@ -27,26 +27,17 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Share(
     val id: String,
-
     val owner: User,
-
     @SerialName("last_updated")
     val lastUpdated: Long,
-
     @SerialName("state")
     val shareState: ShareState,
-
     @SerialName("user_status")
     val userStatus: ShareUserStatus? = null,
-
     val sources: List<Source>,
-
     val recipients: List<Recipient>,
-
     val properties: List<Property>,
-
     val permissions: List<Permission>,
-
     @SerialName("permission_preset")
     val permissionPreset: String? = null
 ) {
@@ -72,9 +63,7 @@ data class Share(
             return advancedProperties.isNotEmpty() || customLinkRecipient != null
         }
 
-    fun toActiveShare(): ActiveShareState {
-        return ActiveShareState.Editing(this)
-    }
+    fun toActiveShare(): ActiveShareState = ActiveShareState.Editing(this)
 
     fun getClipEntry(internalLink: String, category: ShareCategory): ClipEntry? {
         if (category == ShareCategory.Anyone) {
@@ -104,10 +93,14 @@ data class Share(
     }
 
     val label: String?
-        get() = properties
-            .firstOrNull { it.clazz.contains(LABEL_PROPERTY_CLASS, ignoreCase = true) }
-            ?.value
-            ?.takeIf { it.isNotBlank() }
+        get() =
+            properties
+                .firstOrNull { it.clazz.contains(LABEL_PROPERTY_CLASS, ignoreCase = true) }
+                ?.value
+                ?.takeIf { it.isNotBlank() }
+
+    val hasMultipleRecipients: Boolean
+        get() = recipients.size > 1
 
     val belongsAnyoneTab: Boolean
         get() {
