@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -78,7 +77,18 @@ fun ShareListItem(state: ShareListItemState, permissionPresets: List<PermissionP
                     onClick = { actions.onShowOverlay(ShareOverlay.QuickShare(share.id)) }
                 )
             },
-            trailingContent = { ShareItemTrailingContent(state = state, actions = actions) },
+            trailingContent = {
+                ExpandRecipientsButton(
+                    isExpanded = state.isExpanded,
+                    onClick = {
+                        if (state.share.hasMultipleRecipients) {
+                            actions.onToggleExpanded(state.share)
+                        } else {
+                            actions.onSelectShare(share)
+                        }
+                    }
+                )
+            },
             colors = ListItemDefaults.colors(containerColor = Color.Transparent)
         )
 
@@ -90,23 +100,6 @@ fun ShareListItem(state: ShareListItemState, permissionPresets: List<PermissionP
             )
         }
     }
-}
-
-@Composable
-private fun ShareItemTrailingContent(state: ShareListItemState, actions: ShareListItemActions) {
-    if (state.share.hasMultipleRecipients) {
-        ExpandRecipientsButton(
-            isExpanded = state.isExpanded,
-            onClick = { actions.onToggleExpanded(state.share) }
-        )
-        return
-    }
-
-    Icon(
-        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-        contentDescription = null,
-        tint = MaterialTheme.colorScheme.onSurfaceVariant
-    )
 }
 
 @Composable
