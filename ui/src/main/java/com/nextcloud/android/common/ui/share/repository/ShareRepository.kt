@@ -21,6 +21,7 @@ import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareStateR
 import com.nextcloud.android.common.ui.share.model.api.share.Share
 import com.nextcloud.android.common.ui.share.model.api.state.ShareState
 
+@Suppress("TooManyFunctions")
 interface ShareRepository {
     suspend fun fetchRecipients(
         recipientTypeClasses: List<String>?,

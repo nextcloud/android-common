@@ -62,8 +62,7 @@ subprojects {
         kotlin {
             target '**/*.kt'
             ktlint().editorConfigOverride([
-                'ktlint_function_naming_ignore_when_annotated_with': 'Composable',
-                'ktlint_standard_filename'                         : 'disabled'
+                'ktlint_function_naming_ignore_when_annotated_with': 'Composable'
             ])
         }
     }

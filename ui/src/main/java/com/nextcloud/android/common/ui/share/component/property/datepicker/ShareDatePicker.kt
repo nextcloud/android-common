@@ -5,6 +5,8 @@
  * SPDX-License-Identifier: MIT
  */
 
+@file:Suppress("FunctionNaming", "UnusedPrivateMember")
+
 package com.nextcloud.android.common.ui.share.component.property.datepicker
 
 import androidx.compose.foundation.interaction.MutableInteractionSource

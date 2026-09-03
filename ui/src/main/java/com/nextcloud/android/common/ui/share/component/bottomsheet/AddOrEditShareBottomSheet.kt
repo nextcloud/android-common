@@ -5,6 +5,8 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
+@file:Suppress("FunctionNaming", "LongMethod", "UnusedPrivateMember")
+
 package com.nextcloud.android.common.ui.share.component.bottomsheet
 
 import androidx.compose.foundation.layout.Arrangement

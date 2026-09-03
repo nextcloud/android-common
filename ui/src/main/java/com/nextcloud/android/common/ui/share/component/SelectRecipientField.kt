@@ -5,6 +5,8 @@
  * SPDX-License-Identifier: MIT
  */
 
+@file:Suppress("FunctionNaming")
+
 package com.nextcloud.android.common.ui.share.component
 
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -181,7 +183,6 @@ private fun RecipientDropdownContent(results: List<Recipient>, onSelect: (Recipi
     }
 }
 
-// TODO: can this come from backend?
 @Composable
 fun PublicLinkIcon(modifier: Modifier = Modifier) {
     Icon(

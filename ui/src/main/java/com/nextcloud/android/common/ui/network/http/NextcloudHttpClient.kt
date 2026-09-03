@@ -53,6 +53,7 @@ class NextcloudHttpClient private constructor(
 
     private fun errorMeta(code: Int): Meta = Meta(status = OCS_FAILURE, statusCode = code, message = "")
 
+    @Suppress("TooGenericExceptionCaught")
     suspend fun <T> executeRequest(
         endpoint: String,
         method: HttpMethod,

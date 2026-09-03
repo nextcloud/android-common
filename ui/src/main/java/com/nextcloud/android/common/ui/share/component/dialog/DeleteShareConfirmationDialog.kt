@@ -5,6 +5,8 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
+@file:Suppress("FunctionNaming")
+
 package com.nextcloud.android.common.ui.share.component.dialog
 
 import androidx.compose.material3.AlertDialog

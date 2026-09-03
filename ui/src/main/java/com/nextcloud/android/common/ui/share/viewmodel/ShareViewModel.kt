@@ -55,6 +55,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.TimeMark
 import kotlin.time.TimeSource
 
+@Suppress("TooManyFunctions")
 class ShareViewModel(
     private val repository: ShareRepository,
     private val sourceId: String,

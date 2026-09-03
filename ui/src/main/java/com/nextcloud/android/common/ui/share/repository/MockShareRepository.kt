@@ -32,6 +32,7 @@ import com.nextcloud.android.common.ui.share.model.api.source.Source
 import com.nextcloud.android.common.ui.share.model.api.state.ShareState
 import com.nextcloud.android.common.ui.share.model.api.user.User
 
+@Suppress("TooManyFunctions", "LongParameterList")
 class MockShareRepository : ShareRepository {
 
     private val mockOwner = User(
