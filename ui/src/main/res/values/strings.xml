@@ -44,7 +44,7 @@
     <string name="share_view_create_error_message">Failed to create share.</string>
     <string name="share_view_update_error_message">Failed to update share.</string>
 
-    <string name="share_view_quick_permission_title">Change permission</string>
+    <string name="share_view_quick_permission_title">Participants</string>
     <string name="share_view_permission_preset_label">Participants</string>
     <string name="share_view_permission_preset_custom">Can…</string>
 
