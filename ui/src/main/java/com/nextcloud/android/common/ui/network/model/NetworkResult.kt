@@ -7,6 +7,8 @@
 
 package com.nextcloud.android.common.ui.network.model
 
+private const val HTTP_TOO_MANY_REQUESTS = 429
+
 sealed class NetworkResult<out T> {
     data class Success<out T>(val data: T) : NetworkResult<T>()
 
@@ -20,6 +22,9 @@ sealed class NetworkResult<out T> {
         fun fromException(e: Throwable): NetworkException = NetworkException(e)
     }
 }
+
+val NetworkResult<*>.isRateLimited: Boolean
+    get() = this is NetworkResult.ServerError && response.ocs.meta.statusCode == HTTP_TOO_MANY_REQUESTS
 
 inline fun <T> NetworkResult<T>.dataOrElse(onError: () -> Unit): T? =
     when (this) {
