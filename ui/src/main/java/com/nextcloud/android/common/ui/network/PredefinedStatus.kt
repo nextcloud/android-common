@@ -35,9 +35,4 @@ data class ClearAt(
 )
 
 @Serializable
-data class PredefinedStatus(
-    val id: String,
-    val icon: String,
-    val message: String,
-    val clearAt: ClearAt? = null
-)
+data class PredefinedStatus(val id: String, val icon: String, val message: String, val clearAt: ClearAt? = null)

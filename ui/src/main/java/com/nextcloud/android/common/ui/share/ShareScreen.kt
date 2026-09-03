@@ -52,6 +52,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -79,19 +80,21 @@ import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.component.ContentUnavailableView
 import com.nextcloud.android.common.ui.network.auth.ServerCredentials
 import com.nextcloud.android.common.ui.network.http.NextcloudHttpClient
-import com.nextcloud.android.common.ui.share.component.PublicLinkIcon
-import com.nextcloud.android.common.ui.share.component.RecipientIcon
+import com.nextcloud.android.common.ui.share.component.ShareListItem
 import com.nextcloud.android.common.ui.share.component.bottomsheet.AddOrEditShareBottomSheet
 import com.nextcloud.android.common.ui.share.component.bottomsheet.QuickSharePermissionBottomSheet
+import com.nextcloud.android.common.ui.share.component.bottomsheet.RecipientPermissionBottomSheet
 import com.nextcloud.android.common.ui.share.component.dialog.DeleteShareConfirmationDialog
 import com.nextcloud.android.common.ui.share.model.api.permission.PermissionPreset
 import com.nextcloud.android.common.ui.share.model.api.share.Share
 import com.nextcloud.android.common.ui.share.model.ui.PermissionPresetOption
 import com.nextcloud.android.common.ui.share.model.ui.ShareEditorEntry
 import com.nextcloud.android.common.ui.share.model.ui.ShareItemType
+import com.nextcloud.android.common.ui.share.model.ui.ShareListItemActions
+import com.nextcloud.android.common.ui.share.model.ui.ShareListItemState
 import com.nextcloud.android.common.ui.share.model.ui.ShareOverlay
 import com.nextcloud.android.common.ui.share.model.ui.ShareScreenState
-import com.nextcloud.android.common.ui.share.model.ui.label
+import com.nextcloud.android.common.ui.share.model.ui.recipientSummary
 import com.nextcloud.android.common.ui.share.repository.ShareRemoteRepository
 import com.nextcloud.android.common.ui.share.viewmodel.ShareViewModel
 import com.nextcloud.android.common.ui.share.viewmodel.ShareViewModelFactory
@@ -99,11 +102,13 @@ import com.nextcloud.android.common.ui.share.viewmodel.ShareViewModelFactory
 private val FIRST_ITEM_TOP_SPACING = 16.dp
 private val ITEM_SPACING = 2.dp
 
+private val ExpandedShareIdsSaver = listSaver<Set<String>, String>(
+    save = { it.toList() },
+    restore = { it.toSet() }
+)
+
 @Composable
-private fun ShareScreen(
-    internalLink: String,
-    viewModel: ShareViewModel
-) {
+private fun ShareScreen(internalLink: String, viewModel: ShareViewModel) {
     val errorMessageId by viewModel.errorMessageId.collectAsStateWithLifecycle()
     val screenState by viewModel.state.collectAsStateWithLifecycle()
     val activeShare by viewModel.activeShare.collectAsStateWithLifecycle()
@@ -124,7 +129,7 @@ private fun ShareScreen(
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { viewModel.createDraftShare() },
+                onClick = { viewModel.createDraftShare() }
             ) {
                 Icon(painterResource(R.drawable.ic_person_add), contentDescription = "Add")
             }
@@ -196,6 +201,22 @@ private fun ShareItemOverlay(
             onDismiss = onDismiss
         )
 
+        is ShareOverlay.RecipientPermission -> {
+            val recipient = share.recipients.firstOrNull {
+                it.clazz == overlay.recipientClass &&
+                    it.value == overlay.recipientValue &&
+                    it.instance == overlay.recipientInstance
+            } ?: return
+
+            RecipientPermissionBottomSheet(
+                share = share,
+                recipient = recipient,
+                permissionPresets = permissionPresets,
+                viewModel = viewModel,
+                onDismiss = onDismiss
+            )
+        }
+
         is ShareOverlay.DeleteConfirmation -> DeleteShareConfirmationDialog(
             onConfirm = {
                 onDismiss()
@@ -220,6 +241,24 @@ private fun ShareList(
     val context = LocalContext.current
     val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
     val shares = (state as? ShareScreenState.Loaded)?.shares.orEmpty()
+    var expandedShareIds by rememberSaveable(stateSaver = ExpandedShareIdsSaver) { mutableStateOf(emptySet<String>()) }
+    val actions = remember(viewModel, onShowOverlay) {
+        ShareListItemActions(
+            onSelectShare = { share -> viewModel.setActiveShare(share, ShareEditorEntry.EDIT) },
+            onSendEmail = { share -> viewModel.setActiveShare(share, ShareEditorEntry.SEND_EMAIL) },
+            onToggleExpanded = { share ->
+                expandedShareIds = if (share.id in expandedShareIds) {
+                    expandedShareIds - share.id
+                } else {
+                    expandedShareIds + share.id
+                }
+            },
+            onShowOverlay = onShowOverlay,
+            onRemoveRecipient = { share, recipient ->
+                viewModel.removeRecipient(share.id, recipient.clazz, recipient.value, recipient.instance)
+            }
+        )
+    }
 
     PullToRefreshBox(
         isRefreshing = isRefreshing,
@@ -243,19 +282,19 @@ private fun ShareList(
             itemsIndexed(shares, key = { _, share -> share.id }) { index, share ->
                 Spacer(modifier = Modifier.height(if (index == 0) FIRST_ITEM_TOP_SPACING else ITEM_SPACING))
 
-                ShareItem(
-                    share = share,
-                    title = share.getHeadline(context, shares),
-                    type = ShareItemType.type(index, shares.lastIndex),
-                    presetOptions = PermissionPresetOption.optionsFor(share, permissionPresets),
-                    selectedPresetOption = PermissionPresetOption.from(share.permissionPreset, permissionPresets),
-                    onSelectShare = { selected ->
-                        viewModel.setActiveShare(selected, ShareEditorEntry.EDIT)
-                    },
-                    onSendEmail = { selected ->
-                        viewModel.setActiveShare(selected, ShareEditorEntry.SEND_EMAIL)
-                    },
-                    onShowOverlay = onShowOverlay
+                ShareListItem(
+                    state = ShareListItemState(
+                        share = share,
+                        title = if (share.hasMultipleRecipients) {
+                            recipientSummary(share.recipients)
+                        } else {
+                            share.getHeadline(context, shares)
+                        },
+                        type = ShareItemType.type(index, shares.lastIndex),
+                        isExpanded = share.id in expandedShareIds
+                    ),
+                    permissionPresets = permissionPresets,
+                    actions = actions
                 )
             }
         }
@@ -275,160 +314,6 @@ private fun SharePlaceholder(state: ShareScreenState) {
     ContentUnavailableView(
         iconId = R.drawable.ic_person_add_filled,
         title = stringResource(R.string.share_view_empty_title)
-    )
-}
-
-@Composable
-private fun ShareItem(
-    share: Share,
-    title: String,
-    type: ShareItemType,
-    presetOptions: List<PermissionPresetOption>,
-    selectedPresetOption: PermissionPresetOption,
-    onSelectShare: (Share) -> Unit,
-    onSendEmail: (Share) -> Unit,
-    onShowOverlay: (ShareOverlay) -> Unit
-) {
-    var contextMenuExpanded by remember { mutableStateOf(false) }
-    val haptics = LocalHapticFeedback.current
-
-    ListItem(
-        modifier = Modifier
-            .fillMaxWidth(0.9f)
-            .clip(type.getShape())
-            .combinedClickable(
-                onClick = { onSelectShare(share) },
-                onLongClick = {
-                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                    contextMenuExpanded = true
-                }
-            )
-            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
-        headlineContent = {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-        },
-        leadingContent = {
-            Box(
-                modifier = Modifier.size(24.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                val icon = share.recipients.firstOrNull()?.icon
-                if (icon != null) {
-                    RecipientIcon(icon = icon, modifier = Modifier.size(24.dp))
-                } else {
-                    PublicLinkIcon(modifier = Modifier.size(24.dp))
-                }
-            }
-        },
-        supportingContent = {
-            val chipHorizontalPadding = 10.dp
-            val selectedLabel = selectedPresetOption.label()
-
-            Row(
-                modifier = Modifier
-                    .offset(x = -chipHorizontalPadding)
-                    .clip(RoundedCornerShape(percent = 50))
-                    .clickable { onShowOverlay(ShareOverlay.QuickShare(share.id)) }
-                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.08f))
-                    .padding(horizontal = chipHorizontalPadding, vertical = 2.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(contentAlignment = Alignment.CenterStart) {
-                    presetOptions.forEach { option ->
-                        Text(
-                            text = option.label(),
-                            style = MaterialTheme.typography.bodyMedium,
-                            maxLines = 1,
-                            modifier = Modifier
-                                .alpha(0f)
-                                .clearAndSetSemantics {}
-                        )
-                    }
-
-                    Text(
-                        text = selectedLabel,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.primary,
-                        maxLines = 1
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(2.dp))
-
-                Icon(
-                    imageVector = Icons.Default.KeyboardArrowDown,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(18.dp)
-                )
-            }
-        },
-        trailingContent = {
-            Box {
-                IconButton(onClick = { contextMenuExpanded = true }) {
-                    Icon(Icons.Default.MoreVert, contentDescription = "More options")
-                }
-
-                DropdownMenu(
-                    expanded = contextMenuExpanded,
-                    onDismissRequest = { contextMenuExpanded = false }
-                ) {
-                    DropdownMenuItem(
-                        leadingIcon = {
-                            Icon(Icons.Default.Edit,
-                                contentDescription = "Edit icon",
-                                modifier = Modifier.size(18.dp)
-                            )
-                        },
-                        text = { Text(stringResource(R.string.share_view_list_item_edit)) },
-                        onClick = {
-                            contextMenuExpanded = false
-                            onSelectShare(share)
-                        }
-                    )
-                    DropdownMenuItem(
-                        leadingIcon = {
-                            Icon(
-                                Icons.AutoMirrored.Filled.Send,
-                                contentDescription = "Send icon",
-                                modifier = Modifier.size(18.dp)
-                            )
-                        },
-                        text = { Text(stringResource(R.string.share_view_list_item_send_email)) },
-                        onClick = {
-                            contextMenuExpanded = false
-                            onSendEmail(share)
-                        }
-                    )
-                    HorizontalDivider()
-                    DropdownMenuItem(
-                        leadingIcon = {
-                            Icon(
-                                Icons.Default.Delete,
-                                contentDescription = "Delete icon",
-                                modifier = Modifier.size(18.dp)
-                            )
-                        },
-                        text = {
-                            Text(
-                                stringResource(R.string.share_view_list_item_delete),
-                                color = MaterialTheme.colorScheme.error
-                            )
-                        },
-                        onClick = {
-                            contextMenuExpanded = false
-                            onShowOverlay(ShareOverlay.DeleteConfirmation(share.id))
-                        }
-                    )
-                }
-            }
-        },
-        colors = ListItemDefaults.colors(containerColor = Color.Transparent)
     )
 }
 

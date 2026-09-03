@@ -10,8 +10,4 @@ package com.nextcloud.android.common.ui.share.model.api.secret
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Secret(
-    val updatable: Boolean,
-    val value: String? = null,
-    val url: String? = null
-)
+data class Secret(val updatable: Boolean, val value: String? = null, val url: String? = null)

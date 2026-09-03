@@ -18,7 +18,7 @@ data class SharingCapabilities(
     @SerialName("source_types")
     val sourceTypes: List<SourceType> = emptyList(),
     @SerialName("permission_presets")
-    val permissionPresets: List<PermissionPreset> = emptyList(),
+    val permissionPresets: List<PermissionPreset> = emptyList()
 ) {
     val isUnifiedShareEnabled: Boolean
         get() = UNIFIED_SHARE_API_VERSION in apiVersions

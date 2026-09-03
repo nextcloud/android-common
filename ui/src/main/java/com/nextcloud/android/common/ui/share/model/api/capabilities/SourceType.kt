@@ -13,5 +13,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class SourceType(
     @SerialName("class")
-    val classField: String,
+    val classField: String
 )

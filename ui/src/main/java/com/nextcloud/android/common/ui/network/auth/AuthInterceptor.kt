@@ -12,7 +12,6 @@ import okhttp3.Interceptor
 import okhttp3.Response
 
 class AuthInterceptor(private val credentials: ServerCredentials) : Interceptor {
-
     private companion object {
         private const val HTTP_PREFIX = "http://"
         private const val HTTPS_PREFIX = "https://"
@@ -26,12 +25,14 @@ class AuthInterceptor(private val credentials: ServerCredentials) : Interceptor 
     override fun intercept(chain: Interceptor.Chain): Response {
         val basicCredentials = Credentials.basic(credentials.username, credentials.token)
 
-        val request = chain.request()
-            .newBuilder()
-            .header(HEADER_AUTHORIZATION, basicCredentials)
-            .header(HEADER_OCS_REQUEST, HEADER_OCS_REQUEST_VALUE)
-            .url(resolveUrl(chain.request().url.toString()))
-            .build()
+        val request =
+            chain
+                .request()
+                .newBuilder()
+                .header(HEADER_AUTHORIZATION, basicCredentials)
+                .header(HEADER_OCS_REQUEST, HEADER_OCS_REQUEST_VALUE)
+                .url(resolveUrl(chain.request().url.toString()))
+                .build()
 
         return chain.proceed(request)
     }

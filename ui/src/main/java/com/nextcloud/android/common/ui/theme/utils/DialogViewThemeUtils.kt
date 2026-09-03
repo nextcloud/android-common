@@ -29,70 +29,62 @@ import javax.inject.Inject
  * View theme utils for dialogs
  */
 class DialogViewThemeUtils
-    @Inject
-    constructor(
-        schemes: MaterialSchemes
-    ) : ViewThemeUtilsBase(schemes) {
-        private val dynamicColor = MaterialDynamicColors()
+@Inject
+constructor(schemes: MaterialSchemes) : ViewThemeUtilsBase(schemes) {
+    private val dynamicColor = MaterialDynamicColors()
 
-        fun colorMaterialAlertDialogBackground(
-            context: Context,
-            dialogBuilder: MaterialAlertDialogBuilder
-        ) {
-            withScheme(dialogBuilder.context) { scheme ->
-                val materialShapeDrawable =
-                    MaterialShapeDrawable(
-                        context,
-                        null,
-                        androidx.appcompat.R.attr.alertDialogStyle,
-                        com.google.android.material.R.style.MaterialAlertDialog_MaterialComponents
-                    )
-                materialShapeDrawable.initializeElevationOverlay(context)
-                materialShapeDrawable.fillColor = ColorStateList.valueOf(dynamicColor.surface().getArgb(scheme))
+    fun colorMaterialAlertDialogBackground(context: Context, dialogBuilder: MaterialAlertDialogBuilder) {
+        withScheme(dialogBuilder.context) { scheme ->
+            val materialShapeDrawable =
+                MaterialShapeDrawable(
+                    context,
+                    null,
+                    androidx.appcompat.R.attr.alertDialogStyle,
+                    com.google.android.material.R.style.MaterialAlertDialog_MaterialComponents
+                )
+            materialShapeDrawable.initializeElevationOverlay(context)
+            materialShapeDrawable.fillColor = ColorStateList.valueOf(dynamicColor.surface().getArgb(scheme))
 
-                // dialogCornerRadius first appeared in Android Pie
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                    val radius = context.resources.getDimension(R.dimen.dialogBorderRadius)
-                    materialShapeDrawable.setCornerSize(radius)
-                }
-
-                dialogBuilder.background = materialShapeDrawable
+            // dialogCornerRadius first appeared in Android Pie
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                val radius = context.resources.getDimension(R.dimen.dialogBorderRadius)
+                materialShapeDrawable.setCornerSize(radius)
             }
-        }
 
-        fun colorDialogMenuText(button: MaterialButton) {
-            withScheme(button) { scheme ->
-                button.setTextColor(dynamicColor.onSurface().getArgb(scheme))
-                button.iconTint = ColorStateList.valueOf(dynamicColor.onSurface().getArgb(scheme))
-            }
-        }
-
-        fun colorDialogHeadline(textView: TextView) {
-            withScheme(textView) { scheme ->
-                textView.setTextColor(dynamicColor.onSurface().getArgb(scheme))
-            }
-        }
-
-        fun colorDialogSupportingText(textView: TextView) {
-            withScheme(textView) { scheme ->
-                textView.setTextColor(dynamicColor.onSurfaceVariant().getArgb(scheme))
-            }
-        }
-
-        fun colorDialogIcon(icon: ImageView) {
-            withScheme(icon) { scheme ->
-                icon.setColorFilter(dynamicColor.secondary().getArgb(scheme))
-            }
-        }
-
-        fun colorMaterialAlertDialogIcon(
-            context: Context,
-            drawableId: Int
-        ): Drawable {
-            val drawable = AppCompatResources.getDrawable(context, drawableId)!!
-            withScheme(context) { scheme ->
-                DrawableCompat.setTint(drawable, dynamicColor.secondary().getArgb(scheme))
-            }
-            return drawable
+            dialogBuilder.background = materialShapeDrawable
         }
     }
+
+    fun colorDialogMenuText(button: MaterialButton) {
+        withScheme(button) { scheme ->
+            button.setTextColor(dynamicColor.onSurface().getArgb(scheme))
+            button.iconTint = ColorStateList.valueOf(dynamicColor.onSurface().getArgb(scheme))
+        }
+    }
+
+    fun colorDialogHeadline(textView: TextView) {
+        withScheme(textView) { scheme ->
+            textView.setTextColor(dynamicColor.onSurface().getArgb(scheme))
+        }
+    }
+
+    fun colorDialogSupportingText(textView: TextView) {
+        withScheme(textView) { scheme ->
+            textView.setTextColor(dynamicColor.onSurfaceVariant().getArgb(scheme))
+        }
+    }
+
+    fun colorDialogIcon(icon: ImageView) {
+        withScheme(icon) { scheme ->
+            icon.setColorFilter(dynamicColor.secondary().getArgb(scheme))
+        }
+    }
+
+    fun colorMaterialAlertDialogIcon(context: Context, drawableId: Int): Drawable {
+        val drawable = AppCompatResources.getDrawable(context, drawableId)!!
+        withScheme(context) { scheme ->
+            DrawableCompat.setTint(drawable, dynamicColor.secondary().getArgb(scheme))
+        }
+        return drawable
+    }
+}

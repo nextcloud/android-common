@@ -15,12 +15,9 @@ import kotlinx.serialization.Serializable
 data class Source(
     @SerialName("class")
     val clazz: String,
-
     val value: String,
-
     @SerialName("display_name")
     val displayName: String,
-
     val icon: Icon? = null
 ) {
     companion object {

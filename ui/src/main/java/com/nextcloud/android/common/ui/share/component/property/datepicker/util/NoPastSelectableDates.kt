@@ -12,7 +12,6 @@ import java.time.LocalDate
 import java.time.ZoneOffset
 
 class NoPastSelectableDates : SelectableDates {
-
     private val today: LocalDate = LocalDate.now(ZoneOffset.UTC)
     private val todayUtcMillis: Long = today.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
 

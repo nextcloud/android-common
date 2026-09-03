@@ -50,9 +50,7 @@ fun AppCompatActivity.applyEdgeToEdgeWithSystemBarPadding(
  * @warning On Android 15+, this is a visual workaround only. The actual status bar
  *          color cannot be modified and will remain transparent with system-managed contrast.
  */
-fun AppCompatActivity.initStatusBar(
-    @ColorInt color: Int
-) {
+fun AppCompatActivity.initStatusBar(@ColorInt color: Int) {
     window.decorView.setOnApplyWindowInsetsListener { view, insets ->
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
             val statusBarHeight = insets.getInsets(WindowInsets.Type.statusBars()).top

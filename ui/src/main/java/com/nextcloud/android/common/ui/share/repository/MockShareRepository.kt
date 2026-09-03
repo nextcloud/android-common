@@ -22,6 +22,7 @@ import com.nextcloud.android.common.ui.share.model.api.request.AddSourceRequest
 import com.nextcloud.android.common.ui.share.model.api.request.GetShareRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePermissionPresetRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePermissionRequest
+import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareRecipientPermissionRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePropertyRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareRecipientSecretRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareStateRequest
@@ -307,10 +308,7 @@ class MockShareRepository : ShareRepository {
         return NetworkResult.Success(share)
     }
 
-    override suspend fun fetchShare(
-        id: String,
-        request: GetShareRequest
-    ): NetworkResult<Share> {
+    override suspend fun fetchShare(id: String, request: GetShareRequest): NetworkResult<Share> {
         val share = mockShares.find { it.id == id }
             ?: return NetworkResult.Success(
                 buildShare(id = id, sources = emptyList(), recipients = emptyList())
@@ -341,23 +339,31 @@ class MockShareRepository : ShareRepository {
         return NetworkResult.Success(result)
     }
 
-    override suspend fun updateShareState(
-        id: String,
-        request: UpdateShareStateRequest
-    ): NetworkResult<Share> {
+    override suspend fun updateShareState(id: String, request: UpdateShareStateRequest): NetworkResult<Share> {
         val index = mockShares.indexOfFirst { it.id == id }
-        val updated = (if (index >= 0) mockShares[index] else buildShare(id = id, sources = emptyList(), recipients = emptyList()))
+        val updated = (
+            if (index >=
+                0
+            ) {
+                mockShares[index]
+            } else {
+                buildShare(id = id, sources = emptyList(), recipients = emptyList())
+            }
+            )
             .copy(shareState = request.shareState, lastUpdated = System.currentTimeMillis())
         if (index >= 0) mockShares[index] = updated
         return NetworkResult.Success(updated)
     }
 
-    override suspend fun addShareSource(
-        id: String,
-        request: AddSourceRequest
-    ): NetworkResult<Share> {
+    override suspend fun addShareSource(id: String, request: AddSourceRequest): NetworkResult<Share> {
         val index = mockShares.indexOfFirst { it.id == id }
-        val current = if (index >= 0) mockShares[index] else buildShare(id = id, sources = emptyList(), recipients = emptyList())
+        val current = if (index >=
+            0
+        ) {
+            mockShares[index]
+        } else {
+            buildShare(id = id, sources = emptyList(), recipients = emptyList())
+        }
         val newSource = Source(clazz = request.clazz, value = request.value, displayName = request.value)
         val updated = current.copy(
             sources = current.sources + newSource,
@@ -367,13 +373,15 @@ class MockShareRepository : ShareRepository {
         return NetworkResult.Success(updated)
     }
 
-    override suspend fun removeShareSource(
-        id: String,
-        clazz: String,
-        value: String
-    ): NetworkResult<Share> {
+    override suspend fun removeShareSource(id: String, clazz: String, value: String): NetworkResult<Share> {
         val index = mockShares.indexOfFirst { it.id == id }
-        val current = if (index >= 0) mockShares[index] else buildShare(id = id, sources = emptyList(), recipients = emptyList())
+        val current = if (index >=
+            0
+        ) {
+            mockShares[index]
+        } else {
+            buildShare(id = id, sources = emptyList(), recipients = emptyList())
+        }
         val updated = current.copy(
             sources = current.sources.filterNot { it.clazz == clazz && it.value == value },
             lastUpdated = System.currentTimeMillis()
@@ -382,12 +390,15 @@ class MockShareRepository : ShareRepository {
         return NetworkResult.Success(updated)
     }
 
-    override suspend fun addShareRecipient(
-        id: String,
-        request: AddRecipientRequest
-    ): NetworkResult<Share> {
+    override suspend fun addShareRecipient(id: String, request: AddRecipientRequest): NetworkResult<Share> {
         val index = mockShares.indexOfFirst { it.id == id }
-        val current = if (index >= 0) mockShares[index] else buildShare(id = id, sources = emptyList(), recipients = emptyList())
+        val current = if (index >=
+            0
+        ) {
+            mockShares[index]
+        } else {
+            buildShare(id = id, sources = emptyList(), recipients = emptyList())
+        }
         val newRecipient = Recipient(
             clazz = request.clazz,
             value = request.value,
@@ -410,7 +421,13 @@ class MockShareRepository : ShareRepository {
         instance: String?
     ): NetworkResult<Share> {
         val index = mockShares.indexOfFirst { it.id == id }
-        val current = if (index >= 0) mockShares[index] else buildShare(id = id, sources = emptyList(), recipients = emptyList())
+        val current = if (index >=
+            0
+        ) {
+            mockShares[index]
+        } else {
+            buildShare(id = id, sources = emptyList(), recipients = emptyList())
+        }
         val updated = current.copy(
             recipients = current.recipients.filterNot {
                 it.clazz == clazz && it.value == value && it.instance == instance
@@ -421,12 +438,15 @@ class MockShareRepository : ShareRepository {
         return NetworkResult.Success(updated)
     }
 
-    override suspend fun updateShareProperty(
-        id: String,
-        request: UpdateSharePropertyRequest
-    ): NetworkResult<Share> {
+    override suspend fun updateShareProperty(id: String, request: UpdateSharePropertyRequest): NetworkResult<Share> {
         val index = mockShares.indexOfFirst { it.id == id }
-        val current = if (index >= 0) mockShares[index] else buildShare(id = id, sources = emptyList(), recipients = emptyList())
+        val current = if (index >=
+            0
+        ) {
+            mockShares[index]
+        } else {
+            buildShare(id = id, sources = emptyList(), recipients = emptyList())
+        }
         val updated = current.copy(lastUpdated = System.currentTimeMillis())
         if (index >= 0) mockShares[index] = updated
         return NetworkResult.Success(updated)
@@ -437,7 +457,13 @@ class MockShareRepository : ShareRepository {
         request: UpdateShareRecipientSecretRequest
     ): NetworkResult<Share> {
         val index = mockShares.indexOfFirst { it.id == id }
-        val current = if (index >= 0) mockShares[index] else buildShare(id = id, sources = emptyList(), recipients = emptyList())
+        val current = if (index >=
+            0
+        ) {
+            mockShares[index]
+        } else {
+            buildShare(id = id, sources = emptyList(), recipients = emptyList())
+        }
         return NetworkResult.Success(current)
     }
 
@@ -461,6 +487,36 @@ class MockShareRepository : ShareRepository {
         return NetworkResult.Success(updated)
     }
 
+    override suspend fun updateShareRecipientPermission(
+        id: String,
+        request: UpdateShareRecipientPermissionRequest
+    ): NetworkResult<Share> {
+        val index = mockShares.indexOfFirst { it.id == id }
+        val current =
+            if (index >= 0) mockShares[index] else buildShare(id = id, sources = emptyList(), recipients = emptyList())
+        val updatedRecipients = current.recipients.map { recipient ->
+            val isTarget = recipient.clazz == request.recipientClass &&
+                recipient.value == request.recipientValue &&
+                recipient.instance == request.recipientInstance
+            if (!isTarget) return@map recipient
+
+            val override = current.permissions
+                .firstOrNull { it.clazz == request.permissionClass }
+                ?.copy(enabled = request.enabled)
+                ?: return@map recipient
+
+            recipient.copy(
+                permissions = recipient.permissions.filterNot { it.clazz == override.clazz } + override
+            )
+        }
+        val updated = current.copy(
+            recipients = updatedRecipients,
+            lastUpdated = System.currentTimeMillis()
+        )
+        if (index >= 0) mockShares[index] = updated
+        return NetworkResult.Success(updated)
+    }
+
     override suspend fun updateSharePermissionPreset(
         id: String,
         request: UpdateSharePermissionPresetRequest
@@ -476,13 +532,12 @@ class MockShareRepository : ShareRepository {
         return NetworkResult.Success(updated)
     }
 
-    override suspend fun fetchSharingCapabilities(): NetworkResult<SharingCapabilities> =
-        NetworkResult.Success(
-            SharingCapabilities(
-                permissionPresets = listOf(
-                    PermissionPreset(clazz = "view", displayName = "Can view"),
-                    PermissionPreset(clazz = "edit", displayName = "Can edit")
-                )
+    override suspend fun fetchSharingCapabilities(): NetworkResult<SharingCapabilities> = NetworkResult.Success(
+        SharingCapabilities(
+            permissionPresets = listOf(
+                PermissionPreset(clazz = "view", displayName = "Can view"),
+                PermissionPreset(clazz = "edit", displayName = "Can edit")
             )
         )
+    )
 }

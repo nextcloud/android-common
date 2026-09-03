@@ -11,7 +11,6 @@ import com.nextcloud.android.common.ui.share.model.api.permission.PermissionPres
 import com.nextcloud.android.common.ui.share.model.api.share.Share
 
 sealed interface PermissionPresetOption {
-
     val presetClass: String?
 
     data object Custom : PermissionPresetOption {

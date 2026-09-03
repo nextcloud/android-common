@@ -26,12 +26,13 @@ class ShareAvatarRepository(private val credentials: ServerCredentials) {
     suspend fun fetchShareAvatars(sourceId: String): List<Share>? = withContext(Dispatchers.IO) {
         val client = NextcloudHttpClient.create(credentials)
         val shareRepository = ShareRemoteRepository(client)
-        val result = shareRepository.fetchShares(
-            filterSourceTypeValue = sourceId,
-            limit = SHARES_PAGE_SIZE,
-            filterSourceTypeClass = Source.NODE_SOURCE_CLASS,
-            lastShareID = null
-        )
+        val result =
+            shareRepository.fetchShares(
+                filterSourceTypeValue = sourceId,
+                limit = SHARES_PAGE_SIZE,
+                filterSourceTypeClass = Source.NODE_SOURCE_CLASS,
+                lastShareID = null
+            )
         return@withContext result.dataOrElse { Log.e(TAG, "failed to fetch avatars") }
     }
 }

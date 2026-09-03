@@ -19,7 +19,6 @@ import java.time.format.FormatStyle
 import java.util.Locale
 
 class ShareDateFormatter {
-
     private val displayDateFormatter: DateTimeFormatter =
         DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(Locale.getDefault())
 
@@ -30,10 +29,10 @@ class ShareDateFormatter {
         datePickerState.getSelectedDate()?.format(displayDateFormatter)
 
     @OptIn(ExperimentalMaterial3Api::class)
-    fun formatIso8601Date(datePickerState: DatePickerState): String? =
-        datePickerState.getSelectedDate()
-            ?.atStartOfDay(ZoneId.systemDefault())
-            ?.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+    fun formatIso8601Date(datePickerState: DatePickerState): String? = datePickerState
+        .getSelectedDate()
+        ?.atStartOfDay(ZoneId.systemDefault())
+        ?.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
 
     fun formatIsoForDisplay(isoDate: String?): String {
         if (isoDate.isNullOrBlank()) return ""

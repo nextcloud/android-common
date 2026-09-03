@@ -14,17 +14,17 @@ import com.nextcloud.android.common.ui.network.model.OcsResponse
 import com.nextcloud.android.common.ui.network.serialization.OCSSerializer
 
 class UserStatusRepository(private val client: NextcloudHttpClient) {
-
     private companion object {
         private const val PREDEFINED_STATUSES_ENDPOINT =
             "/ocs/v2.php/apps/user_status/api/v1/predefined_statuses"
     }
 
-    suspend fun fetchPredefinedStatuses(): NetworkResult<List<PredefinedStatus>> =
-        client.executeRequest(
-            endpoint = PREDEFINED_STATUSES_ENDPOINT,
-            method = HttpMethod.GET
-        ) { body ->
-            OCSSerializer.json.decodeFromString<OcsResponse<List<PredefinedStatus>>>(body).ocs.data
-        }
+    suspend fun fetchPredefinedStatuses(): NetworkResult<List<PredefinedStatus>> = client.executeRequest(
+        endpoint = PREDEFINED_STATUSES_ENDPOINT,
+        method = HttpMethod.GET
+    ) { body ->
+        OCSSerializer.json
+            .decodeFromString<OcsResponse<List<PredefinedStatus>>>(body)
+            .ocs.data
+    }
 }

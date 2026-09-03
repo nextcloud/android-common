@@ -14,6 +14,7 @@ import com.nextcloud.android.common.ui.share.model.api.request.AddSourceRequest
 import com.nextcloud.android.common.ui.share.model.api.request.GetShareRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePermissionPresetRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePermissionRequest
+import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareRecipientPermissionRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePropertyRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareRecipientSecretRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareStateRequest
@@ -21,7 +22,6 @@ import com.nextcloud.android.common.ui.share.model.api.share.Share
 import com.nextcloud.android.common.ui.share.model.api.state.ShareState
 
 interface ShareRepository {
-
     suspend fun fetchRecipients(
         recipientTypeClasses: List<String>?,
         query: String,
@@ -31,10 +31,7 @@ interface ShareRepository {
 
     suspend fun createDraftShare(): NetworkResult<Share>
 
-    suspend fun fetchShare(
-        id: String,
-        request: GetShareRequest = GetShareRequest()
-    ): NetworkResult<Share>
+    suspend fun fetchShare(id: String, request: GetShareRequest = GetShareRequest()): NetworkResult<Share>
 
     suspend fun deleteShare(id: String): NetworkResult<Unit>
 
@@ -46,26 +43,13 @@ interface ShareRepository {
         lastShareID: String? = null
     ): NetworkResult<List<Share>>
 
-    suspend fun updateShareState(
-        id: String,
-        request: UpdateShareStateRequest
-    ): NetworkResult<Share>
+    suspend fun updateShareState(id: String, request: UpdateShareStateRequest): NetworkResult<Share>
 
-    suspend fun addShareSource(
-        id: String,
-        request: AddSourceRequest
-    ): NetworkResult<Share>
+    suspend fun addShareSource(id: String, request: AddSourceRequest): NetworkResult<Share>
 
-    suspend fun removeShareSource(
-        id: String,
-        clazz: String,
-        value: String
-    ): NetworkResult<Share>
+    suspend fun removeShareSource(id: String, clazz: String, value: String): NetworkResult<Share>
 
-    suspend fun addShareRecipient(
-        id: String,
-        request: AddRecipientRequest
-    ): NetworkResult<Share>
+    suspend fun addShareRecipient(id: String, request: AddRecipientRequest): NetworkResult<Share>
 
     suspend fun removeShareRecipient(
         id: String,
@@ -74,14 +58,13 @@ interface ShareRepository {
         instance: String? = null
     ): NetworkResult<Share>
 
-    suspend fun updateShareProperty(
-        id: String,
-        request: UpdateSharePropertyRequest
-    ): NetworkResult<Share>
+    suspend fun updateShareProperty(id: String, request: UpdateSharePropertyRequest): NetworkResult<Share>
 
-    suspend fun updateSharePermission(
+    suspend fun updateSharePermission(id: String, request: UpdateSharePermissionRequest): NetworkResult<Share>
+
+    suspend fun updateShareRecipientPermission(
         id: String,
-        request: UpdateSharePermissionRequest
+        request: UpdateShareRecipientPermissionRequest
     ): NetworkResult<Share>
 
     suspend fun updateSharePermissionPreset(
@@ -89,10 +72,7 @@ interface ShareRepository {
         request: UpdateSharePermissionPresetRequest
     ): NetworkResult<Share>
 
-    suspend fun updateShareRecipientSecret(
-        id: String,
-        request: UpdateShareRecipientSecretRequest
-    ): NetworkResult<Share>
+    suspend fun updateShareRecipientSecret(id: String, request: UpdateShareRecipientSecretRequest): NetworkResult<Share>
 
     suspend fun generateSecret(): NetworkResult<String>
 

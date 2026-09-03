@@ -20,6 +20,7 @@ import com.nextcloud.android.common.ui.share.model.api.request.AddRecipientReque
 import com.nextcloud.android.common.ui.share.model.api.request.AddSourceRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePermissionPresetRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePermissionRequest
+import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareRecipientPermissionRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateSharePropertyRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareRecipientSecretRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareStateRequest
@@ -30,6 +31,7 @@ import com.nextcloud.android.common.ui.share.model.ui.ActiveShareState
 import com.nextcloud.android.common.ui.share.model.ui.ShareCategory
 import com.nextcloud.android.common.ui.share.model.ui.ShareEditorEntry
 import com.nextcloud.android.common.ui.share.model.ui.ShareScreenState
+import com.nextcloud.android.common.ui.share.model.ui.recipientPermissionChanges
 import com.nextcloud.android.common.ui.share.repository.ShareRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -58,7 +60,6 @@ class ShareViewModel(
     private val sourceId: String,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY = 300L
         private const val SEARCH_SUBSCRIPTION_TIMEOUT = 5_000L
@@ -107,12 +108,13 @@ class ShareViewModel(
     val searchQuery: StateFlow<String> = savedState.searchQuery
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    val recipientSearchResults: StateFlow<List<Recipient>> = searchQuery
-        .debounce(SEARCH_DEBOUNCE_DELAY.milliseconds)
-        .distinctUntilChanged()
-        .filter { it.isNotBlank() }
-        .mapLatest { query -> searchRecipients(query) }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(SEARCH_SUBSCRIPTION_TIMEOUT), emptyList())
+    val recipientSearchResults: StateFlow<List<Recipient>> =
+        searchQuery
+            .debounce(SEARCH_DEBOUNCE_DELAY.milliseconds)
+            .distinctUntilChanged()
+            .filter { it.isNotBlank() }
+            .mapLatest { query -> searchRecipients(query) }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(SEARCH_SUBSCRIPTION_TIMEOUT), emptyList())
 
     private var secretUpdateJob: Job? = null
 
@@ -241,11 +243,12 @@ class ShareViewModel(
     }
 
     private fun onDraftCreationFailed(result: NetworkResult<Share>) {
-        val messageId = if (result.isRateLimited) {
-            R.string.share_view_rate_limited_message
-        } else {
-            R.string.share_view_create_error_message
-        }
+        val messageId =
+            if (result.isRateLimited) {
+                R.string.share_view_rate_limited_message
+            } else {
+                R.string.share_view_create_error_message
+            }
 
         _errorMessageId.update { messageId }
     }
@@ -300,8 +303,9 @@ class ShareViewModel(
     // region sources
     private suspend fun applySource(id: String, value: String) {
         val result = repository.addShareSource(id, AddSourceRequest(Source.NODE_SOURCE_CLASS, value))
-        val updated = result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
-            ?: return
+        val updated =
+            result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
+                ?: return
         refreshActiveShare(updated.toActiveShare())
         replaceInList(updated)
     }
@@ -311,8 +315,9 @@ class ShareViewModel(
     fun addRecipient(id: String, clazz: String, value: String, instance: String? = null) {
         viewModelScope.launch {
             val result = repository.addShareRecipient(id, AddRecipientRequest(clazz, value, instance))
-            val updated = result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
-                ?: return@launch
+            val updated =
+                result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
+                    ?: return@launch
             refreshActiveShare(updated.toActiveShare())
             replaceInList(updated)
         }
@@ -347,8 +352,9 @@ class ShareViewModel(
     fun removeRecipient(id: String, clazz: String, value: String, instance: String? = null) {
         viewModelScope.launch {
             val result = repository.removeShareRecipient(id, clazz, value, instance)
-            val updated = result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
-                ?: return@launch
+            val updated =
+                result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
+                    ?: return@launch
             refreshActiveShare(updated.toActiveShare())
             replaceInList(updated)
         }
@@ -356,19 +362,22 @@ class ShareViewModel(
 
     fun updateRecipientSecret(shareId: String, recipient: Recipient, secret: String) {
         secretUpdateJob?.cancel()
-        secretUpdateJob = viewModelScope.launch {
-            val request = UpdateShareRecipientSecretRequest(
-                clazz = recipient.clazz,
-                value = recipient.value,
-                instance = recipient.instance,
-                secret = secret
-            )
-            val result = repository.updateShareRecipientSecret(shareId, request)
-            val updated = result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
-                ?: return@launch
-            refreshActiveShare(updated.toActiveShare())
-            replaceInList(updated)
-        }
+        secretUpdateJob =
+            viewModelScope.launch {
+                val request =
+                    UpdateShareRecipientSecretRequest(
+                        clazz = recipient.clazz,
+                        value = recipient.value,
+                        instance = recipient.instance,
+                        secret = secret
+                    )
+                val result = repository.updateShareRecipientSecret(shareId, request)
+                val updated =
+                    result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
+                        ?: return@launch
+                refreshActiveShare(updated.toActiveShare())
+                replaceInList(updated)
+            }
     }
 
     suspend fun generateSecret(): String? {
@@ -385,37 +394,79 @@ class ShareViewModel(
         if (value.isNullOrEmpty()) {
             _propertyErrors.update { it - clazz }
         }
-        propertyUpdateJobs[clazz] = viewModelScope.launch {
-            when (val result = repository.updateShareProperty(shareId, UpdateSharePropertyRequest(clazz, value))) {
-                is NetworkResult.Success -> {
-                    _propertyErrors.update { it - clazz }
-                    refreshActiveShare(result.data.toActiveShare())
-                    replaceInList(result.data)
-                }
+        propertyUpdateJobs[clazz] =
+            viewModelScope.launch {
+                when (val result = repository.updateShareProperty(shareId, UpdateSharePropertyRequest(clazz, value))) {
+                    is NetworkResult.Success -> {
+                        _propertyErrors.update { it - clazz }
+                        refreshActiveShare(result.data.toActiveShare())
+                        replaceInList(result.data)
+                    }
 
-                is NetworkResult.ServerError -> {
-                    if (!value.isNullOrEmpty()) {
-                        _propertyErrors.update { it + (clazz to result.response.ocs.data) }
+                    is NetworkResult.ServerError -> {
+                        if (!value.isNullOrEmpty()) {
+                            _propertyErrors.update { it + (clazz to result.response.ocs.data) }
+                        }
+                    }
+
+                    is NetworkResult.NetworkException -> {
+                        if (!value.isNullOrEmpty()) {
+                            _propertyErrors.update { it + (clazz to null) }
+                        }
                     }
                 }
-
-                is NetworkResult.NetworkException -> {
-                    if (!value.isNullOrEmpty()) {
-                        _propertyErrors.update { it + (clazz to null) }
-                    }
-                }
+                _pendingProperties.update { it - clazz }
             }
-            _pendingProperties.update { it - clazz }
-        }
     }
     // endregion
 
     // region permissions
+    fun updateRecipientPermission(shareId: String, recipient: Recipient, clazz: String, enabled: Boolean) {
+        viewModelScope.launch { applyRecipientPermission(shareId, recipient, clazz, enabled) }
+    }
+
+    fun updateRecipientPermissionPreset(shareId: String, recipient: Recipient, presetClass: String) {
+        val share = currentShares.firstOrNull { it.id == shareId } ?: return
+        val changes = share.recipientPermissionChanges(recipient, presetClass)
+        if (changes.isEmpty()) return
+
+        viewModelScope.launch {
+            changes.forEach { (clazz, enabled) ->
+                applyRecipientPermission(shareId, recipient, clazz, enabled) ?: return@launch
+            }
+        }
+    }
+
+    private suspend fun applyRecipientPermission(
+        shareId: String,
+        recipient: Recipient,
+        clazz: String,
+        enabled: Boolean
+    ): Share? {
+        val request =
+            UpdateShareRecipientPermissionRequest(
+                recipientClass = recipient.clazz,
+                recipientValue = recipient.value,
+                recipientInstance = recipient.instance,
+                permissionClass = clazz,
+                enabled = enabled
+            )
+        val result = repository.updateShareRecipientPermission(shareId, request)
+        val updated =
+            result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
+                ?: return null
+
+        refreshActiveShare(updated.toActiveShare())
+        replaceInList(updated)
+        return updated
+    }
+
     fun updatePermission(id: String, clazz: String, enabled: Boolean) {
         viewModelScope.launch {
             val result = repository.updateSharePermission(id, UpdateSharePermissionRequest(clazz, enabled))
-            val updated = result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
-                ?: return@launch
+            val updated =
+                result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
+                    ?: return@launch
             refreshActiveShare(updated.toActiveShare())
             replaceInList(updated)
         }
@@ -424,8 +475,9 @@ class ShareViewModel(
     fun updatePermissionPreset(id: String, presetClass: String, updateActiveShare: Boolean) {
         viewModelScope.launch {
             val result = repository.updateSharePermissionPreset(id, UpdateSharePermissionPresetRequest(presetClass))
-            val updated = result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
-                ?: return@launch
+            val updated =
+                result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
+                    ?: return@launch
             if (updateActiveShare) {
                 refreshActiveShare(updated.toActiveShare())
             }
@@ -497,12 +549,13 @@ class ShareViewModel(
         val index = current.indexOfFirst { it.id == updated.id }
         val isActive = updated.shareState == ShareState.ACTIVE
 
-        val shares = when {
-            index >= 0 && isActive -> current.toMutableList().apply { this[index] = updated }
-            index >= 0 -> current.filterNot { it.id == updated.id }
-            isActive -> listOf(updated) + current
-            else -> return
-        }
+        val shares =
+            when {
+                index >= 0 && isActive -> current.toMutableList().apply { this[index] = updated }
+                index >= 0 -> current.filterNot { it.id == updated.id }
+                isActive -> listOf(updated) + current
+                else -> return
+            }
 
         publishShares(shares)
     }

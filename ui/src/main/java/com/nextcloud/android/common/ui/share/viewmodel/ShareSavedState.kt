@@ -11,9 +11,7 @@ import androidx.lifecycle.SavedStateHandle
 import com.nextcloud.android.common.ui.share.model.ui.ShareEditorEntry
 import kotlinx.coroutines.flow.StateFlow
 
-class ShareSavedState(
-    private val handle: SavedStateHandle
-) {
+class ShareSavedState(private val handle: SavedStateHandle) {
     companion object {
         private const val KEY_ACTIVE_SHARE_ID = "active_share_id"
         private const val KEY_EDITOR_ENTRY = "editor_entry"

@@ -18,7 +18,6 @@ import java.time.format.FormatStyle
 import java.util.Locale
 
 class ShareDateFormatterTest {
-
     private lateinit var originalLocale: Locale
 
     @Before
@@ -58,10 +57,11 @@ class ShareDateFormatterTest {
     }
 
     private fun assertLocalizedDisplay(locale: Locale) {
-        val expected = DateTimeFormatter
-            .ofLocalizedDate(FormatStyle.SHORT)
-            .withLocale(locale)
-            .format(DATE)
+        val expected =
+            DateTimeFormatter
+                .ofLocalizedDate(FormatStyle.SHORT)
+                .withLocale(locale)
+                .format(DATE)
 
         assertEquals(expected, displayFor(locale))
     }

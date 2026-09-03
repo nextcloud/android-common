@@ -14,9 +14,7 @@ import kotlinx.serialization.Serializable
 data class PermissionPreset(
     @SerialName("class")
     val clazz: String,
-
     @SerialName("display_name")
     val displayName: String,
-
     val hint: String? = null
 )

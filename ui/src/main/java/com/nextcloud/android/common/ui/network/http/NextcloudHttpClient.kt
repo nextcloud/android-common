@@ -35,15 +35,15 @@ class NextcloudHttpClient private constructor(
         private const val OCS_OK = "ok"
         private const val OCS_FAILURE = "failure"
 
-        fun create(
-            credentials: ServerCredentials
-        ): NextcloudHttpClient {
-            val okHttpClient = OkHttpClient.Builder()
-                .connectTimeout(CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-                .readTimeout(READ_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-                .writeTimeout(WRITE_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-                .addInterceptor(AuthInterceptor(credentials))
-                .build()
+        fun create(credentials: ServerCredentials): NextcloudHttpClient {
+            val okHttpClient =
+                OkHttpClient
+                    .Builder()
+                    .connectTimeout(CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                    .readTimeout(READ_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                    .writeTimeout(WRITE_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                    .addInterceptor(AuthInterceptor(credentials))
+                    .build()
 
             return NextcloudHttpClient(okHttpClient, credentials, NextcloudHttpClientLogger(BuildConfig.DEBUG))
         }
@@ -75,9 +75,10 @@ class NextcloudHttpClient private constructor(
                 }
             }
 
-            val ocs = OCSSerializer.json
-                .decodeFromString<OcsResponse<JsonElement>>(responseBody)
-                .ocs
+            val ocs =
+                OCSSerializer.json
+                    .decodeFromString<OcsResponse<JsonElement>>(responseBody)
+                    .ocs
             val meta = ocs.meta
             val isError = !response.isSuccessful || meta.status != OCS_OK
             debugLogger.logResponse(endpoint, method, response.code, responseBody, isError = isError)

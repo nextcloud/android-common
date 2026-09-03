@@ -86,9 +86,18 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.testApiBtn.setOnClickListener {
-            val baseUrl = binding.baseUrl.text?.toString().orEmpty()
-            val username = binding.username.text?.toString().orEmpty()
-            val token = binding.token.text?.toString().orEmpty()
+            val baseUrl =
+                binding.baseUrl.text
+                    ?.toString()
+                    .orEmpty()
+            val username =
+                binding.username.text
+                    ?.toString()
+                    .orEmpty()
+            val token =
+                binding.token.text
+                    ?.toString()
+                    .orEmpty()
             mainViewModel.testPredefinedStatuses(baseUrl, username, token)
         }
 
