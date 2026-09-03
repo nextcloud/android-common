@@ -423,7 +423,7 @@ class ShareViewModel(
 
     // region permissions
     fun updateRecipientPermission(shareId: String, recipient: Recipient, clazz: String, enabled: Boolean) {
-        viewModelScope.launch { applyRecipientPermission(shareId, recipient, clazz, enabled) }
+        viewModelScope.launch { applyRecipientPermissions(shareId, recipient, mapOf(clazz to enabled)) }
     }
 
     fun updateRecipientPermissionPreset(shareId: String, recipient: Recipient, presetClass: String) {
@@ -431,14 +431,27 @@ class ShareViewModel(
         val changes = share.recipientPermissionChanges(recipient, presetClass)
         if (changes.isEmpty()) return
 
-        viewModelScope.launch {
-            changes.forEach { (clazz, enabled) ->
-                applyRecipientPermission(shareId, recipient, clazz, enabled) ?: return@launch
-            }
-        }
+        viewModelScope.launch { applyRecipientPermissions(shareId, recipient, changes) }
     }
 
-    private suspend fun applyRecipientPermission(
+    private suspend fun applyRecipientPermissions(
+        shareId: String,
+        recipient: Recipient,
+        changes: Map<String, Boolean>
+    ) {
+        var applied: Share? = null
+        var hasFailed = false
+
+        changes.forEach { (clazz, enabled) ->
+            val updated = requestRecipientPermission(shareId, recipient, clazz, enabled)
+            if (updated == null) hasFailed = true else applied = updated
+        }
+
+        val resolved = if (hasFailed) fetchShareOrNull(shareId) else applied
+        resolved?.let { publishUpdatedShare(it) }
+    }
+
+    private suspend fun requestRecipientPermission(
         shareId: String,
         recipient: Recipient,
         clazz: String,
@@ -453,13 +466,21 @@ class ShareViewModel(
                 enabled = enabled
             )
         val result = repository.updateShareRecipientPermission(shareId, request)
-        val updated =
-            result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
-                ?: return null
+        return result.dataOrElse { _errorMessageId.update { updateErrorMessageId(result) } }
+    }
 
-        refreshActiveShare(updated.toActiveShare())
-        replaceInList(updated)
-        return updated
+    private suspend fun fetchShareOrNull(shareId: String): Share? =
+        (repository.fetchShare(shareId) as? NetworkResult.Success)?.data
+
+    private fun publishUpdatedShare(share: Share) {
+        refreshActiveShare(share.toActiveShare())
+        replaceInList(share)
+    }
+
+    private fun updateErrorMessageId(result: NetworkResult<Share>): Int = if (result.isRateLimited) {
+        R.string.share_view_rate_limited_message
+    } else {
+        R.string.share_view_update_error_message
     }
 
     fun updatePermission(id: String, clazz: String, enabled: Boolean) {

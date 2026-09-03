@@ -245,10 +245,7 @@ private fun ShareList(
                     expandedShareIds + share.id
                 }
             },
-            onShowOverlay = onShowOverlay,
-            onRemoveRecipient = { share, recipient ->
-                viewModel.removeRecipient(share.id, recipient.clazz, recipient.value, recipient.instance)
-            }
+            onShowOverlay = onShowOverlay
         )
     }
 

@@ -11,15 +11,14 @@ package com.nextcloud.android.common.ui.share.component
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -27,18 +26,12 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -60,8 +53,6 @@ private val LEADING_ICON_SIZE = 24.dp
 @Composable
 fun ShareListItem(state: ShareListItemState, permissionPresets: List<PermissionPreset>, actions: ShareListItemActions) {
     val share = state.share
-    var contextMenuExpanded by remember { mutableStateOf(false) }
-    val haptics = LocalHapticFeedback.current
 
     Column(
         modifier = Modifier
@@ -70,13 +61,7 @@ fun ShareListItem(state: ShareListItemState, permissionPresets: List<PermissionP
             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = CONTAINER_ALPHA))
     ) {
         ListItem(
-            modifier = Modifier.combinedClickable(
-                onClick = { actions.onSelectShare(share) },
-                onLongClick = {
-                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                    contextMenuExpanded = true
-                }
-            ),
+            modifier = Modifier.clickable { actions.onSelectShare(share) },
             headlineContent = {
                 Text(
                     text = state.title,
@@ -85,7 +70,7 @@ fun ShareListItem(state: ShareListItemState, permissionPresets: List<PermissionP
                     overflow = TextOverflow.Ellipsis
                 )
             },
-            leadingContent = { ShareItemLeadingContent(share) },
+            leadingContent = { ShareItemLeadingContent(share = share, isExpanded = state.isExpanded) },
             supportingContent = {
                 SharePermissionChip(
                     options = PermissionPresetOption.optionsFor(share, permissionPresets),
@@ -93,14 +78,7 @@ fun ShareListItem(state: ShareListItemState, permissionPresets: List<PermissionP
                     onClick = { actions.onShowOverlay(ShareOverlay.QuickShare(share.id)) }
                 )
             },
-            trailingContent = {
-                ShareItemTrailingContent(
-                    state = state,
-                    isContextMenuExpanded = contextMenuExpanded,
-                    onContextMenuExpandedChange = { contextMenuExpanded = it },
-                    actions = actions
-                )
-            },
+            trailingContent = { ShareItemTrailingContent(state = state, actions = actions) },
             colors = ListItemDefaults.colors(containerColor = Color.Transparent)
         )
 
@@ -115,35 +93,20 @@ fun ShareListItem(state: ShareListItemState, permissionPresets: List<PermissionP
 }
 
 @Composable
-private fun ShareItemTrailingContent(
-    state: ShareListItemState,
-    isContextMenuExpanded: Boolean,
-    onContextMenuExpandedChange: (Boolean) -> Unit,
-    actions: ShareListItemActions
-) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        if (state.share.hasMultipleRecipients) {
-            ExpandRecipientsButton(
-                isExpanded = state.isExpanded,
-                onClick = { actions.onToggleExpanded(state.share) }
-            )
-        }
-
-        Box {
-            IconButton(onClick = { onContextMenuExpandedChange(true) }) {
-                Icon(
-                    imageVector = Icons.Default.MoreVert,
-                    contentDescription = stringResource(R.string.share_view_list_item_more_options)
-                )
-            }
-
-            ShareContextMenu(
-                expanded = isContextMenuExpanded,
-                onDismiss = { onContextMenuExpandedChange(false) },
-                onEdit = { actions.onSelectShare(state.share) }
-            )
-        }
+private fun ShareItemTrailingContent(state: ShareListItemState, actions: ShareListItemActions) {
+    if (state.share.hasMultipleRecipients) {
+        ExpandRecipientsButton(
+            isExpanded = state.isExpanded,
+            onClick = { actions.onToggleExpanded(state.share) }
+        )
+        return
     }
+
+    Icon(
+        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+        contentDescription = null,
+        tint = MaterialTheme.colorScheme.onSurfaceVariant
+    )
 }
 
 @Composable
@@ -164,8 +127,7 @@ private fun ShareRecipientList(share: Share, permissionPresets: List<PermissionP
                                 recipientInstance = recipient.instance
                             )
                         )
-                    },
-                    onRemove = { actions.onRemoveRecipient(share, recipient) }
+                    }
                 )
             }
         }
@@ -173,9 +135,11 @@ private fun ShareRecipientList(share: Share, permissionPresets: List<PermissionP
 }
 
 @Composable
-private fun ShareItemLeadingContent(share: Share) {
+private fun ShareItemLeadingContent(share: Share, isExpanded: Boolean) {
     if (share.hasMultipleRecipients) {
-        RecipientAvatarStack(recipients = share.recipients)
+        if (!isExpanded) {
+            RecipientAvatarStack(recipients = share.recipients)
+        }
         return
     }
 

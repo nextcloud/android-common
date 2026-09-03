@@ -24,7 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun ShareSwitch(label: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+fun ShareSwitch(label: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit, enabled: Boolean = true) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -35,6 +35,7 @@ fun ShareSwitch(label: String, checked: Boolean, onCheckedChange: (Boolean) -> U
         Text(
             text = label,
             style = MaterialTheme.typography.bodyLarge,
+            color = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outline,
             modifier = Modifier.weight(1f)
         )
 
@@ -42,7 +43,8 @@ fun ShareSwitch(label: String, checked: Boolean, onCheckedChange: (Boolean) -> U
 
         Switch(
             checked = checked,
-            onCheckedChange = onCheckedChange
+            onCheckedChange = onCheckedChange,
+            enabled = enabled
         )
     }
 }

@@ -32,7 +32,6 @@
     <string name="share_view_send_action">Send</string>
     <string name="share_view_share_action">Share public link…</string>
 
-    <string name="share_view_list_item_edit">Edit</string>
     <string name="share_view_delete_action">Remove share</string>
     <string name="share_view_delete_confirm_title">Remove share?</string>
     <string name="share_view_delete_confirm_message">This share will be permanently removed.</string>
@@ -47,11 +46,12 @@
     <string name="share_view_recipients_expand">Show recipients</string>
     <string name="share_view_recipients_collapse">Hide recipients</string>
     <string name="share_view_recipients_overflow">+%1$d</string>
-    <string name="share_view_recipient_summary_separator">, </string>
+    <string name="share_view_recipient_summary_separator">", "</string>
     <string name="share_view_recipient_remove">Remove recipient</string>
-    <string name="share_view_list_item_more_options">More options</string>
     <string name="share_view_recipient_permission_title">Permissions for %1$s</string>
     <string name="share_view_recipient_permission_custom_title">Custom permissions</string>
+    <string name="share_view_recipient_permission_default">%1$s (default)</string>
+    <string name="share_view_recipient_permission_cap_hint">You can only grant the same or fewer permissions than the share.</string>
 
     <plurals name="share_view_recipient_summary_people">
         <item quantity="one">%1$d person</item>
