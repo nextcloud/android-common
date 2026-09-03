@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -41,7 +42,6 @@ import com.nextcloud.android.common.ui.share.model.api.recipients.Recipient
 import com.nextcloud.android.common.ui.share.model.api.share.Share
 import com.nextcloud.android.common.ui.share.model.ui.PermissionPresetOption
 import com.nextcloud.android.common.ui.share.model.ui.effectivePermissionsFor
-import com.nextcloud.android.common.ui.share.model.ui.grantedPermissions
 import com.nextcloud.android.common.ui.share.model.ui.label
 import com.nextcloud.android.common.ui.share.model.ui.presetOption
 import com.nextcloud.android.common.ui.share.model.ui.recipientPresetOptions
@@ -86,6 +86,7 @@ fun RecipientPermissionBottomSheet(
                 PresetOptionItem(
                     option = option,
                     isSelected = option == if (showCustomPermissions) PermissionPresetOption.Custom else selectedOption,
+                    isShareDefault = option.presetClass != null && option.presetClass == share.permissionPreset,
                     onClick = {
                         val presetClass = option.presetClass
                         if (presetClass == null) {
@@ -99,17 +100,47 @@ fun RecipientPermissionBottomSheet(
                 )
             }
 
-            if (!showCustomPermissions) return@Column
+            if (showCustomPermissions) {
+                HorizontalDivider()
+
+                CustomPermissions(
+                    share = share,
+                    recipient = recipient,
+                    viewModel = viewModel
+                )
+            }
 
             HorizontalDivider()
 
-            CustomPermissions(
-                share = share,
-                recipient = recipient,
-                viewModel = viewModel
+            RemoveRecipientItem(
+                onClick = {
+                    onDismiss()
+                    viewModel.removeRecipient(share.id, recipient.clazz, recipient.value, recipient.instance)
+                }
             )
         }
     }
+}
+
+@Composable
+private fun RemoveRecipientItem(onClick: () -> Unit) {
+    ListItem(
+        modifier = Modifier.clickable { onClick() },
+        headlineContent = {
+            Text(
+                text = stringResource(R.string.share_view_recipient_remove),
+                color = MaterialTheme.colorScheme.error
+            )
+        },
+        leadingContent = {
+            Icon(
+                imageVector = Icons.Default.Delete,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.error
+            )
+        },
+        colors = ListItemDefaults.colors(containerColor = Color.Transparent)
+    )
 }
 
 @Composable
@@ -124,7 +155,7 @@ private fun CustomPermissions(share: Share, recipient: Recipient, viewModel: Sha
             modifier = Modifier.padding(vertical = CONTENT_PADDING)
         )
 
-        share.grantedPermissions().forEach { permission ->
+        share.permissions.forEach { permission ->
             key(permission.clazz) {
                 val isEnabled = effectivePermissions.first { it.clazz == permission.clazz }.enabled
                 var checked by remember(permission.clazz, isEnabled) { mutableStateOf(isEnabled) }
@@ -135,18 +166,41 @@ private fun CustomPermissions(share: Share, recipient: Recipient, viewModel: Sha
                     onCheckedChange = { value ->
                         checked = value
                         viewModel.updateRecipientPermission(share.id, recipient, permission.clazz, value)
-                    }
+                    },
+                    enabled = permission.enabled
                 )
             }
         }
+
+        Text(
+            text = stringResource(R.string.share_view_recipient_permission_cap_hint),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(vertical = CONTENT_PADDING)
+        )
     }
 }
 
 @Composable
-private fun PresetOptionItem(option: PermissionPresetOption, isSelected: Boolean, onClick: () -> Unit) {
+private fun PresetOptionItem(
+    option: PermissionPresetOption,
+    isSelected: Boolean,
+    isShareDefault: Boolean,
+    onClick: () -> Unit
+) {
+    val label = option.label()
+
     ListItem(
         modifier = Modifier.clickable { onClick() },
-        headlineContent = { Text(option.label()) },
+        headlineContent = {
+            Text(
+                text = if (isShareDefault) {
+                    stringResource(R.string.share_view_recipient_permission_default, label)
+                } else {
+                    label
+                }
+            )
+        },
         trailingContent = {
             if (isSelected) {
                 Icon(
