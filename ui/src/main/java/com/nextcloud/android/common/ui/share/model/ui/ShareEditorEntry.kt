@@ -9,6 +9,5 @@ package com.nextcloud.android.common.ui.share.model.ui
 
 enum class ShareEditorEntry {
     EDIT,
-    CUSTOMIZE_PERMISSION,
-    SEND_EMAIL
+    CUSTOMIZE_PERMISSION
 }

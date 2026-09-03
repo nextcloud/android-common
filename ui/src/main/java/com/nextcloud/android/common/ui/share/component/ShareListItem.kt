@@ -140,9 +140,7 @@ private fun ShareItemTrailingContent(
             ShareContextMenu(
                 expanded = isContextMenuExpanded,
                 onDismiss = { onContextMenuExpandedChange(false) },
-                onEdit = { actions.onSelectShare(state.share) },
-                onSendEmail = { actions.onSendEmail(state.share) },
-                onDelete = { actions.onShowOverlay(ShareOverlay.DeleteConfirmation(state.share.id)) }
+                onEdit = { actions.onSelectShare(state.share) }
             )
         }
     }

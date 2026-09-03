@@ -19,8 +19,6 @@ sealed class ShareOverlay {
 
     data class QuickShare(override val shareId: String) : ShareOverlay()
 
-    data class DeleteConfirmation(override val shareId: String) : ShareOverlay()
-
     data class RecipientPermission(
         override val shareId: String,
         val recipientClass: String,
@@ -30,7 +28,6 @@ sealed class ShareOverlay {
 
     companion object {
         private const val QUICK_SHARE = "quick_share"
-        private const val DELETE_CONFIRMATION = "delete_confirmation"
         private const val RECIPIENT_PERMISSION = "recipient_permission"
         private const val RECIPIENT_CLASS_INDEX = 2
         private const val RECIPIENT_VALUE_INDEX = 3
@@ -46,10 +43,6 @@ sealed class ShareOverlay {
 
                         is QuickShare -> {
                             listOf(QUICK_SHARE, overlay.shareId)
-                        }
-
-                        is DeleteConfirmation -> {
-                            listOf(DELETE_CONFIRMATION, overlay.shareId)
                         }
 
                         is RecipientPermission -> {
@@ -68,10 +61,6 @@ sealed class ShareOverlay {
                     when (saved.firstOrNull()) {
                         QUICK_SHARE -> {
                             shareId?.let(::QuickShare)
-                        }
-
-                        DELETE_CONFIRMATION -> {
-                            shareId?.let(::DeleteConfirmation)
                         }
 
                         RECIPIENT_PERMISSION -> {
