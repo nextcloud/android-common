@@ -49,7 +49,7 @@ fun CustomLink(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 8.dp)
+            .padding(vertical = 8.dp)
     ) {
         Text(
             text = stringResource(R.string.share_view_custom_link_title),
