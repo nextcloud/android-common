@@ -2,7 +2,7 @@
  * Nextcloud Android Common Library
  *
  * SPDX-FileCopyrightText: 2026 Nextcloud GmbH and Nextcloud contributors
- * SPDX-License-Identifier: AGPL-3.0-or-later
+ * SPDX-License-Identifier: MIT
  */
 
 @file:Suppress("FunctionNaming", "LongMethod", "UnusedPrivateMember")
@@ -64,6 +64,7 @@ import com.nextcloud.android.common.ui.R
 import com.nextcloud.android.common.ui.share.viewmodel.ShareViewModel
 import com.nextcloud.android.common.ui.share.component.CollapsibleShareSection
 import com.nextcloud.android.common.ui.share.component.CustomLink
+import com.nextcloud.android.common.ui.share.component.DeleteShareButton
 import com.nextcloud.android.common.ui.share.component.SelectRecipientField
 import com.nextcloud.android.common.ui.share.component.ShareSwitch
 import com.nextcloud.android.common.ui.share.component.property.SharePropertyView
@@ -110,7 +111,7 @@ fun AddOrEditShareBottomSheet(
     var selectedCategory by rememberSaveable(share.id) {
         mutableStateOf(if (share.belongsAnyoneTab) ShareCategory.Anyone else ShareCategory.Invited)
     }
-    var showAdvancedSettings by rememberSaveable(share.id) { mutableStateOf(entry == ShareEditorEntry.SEND_EMAIL) }
+    var showAdvancedSettings by rememberSaveable(share.id) { mutableStateOf(false) }
     val context = LocalContext.current
     val propertyErrors by viewModel.propertyErrors.collectAsStateWithLifecycle()
     val pendingProperties by viewModel.pendingProperties.collectAsStateWithLifecycle()
@@ -378,7 +379,8 @@ private fun AdvancedSettingsSection(
     propertyErrors: Map<String, String?>,
     viewModel: ShareViewModel
 ) {
-    if (!share.isAdvancedSectionAvailable) {
+    val isDeletable = share.shareState != ShareState.DRAFT
+    if (!share.isAdvancedSectionAvailable && !isDeletable) {
         return
     }
 
@@ -405,6 +407,10 @@ private fun AdvancedSettingsSection(
                     viewModel.updateRecipientSecret(share.id, it, token)
                 }
             )
+        }
+
+        if (isDeletable) {
+            DeleteShareButton(onDelete = { viewModel.deleteShare(share.id) })
         }
     }
 }

@@ -33,8 +33,7 @@
     <string name="share_view_share_action">Share public link…</string>
 
     <string name="share_view_list_item_edit">Edit</string>
-    <string name="share_view_list_item_send_email">Send email</string>
-    <string name="share_view_list_item_delete">Delete</string>
+    <string name="share_view_delete_action">Delete share</string>
     <string name="share_view_delete_confirm_title">Delete share?</string>
     <string name="share_view_delete_confirm_message">This share will be permanently removed.</string>
 

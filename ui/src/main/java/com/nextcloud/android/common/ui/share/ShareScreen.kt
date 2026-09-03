@@ -86,7 +86,6 @@ import com.nextcloud.android.common.ui.share.component.ShareListItem
 import com.nextcloud.android.common.ui.share.component.bottomsheet.AddOrEditShareBottomSheet
 import com.nextcloud.android.common.ui.share.component.bottomsheet.QuickSharePermissionBottomSheet
 import com.nextcloud.android.common.ui.share.component.bottomsheet.RecipientPermissionBottomSheet
-import com.nextcloud.android.common.ui.share.component.dialog.DeleteShareConfirmationDialog
 import com.nextcloud.android.common.ui.share.model.api.permission.PermissionPreset
 import com.nextcloud.android.common.ui.share.model.api.share.Share
 import com.nextcloud.android.common.ui.share.model.ui.PermissionPresetOption
@@ -219,14 +218,6 @@ private fun ShareItemOverlay(
             )
         }
 
-        is ShareOverlay.DeleteConfirmation -> DeleteShareConfirmationDialog(
-            onConfirm = {
-                onDismiss()
-                viewModel.deleteShare(share.id)
-            },
-            onDismiss = onDismiss
-        )
-
         ShareOverlay.None -> Unit
     }
 }
@@ -247,7 +238,6 @@ private fun ShareList(
     val actions = remember(viewModel, onShowOverlay) {
         ShareListItemActions(
             onSelectShare = { share -> viewModel.setActiveShare(share, ShareEditorEntry.EDIT) },
-            onSendEmail = { share -> viewModel.setActiveShare(share, ShareEditorEntry.SEND_EMAIL) },
             onToggleExpanded = { share ->
                 expandedShareIds = if (share.id in expandedShareIds) {
                     expandedShareIds - share.id
