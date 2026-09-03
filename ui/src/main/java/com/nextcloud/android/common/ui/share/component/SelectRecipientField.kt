@@ -44,10 +44,10 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.svg.SvgDecoder
 import com.nextcloud.android.common.ui.R
-import com.nextcloud.android.common.ui.share.viewmodel.ShareViewModel
 import com.nextcloud.android.common.ui.share.model.api.icon.Icon
 import com.nextcloud.android.common.ui.share.model.api.recipients.Recipient
 import com.nextcloud.android.common.ui.share.model.api.share.Share
+import com.nextcloud.android.common.ui.share.viewmodel.ShareViewModel
 
 private val FIELD_VERTICAL_PADDING = 12.dp
 private val CHIP_SPACING = 8.dp

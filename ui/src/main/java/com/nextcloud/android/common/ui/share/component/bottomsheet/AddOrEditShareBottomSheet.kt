@@ -61,7 +61,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nextcloud.android.common.ui.R
-import com.nextcloud.android.common.ui.share.viewmodel.ShareViewModel
 import com.nextcloud.android.common.ui.share.component.CollapsibleShareSection
 import com.nextcloud.android.common.ui.share.component.CustomLink
 import com.nextcloud.android.common.ui.share.component.DeleteShareButton
@@ -84,6 +83,7 @@ import com.nextcloud.android.common.ui.share.model.ui.ShareCategory
 import com.nextcloud.android.common.ui.share.model.ui.ShareEditorEntry
 import com.nextcloud.android.common.ui.share.model.ui.label
 import com.nextcloud.android.common.ui.share.repository.MockShareRepository
+import com.nextcloud.android.common.ui.share.viewmodel.ShareViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
