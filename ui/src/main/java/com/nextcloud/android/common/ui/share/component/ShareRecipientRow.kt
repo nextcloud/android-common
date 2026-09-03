@@ -11,9 +11,6 @@ package com.nextcloud.android.common.ui.share.component
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -62,13 +59,7 @@ fun ShareRecipientRow(
                 onClick = onEditPermissions
             )
         },
-        trailingContent = {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        },
+        trailingContent = { ShareTrailingIcon() },
         colors = ListItemDefaults.colors(containerColor = Color.Transparent)
     )
 }

@@ -16,10 +16,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -29,7 +26,6 @@ import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -44,8 +40,6 @@ import com.nextcloud.android.common.ui.share.model.ui.ShareOverlay
 
 private const val ITEM_WIDTH_FRACTION = 0.9f
 private const val CONTAINER_ALPHA = 0.5f
-private const val COLLAPSED_CHEVRON_ROTATION = -90f
-private const val EXPANDED_CHEVRON_ROTATION = 0f
 
 private val LEADING_ICON_SIZE = 24.dp
 
@@ -77,18 +71,7 @@ fun ShareListItem(state: ShareListItemState, permissionPresets: List<PermissionP
                     onClick = { actions.onShowOverlay(ShareOverlay.QuickShare(share.id)) }
                 )
             },
-            trailingContent = {
-                ExpandRecipientsButton(
-                    isExpanded = state.isExpanded,
-                    onClick = {
-                        if (state.share.hasMultipleRecipients) {
-                            actions.onToggleExpanded(state.share)
-                        } else {
-                            actions.onSelectShare(share)
-                        }
-                    }
-                )
-            },
+            trailingContent = { ShareItemTrailingIcon(state = state, actions = actions) },
             colors = ListItemDefaults.colors(containerColor = Color.Transparent)
         )
 
@@ -150,20 +133,21 @@ private fun ShareItemLeadingContent(share: Share, isExpanded: Boolean) {
 }
 
 @Composable
-private fun ExpandRecipientsButton(isExpanded: Boolean, onClick: () -> Unit) {
-    val descriptionId = if (isExpanded) {
+private fun ShareItemTrailingIcon(state: ShareListItemState, actions: ShareListItemActions) {
+    if (!state.share.hasMultipleRecipients) {
+        ShareTrailingIcon(onClick = { actions.onSelectShare(state.share) })
+        return
+    }
+
+    val descriptionId = if (state.isExpanded) {
         R.string.share_view_recipients_collapse
     } else {
         R.string.share_view_recipients_expand
     }
 
-    IconButton(onClick = onClick) {
-        Icon(
-            imageVector = Icons.Default.KeyboardArrowDown,
-            contentDescription = stringResource(descriptionId),
-            modifier = Modifier.rotate(
-                if (isExpanded) EXPANDED_CHEVRON_ROTATION else COLLAPSED_CHEVRON_ROTATION
-            )
-        )
-    }
+    ShareTrailingIcon(
+        contentDescription = stringResource(descriptionId),
+        isPointingDown = state.isExpanded,
+        onClick = { actions.onToggleExpanded(state.share) }
+    )
 }
