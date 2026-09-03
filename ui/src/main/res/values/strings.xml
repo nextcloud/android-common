@@ -16,7 +16,7 @@
 
     <string name="share_view_advanced_settings">Settings</string>
 
-    <string name="share_view_select_recipient_label">Recipient</string>
+    <string name="share_view_select_recipient_label">Participant</string>
     <string name="share_view_select_recipient_clear">Clear recipient</string>
 
     <string name="share_view_custom_link_title">Custom link</string>
@@ -33,13 +33,13 @@
     <string name="share_view_share_action">Share public link…</string>
 
     <string name="share_view_list_item_edit">Edit</string>
-    <string name="share_view_delete_action">Delete share</string>
-    <string name="share_view_delete_confirm_title">Delete share?</string>
+    <string name="share_view_delete_action">Remove share</string>
+    <string name="share_view_delete_confirm_title">Remove share?</string>
     <string name="share_view_delete_confirm_message">This share will be permanently removed.</string>
 
     <string name="share_view_fetch_error_message">Failed to fetch shares.</string>
     <string name="share_view_fetch_error_description">Pull down to try again.</string>
-    <string name="share_view_delete_error_message">Failed to delete share.</string>
+    <string name="share_view_delete_error_message">Failed to remove share.</string>
     <string name="share_view_create_error_message">Failed to create share.</string>
     <string name="share_view_update_error_message">Failed to update share.</string>
     <string name="share_view_rate_limited_message">Please try again in a few seconds.</string>
