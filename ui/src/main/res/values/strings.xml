@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Nextcloud Android Common Library
+  ~
+  ~ SPDX-FileCopyrightText: 2026 Nextcloud GmbH and Nextcloud contributors
+  ~ SPDX-License-Identifier: MIT
+  -->
+
+<resources>
+    <string name="common_ok">OK</string>
+    <string name="common_cancel">Cancel</string>
+
+    <string name="share_view_public_link">Share link</string>
+    <string name="share_view_public_link_numbered">Share link (%1$d)</string>
+
+    <string name="share_view_bottom_sheet_title">Share "%s"</string>
+
+    <string name="share_view_advanced_settings">Settings</string>
+
+    <string name="share_view_select_recipient_label">Participant</string>
+    <string name="share_view_select_recipient_clear">Clear recipient</string>
+
+    <string name="share_view_custom_link_title">Custom link</string>
+    <string name="share_view_custom_link_description">The link can be changed to be easy to remember, but do not set it to something that is easy to guess.</string>
+    <string name="share_view_custom_link_refresh">Refresh link</string>
+
+    <string name="share_view_empty_title">Not shared yet</string>
+    <string name="share_view_recipient_search_field_empty_result">No result</string>
+
+    <string name="share_view_copy_to_clipboard_label">Copied</string>
+    <string name="share_view_invited_copy_action">Copy private link</string>
+    <string name="share_view_anyone_copy_action">Copy public link</string>
+    <string name="share_view_send_action">Send</string>
+    <string name="share_view_share_action">Share public link…</string>
+
+    <string name="share_view_delete_action">Remove share</string>
+    <string name="share_view_delete_confirm_title">Remove share?</string>
+    <string name="share_view_delete_confirm_message">This share will be permanently removed.</string>
+
+    <string name="share_view_fetch_error_message">Failed to fetch shares.</string>
+    <string name="share_view_fetch_error_description">Pull down to try again.</string>
+    <string name="share_view_delete_error_message">Failed to remove share.</string>
+    <string name="share_view_create_error_message">Failed to create share.</string>
+    <string name="share_view_update_error_message">Failed to update share.</string>
+
+    <string name="share_view_recipients_expand">Show recipients</string>
+    <string name="share_view_recipients_collapse">Hide recipients</string>
+    <string name="share_view_recipients_overflow">+%1$d</string>
+    <string name="share_view_recipient_summary_separator">", "</string>
+    <string name="share_view_recipient_remove">Remove recipient</string>
+    <string name="share_view_recipient_permission_title">Permissions for %1$s</string>
+    <string name="share_view_recipient_permission_custom_title">Custom permissions</string>
+    <string name="share_view_recipient_permission_default">%1$s (default)</string>
+    <string name="share_view_recipient_permission_cap_hint">You can only grant the same or fewer permissions than the share.</string>
+
+    <plurals name="share_view_recipient_summary_people">
+        <item quantity="one">%1$d person</item>
+        <item quantity="other">%1$d people</item>
+    </plurals>
+    <plurals name="share_view_recipient_summary_groups">
+        <item quantity="one">%1$d group</item>
+        <item quantity="other">%1$d groups</item>
+    </plurals>
+    <plurals name="share_view_recipient_summary_teams">
+        <item quantity="one">%1$d team</item>
+        <item quantity="other">%1$d teams</item>
+    </plurals>
+    <plurals name="share_view_recipient_summary_emails">
+        <item quantity="one">%1$d email</item>
+        <item quantity="other">%1$d emails</item>
+    </plurals>
+    <plurals name="share_view_recipient_summary_links">
+        <item quantity="one">%1$d link</item>
+        <item quantity="other">%1$d links</item>
+    </plurals>
+    <plurals name="share_view_recipient_summary_others">
+        <item quantity="one">%1$d recipient</item>
+        <item quantity="other">%1$d recipients</item>
+    </plurals>
+
+    <string name="share_view_quick_permission_title">Participants</string>
+    <string name="share_view_permission_preset_label">Participants</string>
+    <string name="share_view_permission_preset_custom">Can…</string>
+
+    <string name="share_view_invited_category_title">Invited people</string>
+    <string name="share_view_anyone_category_title">Anyone</string>
+</resources>

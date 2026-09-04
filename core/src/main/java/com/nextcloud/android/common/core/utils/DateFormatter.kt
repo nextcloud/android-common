@@ -18,9 +18,7 @@ import kotlin.text.toInt
 /**
  * Helper implementation for date formatting.
  */
-class DateFormatter(
-    private val context: Context
-) {
+class DateFormatter(private val context: Context) {
     private val sdfDays: SimpleDateFormat
     private val sdfMonths: SimpleDateFormat
     private val sdfYears: SimpleDateFormat
