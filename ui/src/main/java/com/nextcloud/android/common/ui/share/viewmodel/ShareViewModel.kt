@@ -449,7 +449,7 @@ class ShareViewModel(
                 enabled = enabled
             )
         val result = repository.updateShareRecipientPermission(shareId, request)
-        return result.dataOrElse { _errorMessageId.update {  R.string.share_view_update_error_message } }
+        return result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
     }
 
     private suspend fun fetchShareOrNull(shareId: String): Share? =

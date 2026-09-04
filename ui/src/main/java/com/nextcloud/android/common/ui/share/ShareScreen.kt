@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -55,6 +54,7 @@ import com.nextcloud.android.common.ui.component.ContentUnavailableView
 import com.nextcloud.android.common.ui.network.auth.ServerCredentials
 import com.nextcloud.android.common.ui.network.http.NextcloudHttpClient
 import com.nextcloud.android.common.ui.share.component.ShareListItem
+import com.nextcloud.android.common.ui.share.component.ShareListShimmer
 import com.nextcloud.android.common.ui.share.component.bottomsheet.AddOrEditShareBottomSheet
 import com.nextcloud.android.common.ui.share.component.bottomsheet.QuickSharePermissionBottomSheet
 import com.nextcloud.android.common.ui.share.component.bottomsheet.RecipientPermissionBottomSheet
@@ -111,14 +111,7 @@ private fun ShareScreen(internalLink: String, viewModel: ShareViewModel) {
         containerColor = Color.Transparent
     ) { paddingValues ->
         when (val state = screenState) {
-            is ShareScreenState.Loading -> Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
+            is ShareScreenState.Loading -> ShareListShimmer(modifier = Modifier.padding(paddingValues))
 
             else -> ShareList(
                 state = state,
@@ -215,7 +208,6 @@ private fun ShareList(
         }
     }
 }
-
 
 @Composable
 private fun ShareItemOverlay(
