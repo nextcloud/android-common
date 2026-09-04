@@ -259,6 +259,7 @@ private fun ShareItemOverlay(
 private fun SharePlaceholder(state: ShareScreenState) {
     if (state is ShareScreenState.Error) {
         ContentUnavailableView(
+            iconId = R.drawable.ic_error,
             title = stringResource(R.string.share_view_fetch_error_message),
             description = stringResource(R.string.share_view_fetch_error_description)
         )
