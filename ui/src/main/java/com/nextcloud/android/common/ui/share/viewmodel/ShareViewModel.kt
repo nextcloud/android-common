@@ -99,9 +99,6 @@ class ShareViewModel(
     private val _pendingProperties = MutableStateFlow<Set<String>>(emptySet())
     val pendingProperties: StateFlow<Set<String>> = _pendingProperties.asStateFlow()
 
-    private val currentShares: List<Share>
-        get() = (_state.value as? ShareScreenState.Loaded)?.shares ?: emptyList()
-
     private val propertyUpdateJobs = mutableMapOf<String, Job>()
     private val pendingUpdateJobs = mutableSetOf<Job>()
     private val activatingShareIds = mutableSetOf<String>()
@@ -339,7 +336,8 @@ class ShareViewModel(
                 result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
                     ?: return@launch
             refreshActiveShare(updated.toActiveShare())
-        }.trackPendingUpdateJobs()
+            replaceInList(updated)
+        }
     }
 
     fun updateRecipientSecret(shareId: String, recipient: Recipient, secret: String) {
@@ -402,19 +400,18 @@ class ShareViewModel(
 
     // region permissions
     fun updateRecipientPermission(shareId: String, recipient: Recipient, clazz: String, enabled: Boolean) {
-        viewModelScope
-            .launch { applyRecipientPermissions(shareId, recipient, mapOf(clazz to enabled)) }
-            .trackPendingUpdateJobs()
+        viewModelScope.launch {
+            applyRecipientPermissions(shareId, recipient, mapOf(clazz to enabled))
+        }
     }
 
-    fun updateRecipientPermissionPreset(shareId: String, recipient: Recipient, presetClass: String) {
-        val share = currentShares.firstOrNull { it.id == shareId } ?: return
+    fun updateRecipientPermissionPreset(share: Share, recipient: Recipient, presetClass: String) {
         val changes = share.recipientPermissionChanges(recipient, presetClass)
         if (changes.isEmpty()) return
 
-        viewModelScope
-            .launch { applyRecipientPermissions(shareId, recipient, changes) }
-            .trackPendingUpdateJobs()
+        viewModelScope.launch {
+            applyRecipientPermissions(share.id, recipient, changes)
+        }
     }
 
     private suspend fun applyRecipientPermissions(
@@ -431,7 +428,10 @@ class ShareViewModel(
         }
 
         val resolved = if (hasFailed) fetchShareOrNull(shareId) else applied
-        resolved?.let { refreshActiveShare(it.toActiveShare()) }
+        resolved?.let {
+            refreshActiveShare(it.toActiveShare())
+            replaceInList(it)
+        }
     }
 
     private suspend fun requestRecipientPermission(
@@ -474,7 +474,8 @@ class ShareViewModel(
             if (updateActiveShare) {
                 refreshActiveShare(updated.toActiveShare())
             }
-        }.trackPendingUpdateJobs()
+            replaceInList(updated)
+        }
     }
     // endregion
 
