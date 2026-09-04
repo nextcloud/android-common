@@ -41,7 +41,6 @@
     <string name="share_view_delete_error_message">Failed to remove share.</string>
     <string name="share_view_create_error_message">Failed to create share.</string>
     <string name="share_view_update_error_message">Failed to update share.</string>
-    <string name="share_view_rate_limited_message">Please try again in a few seconds.</string>
 
     <string name="share_view_recipients_expand">Show recipients</string>
     <string name="share_view_recipients_collapse">Hide recipients</string>
