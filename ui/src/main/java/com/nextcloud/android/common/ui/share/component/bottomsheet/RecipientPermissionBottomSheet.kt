@@ -105,7 +105,7 @@ fun RecipientPermissionBottomSheet(
                         }
 
                         onDismiss()
-                        viewModel.updateRecipientPermissionPreset(share.id, recipient, presetClass)
+                        viewModel.updateRecipientPermissionPreset(share, recipient, presetClass)
                     }
                 )
             }
