@@ -48,7 +48,9 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import java.util.UUID
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -68,6 +70,7 @@ class ShareViewModel(
         private const val RECIPIENT_SEARCH_OFFSET = 0
 
         private val DRAFT_CREATION_INTERVAL = 5.seconds
+        private val PENDING_MUTATION_JOIN_TIMEOUT = 15.seconds
     }
 
     private val savedState = ShareSavedState(savedStateHandle)
@@ -105,6 +108,8 @@ class ShareViewModel(
         get() = (_state.value as? ShareScreenState.Loaded)?.shares ?: emptyList()
 
     private val propertyUpdateJobs = mutableMapOf<String, Job>()
+    private val pendingUpdateJobs = mutableSetOf<Job>()
+    private val activatingShareIds = mutableSetOf<String>()
 
     val searchQuery: StateFlow<String> = savedState.searchQuery
 
@@ -261,14 +266,19 @@ class ShareViewModel(
     // region state
     fun updateState(id: String, shareState: ShareState) {
         viewModelScope.launch {
-            val updated = applyState(id, shareState) ?: return@launch
+            if (shareState == ShareState.ACTIVE) activatingShareIds += id
+            try {
+                val updated = applyState(id, shareState) ?: return@launch
 
-            if (shareState == ShareState.ACTIVE) {
-                updateActiveShare(ActiveShareState.None)
-            } else {
-                refreshActiveShare(updated.toActiveShare())
+                if (shareState == ShareState.ACTIVE) {
+                    updateActiveShare(ActiveShareState.None)
+                } else {
+                    refreshActiveShare(updated.toActiveShare())
+                }
+                replaceInList(updated)
+            } finally {
+                if (shareState == ShareState.ACTIVE) activatingShareIds -= id
             }
-            replaceInList(updated)
         }
     }
 
@@ -277,14 +287,18 @@ class ShareViewModel(
 
         viewModelScope.launch {
             _isPreparingLink.update { true }
+            activatingShareIds += id
 
-            val updated = applyState(id, ShareState.ACTIVE)
-            if (updated != null) {
-                refreshActiveShare(ActiveShareState.Activating(updated))
-                replaceInList(updated)
+            try {
+                val updated = applyState(id, ShareState.ACTIVE)
+                if (updated != null) {
+                    refreshActiveShare(ActiveShareState.Activating(updated))
+                    replaceInList(updated)
+                }
+            } finally {
+                activatingShareIds -= id
+                _isPreparingLink.update { false }
             }
-
-            _isPreparingLink.update { false }
         }
     }
 
@@ -306,7 +320,6 @@ class ShareViewModel(
             result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
                 ?: return
         refreshActiveShare(updated.toActiveShare())
-        replaceInList(updated)
     }
     // endregion
 
@@ -318,8 +331,7 @@ class ShareViewModel(
                 result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
                     ?: return@launch
             refreshActiveShare(updated.toActiveShare())
-            replaceInList(updated)
-        }
+        }.trackPendingUpdateJobs()
     }
 
     fun selectCategory(category: ShareCategory, share: Share) {
@@ -355,8 +367,7 @@ class ShareViewModel(
                 result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
                     ?: return@launch
             refreshActiveShare(updated.toActiveShare())
-            replaceInList(updated)
-        }
+        }.trackPendingUpdateJobs()
     }
 
     fun updateRecipientSecret(shareId: String, recipient: Recipient, secret: String) {
@@ -375,8 +386,7 @@ class ShareViewModel(
                     result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
                         ?: return@launch
                 refreshActiveShare(updated.toActiveShare())
-                replaceInList(updated)
-            }
+            }.trackPendingUpdateJobs()
     }
 
     suspend fun generateSecret(): String? {
@@ -399,7 +409,6 @@ class ShareViewModel(
                     is NetworkResult.Success -> {
                         _propertyErrors.update { it - clazz }
                         refreshActiveShare(result.data.toActiveShare())
-                        replaceInList(result.data)
                     }
 
                     is NetworkResult.ServerError -> {
@@ -415,13 +424,15 @@ class ShareViewModel(
                     }
                 }
                 _pendingProperties.update { it - clazz }
-            }
+            }.trackPendingUpdateJobs()
     }
     // endregion
 
     // region permissions
     fun updateRecipientPermission(shareId: String, recipient: Recipient, clazz: String, enabled: Boolean) {
-        viewModelScope.launch { applyRecipientPermissions(shareId, recipient, mapOf(clazz to enabled)) }
+        viewModelScope
+            .launch { applyRecipientPermissions(shareId, recipient, mapOf(clazz to enabled)) }
+            .trackPendingUpdateJobs()
     }
 
     fun updateRecipientPermissionPreset(shareId: String, recipient: Recipient, presetClass: String) {
@@ -429,7 +440,9 @@ class ShareViewModel(
         val changes = share.recipientPermissionChanges(recipient, presetClass)
         if (changes.isEmpty()) return
 
-        viewModelScope.launch { applyRecipientPermissions(shareId, recipient, changes) }
+        viewModelScope
+            .launch { applyRecipientPermissions(shareId, recipient, changes) }
+            .trackPendingUpdateJobs()
     }
 
     private suspend fun applyRecipientPermissions(
@@ -446,7 +459,7 @@ class ShareViewModel(
         }
 
         val resolved = if (hasFailed) fetchShareOrNull(shareId) else applied
-        resolved?.let { publishUpdatedShare(it) }
+        resolved?.let { refreshActiveShare(it.toActiveShare()) }
     }
 
     private suspend fun requestRecipientPermission(
@@ -470,11 +483,6 @@ class ShareViewModel(
     private suspend fun fetchShareOrNull(shareId: String): Share? =
         (repository.fetchShare(shareId) as? NetworkResult.Success)?.data
 
-    private fun publishUpdatedShare(share: Share) {
-        refreshActiveShare(share.toActiveShare())
-        replaceInList(share)
-    }
-
     private fun updateErrorMessageId(result: NetworkResult<Share>): Int = if (result.isRateLimited) {
         R.string.share_view_rate_limited_message
     } else {
@@ -488,8 +496,7 @@ class ShareViewModel(
                 result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
                     ?: return@launch
             refreshActiveShare(updated.toActiveShare())
-            replaceInList(updated)
-        }
+        }.trackPendingUpdateJobs()
     }
 
     fun updatePermissionPreset(id: String, presetClass: String, updateActiveShare: Boolean) {
@@ -501,8 +508,7 @@ class ShareViewModel(
             if (updateActiveShare) {
                 refreshActiveShare(updated.toActiveShare())
             }
-            replaceInList(updated)
-        }
+        }.trackPendingUpdateJobs()
     }
     // endregion
 
@@ -531,10 +537,21 @@ class ShareViewModel(
         val active = _activeShare.value.shareOrNull ?: return
         if (active.id != id) return
 
-        if (active.shareState == ShareState.DRAFT) {
-            deleteShare(id)
+        when {
+            id in activatingShareIds -> Unit
+            active.shareState == ShareState.DRAFT -> deleteShare(id)
+            else -> refreshSharesAfterPendingUpdates()
         }
         setActiveShare(null)
+    }
+
+    private fun refreshSharesAfterPendingUpdates() {
+        viewModelScope.launch {
+            withTimeoutOrNull(PENDING_MUTATION_JOIN_TIMEOUT) {
+                pendingUpdateJobs.toList().joinAll()
+            }
+            refreshShares()
+        }
     }
 
     fun setActiveShare(value: Share?, entry: ShareEditorEntry = ShareEditorEntry.EDIT) {
@@ -560,6 +577,11 @@ class ShareViewModel(
         val id = value.shareOrNull?.id ?: return
         if (_activeShare.value.shareOrNull?.id != id) return
         updateActiveShare(value)
+    }
+
+    private fun Job.trackPendingUpdateJobs(): Job = also { job ->
+        pendingUpdateJobs += job
+        job.invokeOnCompletion { pendingUpdateJobs -= job }
     }
 
     // The list only ever holds active shares, so a draft being edited never reaches it and an
