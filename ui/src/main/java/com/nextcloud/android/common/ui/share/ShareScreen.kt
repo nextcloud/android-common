@@ -148,52 +148,6 @@ private fun ShareScreen(internalLink: String, viewModel: ShareViewModel) {
     )
 }
 
-@Composable
-private fun ShareItemOverlay(
-    overlay: ShareOverlay,
-    shares: List<Share>,
-    permissionPresets: List<PermissionPreset>,
-    onDismiss: () -> Unit,
-    viewModel: ShareViewModel
-) {
-    val share = overlay.shareId?.let { id -> shares.firstOrNull { it.id == id } } ?: return
-
-    when (overlay) {
-        is ShareOverlay.QuickShare -> QuickSharePermissionBottomSheet(
-            options = PermissionPresetOption.optionsFor(share, permissionPresets),
-            selectedOption = PermissionPresetOption.from(share.permissionPreset, permissionPresets),
-            onOptionSelected = { option ->
-                onDismiss()
-                val presetClass = option.presetClass
-                if (presetClass != null) {
-                    viewModel.updatePermissionPreset(share.id, presetClass, updateActiveShare = false)
-                } else {
-                    viewModel.setActiveShare(share, ShareEditorEntry.CUSTOMIZE_PERMISSION)
-                }
-            },
-            onDismiss = onDismiss
-        )
-
-        is ShareOverlay.RecipientPermission -> {
-            val recipient = share.recipients.firstOrNull {
-                it.clazz == overlay.recipientClass &&
-                    it.value == overlay.recipientValue &&
-                    it.instance == overlay.recipientInstance
-            } ?: return
-
-            RecipientPermissionBottomSheet(
-                share = share,
-                recipient = recipient,
-                permissionPresets = permissionPresets,
-                viewModel = viewModel,
-                onDismiss = onDismiss
-            )
-        }
-
-        ShareOverlay.None -> Unit
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ShareList(
@@ -259,6 +213,53 @@ private fun ShareList(
                 )
             }
         }
+    }
+}
+
+
+@Composable
+private fun ShareItemOverlay(
+    overlay: ShareOverlay,
+    shares: List<Share>,
+    permissionPresets: List<PermissionPreset>,
+    onDismiss: () -> Unit,
+    viewModel: ShareViewModel
+) {
+    val share = overlay.shareId?.let { id -> shares.firstOrNull { it.id == id } } ?: return
+
+    when (overlay) {
+        is ShareOverlay.QuickShare -> QuickSharePermissionBottomSheet(
+            options = PermissionPresetOption.optionsFor(share, permissionPresets),
+            selectedOption = PermissionPresetOption.from(share.permissionPreset, permissionPresets),
+            onOptionSelected = { option ->
+                onDismiss()
+                val presetClass = option.presetClass
+                if (presetClass != null) {
+                    viewModel.updatePermissionPreset(share.id, presetClass, updateActiveShare = false)
+                } else {
+                    viewModel.setActiveShare(share, ShareEditorEntry.CUSTOMIZE_PERMISSION)
+                }
+            },
+            onDismiss = onDismiss
+        )
+
+        is ShareOverlay.RecipientPermission -> {
+            val recipient = share.recipients.firstOrNull {
+                it.clazz == overlay.recipientClass &&
+                    it.value == overlay.recipientValue &&
+                    it.instance == overlay.recipientInstance
+            } ?: return
+
+            RecipientPermissionBottomSheet(
+                share = share,
+                recipient = recipient,
+                permissionPresets = permissionPresets,
+                viewModel = viewModel,
+                onDismiss = onDismiss
+            )
+        }
+
+        ShareOverlay.None -> Unit
     }
 }
 

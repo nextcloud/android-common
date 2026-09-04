@@ -126,8 +126,6 @@ class ShareViewModel(
     }
 
     override fun onCleared() {
-        super.onCleared()
-
         val draft = _activeShare.value.shareOrNull?.takeIf { it.shareState == ShareState.DRAFT } ?: return
         CoroutineScope(SupervisorJob()).launch { repository.deleteShare(draft.id) }
     }
