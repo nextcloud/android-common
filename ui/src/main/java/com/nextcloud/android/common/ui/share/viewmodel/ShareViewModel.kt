@@ -157,7 +157,6 @@ class ShareViewModel(
         val restored = savedState.activeShareId?.let { fetchRestorableShare(it) } ?: return
 
         updateActiveShare(ActiveShareState.Editing(restored))
-        replaceInList(restored)
     }
 
     private suspend fun fetchRestorableShare(id: String): Share? {
@@ -518,7 +517,10 @@ class ShareViewModel(
             val result = repository.deleteShare(id)
             result.dataOrElse { _errorMessageId.update { R.string.share_view_delete_error_message } } ?: return@launch
 
-            publishShares(currentShares.filterNot { it.id == id })
+            _state.update { state ->
+                val shares = ((state as? ShareScreenState.Loaded)?.shares ?: emptyList()).filterNot { it.id == id }
+                if (shares.isEmpty()) ShareScreenState.Empty else ShareScreenState.Loaded(shares)
+            }
 
             val editingShare = _activeShare.value
             if (editingShare is ActiveShareState.Editing && editingShare.share.id == id) {
@@ -584,22 +586,18 @@ class ShareViewModel(
         job.invokeOnCompletion { pendingUpdateJobs -= job }
     }
 
-    // The list only ever holds active shares, so a draft being edited never reaches it and an
-    // activated one is inserted rather than silently dropped.
     private fun replaceInList(updated: Share) {
-        val current = currentShares
-        val index = current.indexOfFirst { it.id == updated.id }
-        val isActive = updated.shareState == ShareState.ACTIVE
-
-        val shares =
-            when {
-                index >= 0 && isActive -> current.toMutableList().apply { this[index] = updated }
-                index >= 0 -> current.filterNot { it.id == updated.id }
-                isActive -> listOf(updated) + current
-                else -> return
-            }
-
-        publishShares(shares)
+        _state.update { state ->
+            val current = (state as? ShareScreenState.Loaded)?.shares ?: emptyList()
+            val index = current.indexOfFirst { it.id == updated.id }
+            val shares =
+                if (index >= 0) {
+                    current.toMutableList().apply { this[index] = updated }
+                } else {
+                    listOf(updated) + current
+                }
+            ShareScreenState.Loaded(shares)
+        }
     }
 
     private fun publishShares(shares: List<Share>) {
