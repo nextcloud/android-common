@@ -89,7 +89,7 @@ data class Share(
             return context.getString(R.string.share_view_public_link)
         }
 
-        val position = publicLinks.sortedBy { it.lastUpdated }.indexOfFirst { it.id == id } + 1
+        val position = publicLinks.sortedWith(ShareCreationOrder).indexOfFirst { it.id == id } + 1
         return context.getString(R.string.share_view_public_link_numbered, position)
     }
 

@@ -37,9 +37,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -74,6 +76,7 @@ import com.nextcloud.android.common.ui.share.viewmodel.ShareViewModelFactory
 
 private val FIRST_ITEM_TOP_SPACING = 16.dp
 private val ITEM_SPACING = 2.dp
+private val FAB_CLEARANCE = 88.dp
 
 private val ExpandedShareIdsSaver = listSaver<Set<String>, String>(
     save = { it.toList() },
@@ -176,7 +179,10 @@ private fun ShareList(
             .padding(paddingValues)
     ) {
         LazyColumn(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .nestedScroll(rememberNestedScrollInteropConnection()),
+            contentPadding = PaddingValues(bottom = FAB_CLEARANCE),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if (shares.isEmpty()) {

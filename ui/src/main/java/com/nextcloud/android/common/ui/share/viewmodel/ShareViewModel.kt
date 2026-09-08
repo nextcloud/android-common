@@ -24,6 +24,7 @@ import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareRecipi
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareRecipientSecretRequest
 import com.nextcloud.android.common.ui.share.model.api.request.UpdateShareStateRequest
 import com.nextcloud.android.common.ui.share.model.api.share.Share
+import com.nextcloud.android.common.ui.share.model.api.share.ShareCreationOrder
 import com.nextcloud.android.common.ui.share.model.api.source.Source
 import com.nextcloud.android.common.ui.share.model.api.state.ShareState
 import com.nextcloud.android.common.ui.share.model.ui.ActiveShareState
@@ -562,15 +563,19 @@ class ShareViewModel(
                 if (index >= 0) {
                     current.toMutableList().apply { this[index] = updated }
                 } else {
-                    listOf(updated) + current
+                    current + updated
                 }
-            ShareScreenState.Loaded(shares)
+            ShareScreenState.Loaded(shares.sortedWith(ShareCreationOrder))
         }
     }
 
     private fun publishShares(shares: List<Share>) {
         _state.update {
-            if (shares.isEmpty()) ShareScreenState.Empty else ShareScreenState.Loaded(shares)
+            if (shares.isEmpty()) {
+                ShareScreenState.Empty
+            } else {
+                ShareScreenState.Loaded(shares.sortedWith(ShareCreationOrder))
+            }
         }
     }
     // endregion
