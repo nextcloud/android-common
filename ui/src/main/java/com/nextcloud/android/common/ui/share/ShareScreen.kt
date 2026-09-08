@@ -16,12 +16,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -78,6 +81,8 @@ import com.nextcloud.android.common.ui.share.viewmodel.ShareViewModelFactory
 private val FIRST_ITEM_TOP_SPACING = 16.dp
 private val ITEM_SPACING = 2.dp
 private val FAB_CLEARANCE = 88.dp
+private val FAB_PROGRESS_SIZE = 24.dp
+private val FAB_PROGRESS_STROKE = 2.dp
 
 private val ExpandedShareIdsSaver = listSaver<Set<String>, String>(
     save = { it.toList() },
@@ -89,6 +94,7 @@ private fun ShareScreen(internalLink: String, viewModel: ShareViewModel) {
     val errorMessageId by viewModel.errorMessageId.collectAsStateWithLifecycle()
     val screenState by viewModel.state.collectAsStateWithLifecycle()
     val activeShare by viewModel.activeShare.collectAsStateWithLifecycle()
+    val isCreatingDraft by viewModel.isCreatingDraft.collectAsStateWithLifecycle()
     val permissionPresets by viewModel.permissionPresets.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val resources = LocalResources.current
@@ -108,7 +114,15 @@ private fun ShareScreen(internalLink: String, viewModel: ShareViewModel) {
             FloatingActionButton(
                 onClick = { viewModel.createDraftShare() }
             ) {
-                Icon(painterResource(R.drawable.ic_person_add), contentDescription = "Add")
+                if (isCreatingDraft) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(FAB_PROGRESS_SIZE),
+                        strokeWidth = FAB_PROGRESS_STROKE,
+                        color = LocalContentColor.current
+                    )
+                } else {
+                    Icon(painterResource(R.drawable.ic_person_add), contentDescription = "Add")
+                }
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },

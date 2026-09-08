@@ -81,7 +81,8 @@ class ShareViewModel(
     private val _isPreparingLink = MutableStateFlow(false)
     val isPreparingLink: StateFlow<Boolean> = _isPreparingLink.asStateFlow()
 
-    private val isCreatingDraft = MutableStateFlow(false)
+    private val _isCreatingDraft = MutableStateFlow(false)
+    val isCreatingDraft: StateFlow<Boolean> = _isCreatingDraft.asStateFlow()
 
     private val _activeShare = MutableStateFlow<ActiveShareState>(ActiveShareState.None)
     val activeShare: StateFlow<ActiveShareState> = _activeShare.asStateFlow()
@@ -202,7 +203,7 @@ class ShareViewModel(
 
     // region create
     fun createDraftShare() {
-        if (!isCreatingDraft.compareAndSet(expect = false, update = true)) return
+        if (!_isCreatingDraft.compareAndSet(expect = false, update = true)) return
 
         viewModelScope.launch {
             try {
@@ -216,7 +217,7 @@ class ShareViewModel(
                 updateEditorEntry(ShareEditorEntry.EDIT)
                 applySource(draft.id, sourceId)
             } finally {
-                isCreatingDraft.value = false
+                _isCreatingDraft.value = false
             }
         }
     }
