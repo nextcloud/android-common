@@ -192,7 +192,6 @@ class ShareViewModel(
         }
 
         publishShares(fetched)
-        viewModelScope.launch { deleteAbandonedDrafts() }
     }
 
     private suspend fun fetchShares(filterState: ShareState): NetworkResult<List<Share>> = repository.fetchShares(
@@ -200,14 +199,6 @@ class ShareViewModel(
         filterSourceTypeClass = Source.NODE_SOURCE_CLASS,
         filterState = filterState
     )
-
-    private suspend fun deleteAbandonedDrafts() {
-        if (isCreatingDraft.value) return
-
-        val drafts = (fetchShares(ShareState.DRAFT) as? NetworkResult.Success)?.data ?: return
-        val openShareIds = setOfNotNull(_activeShare.value.shareOrNull?.id, savedState.activeShareId)
-        drafts.filterNot { it.id in openShareIds }.forEach { repository.deleteShare(it.id) }
-    }
     // endregion
 
     // region create
@@ -224,8 +215,6 @@ class ShareViewModel(
                 } ?: return@launch
 
                 updateEditorEntry(ShareEditorEntry.EDIT)
-                updateActiveShare(draft.toActiveShare())
-
                 applySource(draft.id, sourceId)
             } finally {
                 isCreatingDraft.value = false
@@ -290,7 +279,7 @@ class ShareViewModel(
         val updated =
             result.dataOrElse { _errorMessageId.update { R.string.share_view_update_error_message } }
                 ?: return
-        refreshActiveShare(updated.toActiveShare())
+        updateActiveShare(updated.toActiveShare())
     }
     // endregion
 
