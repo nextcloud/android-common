@@ -1,6 +1,7 @@
 /*
  * Nextcloud Android Common Library
  *
+ * SPDX-FileCopyrightText: 2026 Alper Ozturk <alper.ozturk@nextcloud.com>
  * SPDX-FileCopyrightText: 2022-2023 Nextcloud GmbH and Nextcloud contributors
  * SPDX-FileCopyrightText: 2022-2023 Andy Scherzinger <info@andy-scherzinger.de>
  * SPDX-FileCopyrightText: 2023 Thore Goebel <goebel.thore@gmail.com>
