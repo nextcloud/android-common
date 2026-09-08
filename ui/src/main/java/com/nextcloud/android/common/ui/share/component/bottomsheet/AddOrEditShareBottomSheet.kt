@@ -49,7 +49,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboard
@@ -85,7 +84,6 @@ import com.nextcloud.android.common.ui.share.model.ui.ShareEditorEntry
 import com.nextcloud.android.common.ui.share.model.ui.label
 import com.nextcloud.android.common.ui.share.repository.MockShareRepository
 import com.nextcloud.android.common.ui.share.viewmodel.ShareViewModel
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 private const val CUSTOM_SELECTION = "custom"
@@ -118,12 +116,6 @@ fun AddOrEditShareBottomSheet(
     val pendingProperties by viewModel.pendingProperties.collectAsStateWithLifecycle()
     val hasPropertyErrors = propertyErrors.isNotEmpty()
     val sendEnabled = !hasPropertyErrors && pendingProperties.isEmpty()
-
-    LaunchedEffect(sheetState, share.id) {
-        snapshotFlow { sheetState.isVisible }.first { it }
-        snapshotFlow { sheetState.isVisible }.first { !it }
-        dismissSheet()
-    }
 
     ModalBottomSheet(
         onDismissRequest = dismissSheet,

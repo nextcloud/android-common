@@ -103,7 +103,6 @@ class ShareViewModel(
 
     private val propertyUpdateJobs = mutableMapOf<String, Job>()
     private val pendingUpdateJobs = mutableSetOf<Job>()
-    private val activatingShareIds = mutableSetOf<String>()
 
     val searchQuery: StateFlow<String> = savedState.searchQuery
 
@@ -226,19 +225,14 @@ class ShareViewModel(
     // region state
     fun updateState(id: String, shareState: ShareState) {
         viewModelScope.launch {
-            if (shareState == ShareState.ACTIVE) activatingShareIds += id
-            try {
-                val updated = applyState(id, shareState) ?: return@launch
+            val updated = applyState(id, shareState) ?: return@launch
 
-                if (shareState == ShareState.ACTIVE) {
-                    updateActiveShare(ActiveShareState.None)
-                } else {
-                    refreshActiveShare(updated.toActiveShare())
-                }
-                replaceInList(updated)
-            } finally {
-                if (shareState == ShareState.ACTIVE) activatingShareIds -= id
+            if (shareState == ShareState.ACTIVE) {
+                updateActiveShare(ActiveShareState.None)
+            } else {
+                refreshActiveShare(updated.toActiveShare())
             }
+            replaceInList(updated)
         }
     }
 
@@ -247,7 +241,6 @@ class ShareViewModel(
 
         viewModelScope.launch {
             _isPreparingLink.update { true }
-            activatingShareIds += id
 
             try {
                 val updated = applyState(id, ShareState.ACTIVE)
@@ -256,7 +249,6 @@ class ShareViewModel(
                     replaceInList(updated)
                 }
             } finally {
-                activatingShareIds -= id
                 _isPreparingLink.update { false }
             }
         }
@@ -498,11 +490,12 @@ class ShareViewModel(
         val active = _activeShare.value.shareOrNull ?: return
         if (active.id != id) return
 
-        when {
-            id in activatingShareIds -> Unit
-            active.shareState == ShareState.DRAFT -> deleteShare(id)
-            else -> refreshSharesAfterPendingUpdates()
+        if (active.shareState == ShareState.DRAFT) {
+            deleteShare(id)
+        } else if (active.shareState == ShareState.ACTIVE) {
+            refreshSharesAfterPendingUpdates()
         }
+
         setActiveShare(null)
     }
 
