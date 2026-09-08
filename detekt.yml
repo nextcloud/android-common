@@ -3,6 +3,10 @@
 
 # Applied on top of the detekt default config (buildUponDefaultConfig = true).
 comments:
+  CommentOverPrivateFunction:
+    active: false
+  CommentOverPrivateProperty:
+    active: false
   UndocumentedPublicClass:
     active: false
   UndocumentedPublicFunction:
