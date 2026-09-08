@@ -1,6 +1,7 @@
 /*
  * Nextcloud Android Common Library
  *
+ * SPDX-FileCopyrightText: 2026 Alper Ozturk <alper.ozturk@nextcloud.com>
  * SPDX-FileCopyrightText: 2022-2023 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: MIT
  */
@@ -48,11 +49,11 @@ android {
 
 dependencies {
     // region Jetpack Compose
-    implementation 'androidx.compose.ui:ui-tooling-preview:1.11.4'
-    debugImplementation 'androidx.compose.ui:ui-tooling:1.11.4'
+    implementation "androidx.compose.ui:ui-tooling-preview:$composeUiToolingVersion"
+    debugImplementation "androidx.compose.ui:ui-tooling:$composeUiToolingVersion"
     kapt "org.jetbrains.kotlin:kotlin-metadata-jvm:${kotlinVersion}"
 
-    implementation(platform("androidx.compose:compose-bom:2026.08.00"))
+    implementation(platform("androidx.compose:compose-bom:$composeBomVersion"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.material3:material3")
@@ -65,9 +66,9 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-runtime-compose:$lifecycleVersion"
     // endregion
 
-    implementation("io.coil-kt.coil3:coil-compose:3.5.0")
-    implementation("io.coil-kt.coil3:coil-network-okhttp:3.5.0")
-    implementation("io.coil-kt.coil3:coil-svg:3.5.0")
+    implementation("io.coil-kt.coil3:coil-compose:$coilVersion")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:$coilVersion")
+    implementation("io.coil-kt.coil3:coil-svg:$coilVersion")
 
     implementation("com.vanniktech:ui:0.10.0")
 
@@ -78,12 +79,12 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
 
     // region okhttp
-    implementation(platform("com.squareup.okhttp3:okhttp-bom:5.4.0"))
+    implementation(platform("com.squareup.okhttp3:okhttp-bom:$okHttpVersion"))
     implementation("com.squareup.okhttp3:okhttp")
     implementation("com.squareup.okhttp3:logging-interceptor")
     // endregion
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationVersion")
 
     implementation project(':core')
     api project(':material-color-utilities')
