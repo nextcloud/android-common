@@ -1,0 +1,11 @@
+/*
+ * Nextcloud Android Common Library
+ *
+ * SPDX-FileCopyrightText: 2026 Alper Ozturk <alper.ozturk@nextcloud.com>
+ * SPDX-FileCopyrightText: 2026 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-License-Identifier: MIT
+ */
+
+package com.nextcloud.android.common.ui.network.auth
+
+data class ServerCredentials(val baseURL: String, val username: String, val token: String)

@@ -1,12 +1,14 @@
 /*
  * Nextcloud Android Common Library
  *
+ * SPDX-FileCopyrightText: 2026 Alper Ozturk <alper.ozturk@nextcloud.com>
  * SPDX-FileCopyrightText: 2022-2023 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: MIT
  */
 
 plugins {
     id 'org.jetbrains.kotlin.plugin.compose'
+    id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlinVersion"
     id 'com.android.library'
     id 'com.android.built-in-kotlin'
     id 'com.android.legacy-kapt'
@@ -15,7 +17,7 @@ plugins {
 
 android {
     defaultConfig {
-        minSdk = 21
+        minSdk = 26
         compileSdk = 37
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -23,6 +25,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     compileOptions {
@@ -45,12 +48,27 @@ android {
 }
 
 dependencies {
+    // region Jetpack Compose
+    implementation "androidx.compose.ui:ui-tooling-preview:$composeUiToolingVersion"
+    debugImplementation "androidx.compose.ui:ui-tooling:$composeUiToolingVersion"
     kapt "org.jetbrains.kotlin:kotlin-metadata-jvm:${kotlinVersion}"
 
-    implementation(platform("androidx.compose:compose-bom:2026.08.00"))
+    implementation(platform("androidx.compose:compose-bom:$composeBomVersion"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.material:material-icons-core")
+    // endregion
+
+    // region lifecycle
+    api "androidx.lifecycle:lifecycle-viewmodel:$lifecycleVersion"
+    api "androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-runtime-compose:$lifecycleVersion"
+    // endregion
+
+    implementation("io.coil-kt.coil3:coil-compose:$coilVersion")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:$coilVersion")
+    implementation("io.coil-kt.coil3:coil-svg:$coilVersion")
 
     implementation("com.vanniktech:ui:0.10.0")
 
@@ -59,6 +77,14 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.3.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
+
+    // region okhttp
+    implementation(platform("com.squareup.okhttp3:okhttp-bom:$okHttpVersion"))
+    implementation("com.squareup.okhttp3:okhttp")
+    implementation("com.squareup.okhttp3:logging-interceptor")
+    // endregion
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationVersion")
 
     implementation project(':core')
     api project(':material-color-utilities')

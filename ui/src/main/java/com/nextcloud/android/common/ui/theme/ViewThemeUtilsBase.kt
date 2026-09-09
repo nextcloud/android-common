@@ -1,6 +1,7 @@
 /*
  * Nextcloud Android Common Library
  *
+ * SPDX-FileCopyrightText: 2024-2026 Alper Ozturk <alper.ozturk@nextcloud.com>
  * SPDX-FileCopyrightText: 2022-2023 Nextcloud GmbH and Nextcloud contributors
  * SPDX-FileCopyrightText: 2022-2023 Andy Scherzinger <info@andy-scherzinger.de>
  * SPDX-FileCopyrightText: 2022 Álvaro Brey <alvaro@alvarobrey.com>
@@ -15,9 +16,7 @@ import com.nextcloud.android.common.ui.util.PlatformThemeUtil
 import com.nextcloud.android.common.ui.util.extensions.toColorScheme
 import dynamiccolor.DynamicScheme
 
-open class ViewThemeUtilsBase(
-    private val schemes: MaterialSchemes
-) {
+open class ViewThemeUtilsBase(private val schemes: MaterialSchemes) {
     /**
      * Scheme for painting elements
      */
@@ -34,15 +33,9 @@ open class ViewThemeUtilsBase(
             else -> schemes.lightScheme
         }
 
-    protected fun <R> withScheme(
-        view: View,
-        block: (DynamicScheme) -> R
-    ): R = block(getSchemeInternal(view.context))
+    protected fun <R> withScheme(view: View, block: (DynamicScheme) -> R): R = block(getSchemeInternal(view.context))
 
-    protected fun <R> withScheme(
-        context: Context,
-        block: (DynamicScheme) -> R
-    ): R = block(getSchemeInternal(context))
+    protected fun <R> withScheme(context: Context, block: (DynamicScheme) -> R): R = block(getSchemeInternal(context))
 
     protected fun <R> withSchemeDark(block: (DynamicScheme) -> R): R = block(schemes.darkScheme)
 }

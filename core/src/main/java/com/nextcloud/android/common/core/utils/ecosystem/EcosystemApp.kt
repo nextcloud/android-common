@@ -1,6 +1,7 @@
 /*
  * Nextcloud Android Common Library
  *
+ * SPDX-FileCopyrightText: 2026 Alper Ozturk <alper.ozturk@nextcloud.com>
  * SPDX-FileCopyrightText: 2026 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: MIT
  */
@@ -15,9 +16,7 @@ package com.nextcloud.android.common.core.utils.ecosystem
  * allow compatibility with different flavours (Play Store, F-Droid, QA, beta/dev versions, etc.).
  *
  */
-enum class EcosystemApp(
-    val packageNames: List<String>
-) {
+enum class EcosystemApp(val packageNames: List<String>) {
     FILES(
         listOf(
             "com.nextcloud.client", // generic, gplay, huawei

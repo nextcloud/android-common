@@ -1,6 +1,7 @@
 /*
  * Nextcloud Android Common Library
  *
+ * SPDX-FileCopyrightText: 2026 Alper Ozturk <alper.ozturk@nextcloud.com>
  * SPDX-FileCopyrightText: 2022-2023 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: MIT
  */
@@ -9,6 +10,12 @@ buildscript {
     ext {
         daggerVersion = "2.60.1"
         kotlinVersion = "2.4.20"
+        lifecycleVersion = "2.11.0"
+        composeUiToolingVersion = "1.12.0"
+        coilVersion = "3.6.2"
+        okHttpVersion = "5.5.0"
+        composeBomVersion = "2026.08.00"
+        kotlinxSerializationVersion = "1.11.0"
         jUnitVersion = "4.13.2"
         androidXTestVersion = "1.3.0"
         androidXEspressoTestVersion = "3.7.0"
@@ -60,10 +67,13 @@ subprojects {
     spotless {
         kotlin {
             target '**/*.kt'
-            ktlint()
+            ktlint().editorConfigOverride([
+                'ktlint_function_naming_ignore_when_annotated_with': 'Composable'
+            ])
         }
     }
     detekt {
         buildUponDefaultConfig = true
+        config.setFrom(rootProject.file('detekt.yml'))
     }
 }

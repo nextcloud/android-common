@@ -1,6 +1,7 @@
 /*
  * Nextcloud Android Common Library
  *
+ * SPDX-FileCopyrightText: 2026 Alper Ozturk <alper.ozturk@nextcloud.com>
  * SPDX-FileCopyrightText: 2022-2023 Nextcloud GmbH and Nextcloud contributors
  * SPDX-FileCopyrightText: 2022 Álvaro Brey <alvaro@alvarobrey.com>
  * SPDX-License-Identifier: MIT
@@ -21,15 +22,9 @@ import dynamiccolor.MaterialDynamicColors
 internal object SwitchColorUtils {
     private const val SWITCH_COMPAT_TRACK_ALPHA: Int = 77
 
-    data class SwitchColors(
-        val thumbColor: ColorStateList,
-        val trackColor: ColorStateList
-    )
+    data class SwitchColors(val thumbColor: ColorStateList, val trackColor: ColorStateList)
 
-    fun calculateSwitchColors(
-        context: Context,
-        scheme: DynamicScheme
-    ): SwitchColors {
+    fun calculateSwitchColors(context: Context, scheme: DynamicScheme): SwitchColors {
         val dynamicColor = MaterialDynamicColors()
 
         val thumbUncheckedColor =
@@ -55,15 +50,15 @@ internal object SwitchColorUtils {
 
         return SwitchColors(
             thumbColor =
-                ColorStateList(
-                    arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
-                    intArrayOf(dynamicColor.primary().getArgb(scheme), thumbUncheckedColor)
-                ),
+            ColorStateList(
+                arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+                intArrayOf(dynamicColor.primary().getArgb(scheme), thumbUncheckedColor)
+            ),
             trackColor =
-                ColorStateList(
-                    arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
-                    intArrayOf(trackColor, trackUncheckedColor)
-                )
+            ColorStateList(
+                arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+                intArrayOf(trackColor, trackUncheckedColor)
+            )
         )
     }
 }

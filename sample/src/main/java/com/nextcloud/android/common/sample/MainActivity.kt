@@ -1,6 +1,7 @@
 /*
  * Nextcloud Android Common Library
  *
+ * SPDX-FileCopyrightText: 2026 Alper Ozturk <alper.ozturk@nextcloud.com>
  * SPDX-FileCopyrightText: 2022-2023 Nextcloud GmbH and Nextcloud contributors
  * SPDX-FileCopyrightText: 2023 Andy Scherzinger <info@andy-scherzinger.de>
  * SPDX-FileCopyrightText: 2023 Stefan Niedermann <info@niedermann.it>
@@ -31,6 +32,7 @@ import com.nextcloud.android.common.ui.util.extensions.addSystemBarPaddings
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
+    @Suppress("LongMethod")
     override fun onCreate(savedInstanceState: Bundle?) {
         val style = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT)
         enableEdgeToEdge(style, style)
@@ -83,6 +85,26 @@ class MainActivity : AppCompatActivity() {
 
             val negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE) as MaterialButton
             material.colorMaterialButtonPrimaryBorderless(negativeButton)
+        }
+
+        binding.testApiBtn.setOnClickListener {
+            val baseUrl =
+                binding.baseUrl.text
+                    ?.toString()
+                    .orEmpty()
+            val username =
+                binding.username.text
+                    ?.toString()
+                    .orEmpty()
+            val token =
+                binding.token.text
+                    ?.toString()
+                    .orEmpty()
+            mainViewModel.testPredefinedStatuses(baseUrl, username, token)
+        }
+
+        mainViewModel.apiTestResult.observe(this) { result ->
+            Toast.makeText(this, result, Toast.LENGTH_LONG).show()
         }
 
         setSupportActionBar(binding.toolbar)
