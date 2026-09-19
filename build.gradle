@@ -12,7 +12,7 @@ buildscript {
         kotlinVersion = "2.4.20"
         lifecycleVersion = "2.11.0"
         composeUiToolingVersion = "1.12.1"
-        coilVersion = "3.6.2"
+        coilVersion = "3.6.3"
         okHttpVersion = "5.5.0"
         composeBomVersion = "2026.09.00"
         kotlinxSerializationVersion = "1.11.0"
