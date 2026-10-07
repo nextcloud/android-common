@@ -18,7 +18,7 @@
     </plurals>
     <!-- relative time in hours, less than 1 day, i.e. 1h, 5h, 23h -->
     <plurals name="date_formatting_relative_hours">
-        <item quantity="one">%dh</item>
+        <item quantity="one">%d h</item>
         <item quantity="few">%dh</item>
         <item quantity="many">%dh</item>
         <item quantity="other">%dh</item>
