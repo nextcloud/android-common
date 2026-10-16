@@ -24,8 +24,10 @@
         <item quantity="other">%dч</item>
     </plurals>
 
-    <string name="ecosystem_null_account">Аккаунт отсутствует. Не удается открыть приложение.</string>
-    <string name="ecosystem_invalid_account">Недопустимый формат аккаунта. Должен быть указан адрес электронной почты.</string>
+    <string name="ecosystem_null_account">Учётная запись отсутствует. Не удаётся открыть приложение.</string>
+    <string name="ecosystem_wrong_intent">Не удалось выполнить действие: получены неожиданные данные</string>
+    <string name="ecosystem_received_account_invalid">Полученная учётная запись недействительна.</string>
+    <string name="ecosystem_invalid_account">Недопустимый формат учётной записи. Нужен адрес электронной почты.</string>
     <string name="ecosystem_app_not_found">Приложение не установлено. Перенаправление в магазин…</string>
-    <string name="ecosystem_store_open_failed">Не удается открыть App Store. Пожалуйста, установите приложение вручную.</string>
+    <string name="ecosystem_store_open_failed">Не удаётся открыть магазин приложений. Установите приложение вручную.</string>
 </resources>
