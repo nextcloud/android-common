@@ -124,6 +124,7 @@
             <trusting group="com.google.devtools.ksp" name="symbol-processing-api" version="2.2.20-2.0.3"/>
             <trusting group="com.google.devtools.ksp" name="symbol-processing-api" version="2.3.7"/>
          </trusted-key>
+         <trusted-key id="2820DE9F95EC4043E616B735FA5C18CFB74EC7C6" group="com.diffplug.spotless"/>
          <trusted-key id="2BAB4466B44F54F8F99BBBDD5ED22F661BBF0ACC" group="com.almworks.sqlite4java" name="sqlite4java" version="1.0.392"/>
          <trusted-key id="2BCBDD0F23EA1CAFCC11D4860374CF2E8DD1BDFD" group="org.sonatype.oss"/>
          <trusted-key id="2DB4F1EF0FA761ECC4EA935C86FDC7E2A11262CB">
