@@ -53,7 +53,7 @@ class DateFormatterTest {
         val calendar = Calendar.getInstance()
         calendar.add(Calendar.MINUTE, -5)
         val formattedDate = dateFormatter.getConditionallyRelativeFormattedTimeSpan(calendar)
-        val expected = context.resources.getQuantityString(R.plurals.date_formatting_relative_minutes, 5)
+        val expected = "5m"
         assertEquals(expected, formattedDate)
     }
 
@@ -62,7 +62,7 @@ class DateFormatterTest {
         val calendar = Calendar.getInstance()
         calendar.add(Calendar.HOUR, -3)
         val formattedDate = dateFormatter.getConditionallyRelativeFormattedTimeSpan(calendar)
-        val expected = context.resources.getQuantityString(R.plurals.date_formatting_relative_hours, 3, 3)
+        val expected = "3h"
         assertEquals(expected, formattedDate)
     }
 
