@@ -60,10 +60,12 @@ class DateFormatter(private val context: Context) {
 
             // less than 1h
             span < ONE_HOUR_IN_MILLIS -> {
+                val minutes: Int = span.toInt() / ONE_MINUTE_IN_MILLIS
                 context.resources
                     .getQuantityString(
                         R.plurals.date_formatting_relative_minutes,
-                        span.toInt() / ONE_MINUTE_IN_MILLIS
+                        minutes,
+                        minutes
                     )
             }
 
