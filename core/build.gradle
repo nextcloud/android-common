@@ -13,7 +13,7 @@ plugins {
 android {
     namespace 'com.nextcloud.android.common.core'
     defaultConfig {
-        minSdk = 21
+        minSdk = 26
         compileSdk = 37
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -27,8 +27,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
     }
     namespace 'com.nextcloud.android.common.core'
 
@@ -44,17 +44,11 @@ android {
 
 dependencies {
     implementation 'androidx.core:core-ktx:1.19.1'
-    implementation 'androidx.appcompat:appcompat:1.8.0'
     implementation 'com.google.android.material:material:1.14.0'
 
     testImplementation "junit:junit:$jUnitVersion"
     testImplementation 'androidx.test:core:1.7.0'
     testImplementation 'org.robolectric:robolectric:4.17'
-    testImplementation "org.mockito:mockito-core:$mockitoVersion"
-    testImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion"
-    testImplementation "io.mockk:mockk:$mockkVersion"
-    androidTestImplementation "androidx.test.ext:junit:$androidXTestVersion"
-    androidTestImplementation "androidx.test.espresso:espresso-core:$androidXEspressoTestVersion"
 }
 
 afterEvaluate {

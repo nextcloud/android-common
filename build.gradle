@@ -17,11 +17,6 @@ buildscript {
         composeBomVersion = "2026.09.00"
         kotlinxSerializationVersion = "1.12.0"
         jUnitVersion = "4.13.2"
-        androidXTestVersion = "1.3.0"
-        androidXEspressoTestVersion = "3.7.0"
-        mockkVersion = "1.14.11"
-        mockitoVersion = "5.24.0"
-        mockitoKotlinVersion = "6.4.0"
     }
 }
 
