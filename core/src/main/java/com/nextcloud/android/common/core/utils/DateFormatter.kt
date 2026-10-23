@@ -8,7 +8,6 @@
 package com.nextcloud.android.common.core.utils
 
 import android.content.Context
-import android.os.Build
 import android.text.format.DateFormat
 import com.nextcloud.android.common.core.R
 import java.text.SimpleDateFormat
@@ -24,14 +23,7 @@ class DateFormatter(private val context: Context) {
     private val sdfYears: SimpleDateFormat
 
     init {
-        val locale =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                this.context.resources.configuration
-                    .getLocales()
-                    .get(0)
-            } else {
-                this.context.resources.configuration.locale
-            }
+        val locale = this.context.resources.configuration.locales[0]
         this.sdfDays = SimpleDateFormat(DateFormat.getBestDateTimePattern(locale, "EEE"), locale)
         this.sdfMonths =
             SimpleDateFormat(DateFormat.getBestDateTimePattern(locale, "MMM d"), locale)
