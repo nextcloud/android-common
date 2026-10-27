@@ -19,11 +19,6 @@ internal object ServerAddressUtils {
     private const val FRAGMENT_START = '#'
     private const val IPV6_START = '['
     private const val IPV6_END = ']'
-    private const val IPV6_COMPRESSION = "::"
-    private const val IPV6_GROUP_SEPARATOR = ':'
-    private const val IPV6_GROUP_COUNT = 8
-    private const val IPV6_ZERO = '0'
-    private const val IPV6_ZERO_GROUP = "0"
     private const val INDEX_PHP_PATH = "/index.php"
     private const val HTTP_SCHEME = "http"
     private const val HTTP_PORT = "80"
@@ -71,7 +66,7 @@ internal object ServerAddressUtils {
         val defaultPort = if (scheme == HTTP_SCHEME) HTTP_PORT else HTTPS_PORT
         val effectivePort = port.takeUnless { it.isEmpty() || it == defaultPort } ?: HTTPS_PORT
         val comparablePort = if (effectivePort == HTTPS_PORT) "" else "$PORT_SEPARATOR$effectivePort"
-        val comparableHost = if (isIpv6) host.toComparableIpv6Host() else host.toComparableHostName()
+        val comparableHost = if (isIpv6) host.lowercase(Locale.ROOT) else host.toComparableHostName()
 
         return comparableHost + comparablePort + path
     }
@@ -82,27 +77,7 @@ internal object ServerAddressUtils {
         substringBefore(PORT_SEPARATOR)
     }
 
-    private fun String.toComparableIpv6Host(): String {
-        val address = removePrefix(IPV6_START.toString()).removeSuffix(IPV6_END.toString()).lowercase(Locale.ROOT)
-        val parts = address.split(IPV6_COMPRESSION)
-        val head = parts.first().toIpv6Groups()
-        val tail = parts.getOrNull(1)?.toIpv6Groups().orEmpty()
-        val missingGroupCount = IPV6_GROUP_COUNT - head.size - tail.size
-        val isCompressed = parts.size == 2
-        val isValid = parts.size <= 2 && missingGroupCount >= 0 && (isCompressed || missingGroupCount == 0)
-        if (!isValid) {
-            return "$IPV6_START$address$IPV6_END"
-        }
-
-        val groups = head + List(missingGroupCount) { IPV6_ZERO_GROUP } + tail
-        return groups.joinToString(IPV6_GROUP_SEPARATOR.toString(), IPV6_START.toString(), IPV6_END.toString()) {
-            it.trimStart(IPV6_ZERO).ifEmpty { IPV6_ZERO_GROUP }
-        }
-    }
-
     private fun Char.isForbiddenInServer(): Boolean = isWhitespace() || this == QUERY_START || this == FRAGMENT_START
-
-    private fun String.toIpv6Groups(): List<String> = split(IPV6_GROUP_SEPARATOR).filter { it.isNotEmpty() }
 
     private fun String.toComparableHostName(): String {
         val host = lowercase(Locale.ROOT).trimEnd(HOST_LABEL_SEPARATOR)
