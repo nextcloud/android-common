@@ -18,7 +18,7 @@ import android.view.View
 import androidx.core.net.toUri
 import com.google.android.material.snackbar.Snackbar
 import com.nextcloud.android.common.core.R
-import java.util.regex.Pattern
+import com.nextcloud.android.common.core.utils.AccountNameUtils
 
 /**
  * EcosystemManager: handles sending and receiving account info across apps
@@ -37,15 +37,7 @@ class EcosystemManager(private val activity: Activity) {
         private const val PLAY_STORE_LINK = "https://play.google.com/store/apps/details?id="
         private const val PLAY_STORE_MARKET_LINK = "market://details?id="
         private const val EXTRA_KEY_ACCOUNT = "KEY_ACCOUNT"
-
-        const val ACCOUNT_NAME_PATTERN_REGEX =
-            "^[A-Za-z0-9._%+-]+(?:@(?:[A-Za-z0-9-]+\\.)+[A-Za-z]{2,})?" +
-                "@(?:(?:[A-Za-z0-9-]+\\.)+[A-Za-z]{2,}|(?:\\d{1,3}\\.){3}\\d{1,3})" +
-                "(?::\\d{1,5})?" +
-                "(?:/[^\\s?#]*)?$"
     }
-
-    private val accountNamePattern = Pattern.compile(ACCOUNT_NAME_PATTERN_REGEX)
 
     /**
      * Opens an ecosystem app with the given account information.
@@ -74,7 +66,7 @@ class EcosystemManager(private val activity: Activity) {
         }
 
         // validate account name
-        if (!accountNamePattern.matcher(accountName).matches()) {
+        if (!AccountNameUtils.isValid(accountName)) {
             showSnackbar(R.string.ecosystem_invalid_account)
             return
         }
@@ -184,7 +176,7 @@ class EcosystemManager(private val activity: Activity) {
             return
         }
 
-        if (!accountNamePattern.matcher(account).matches()) {
+        if (!AccountNameUtils.isValid(account)) {
             val message = activity.getString(R.string.ecosystem_received_account_invalid)
             callback.onAccountError(message)
             return
