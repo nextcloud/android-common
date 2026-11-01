@@ -21,9 +21,9 @@
     </plurals>
 
     <string name="ecosystem_null_account">Kontoen mangler. Kan ikke åbne appen.</string>
-    <string name="ecosystem_wrong_intent">Kan ikke fuldføre handling: modtaget uventede data</string>
-    <string name="ecosystem_received_account_invalid">Modtaget konto er ugyldig.</string>
-    <string name="ecosystem_invalid_account">Ugyldigt kontoformat. Det må være en mail.</string>
-    <string name="ecosystem_app_not_found">App ikke installeret. Omdirigerer til app butik...</string>
-    <string name="ecosystem_store_open_failed">Kan ikke åbne app butik. Vær venlig at installere manuelt.</string>
+    <string name="ecosystem_wrong_intent">Handlingen kan ikke fuldføres: Der blev modtaget uventede data</string>
+    <string name="ecosystem_received_account_invalid">Den modtagne konto er ugyldig.</string>
+    <string name="ecosystem_invalid_account">Ugyldigt kontoformat. Det skal være en e-mailadresse.</string>
+    <string name="ecosystem_app_not_found">Appen er ikke installeret. Omdirigerer til appbutikken…</string>
+    <string name="ecosystem_store_open_failed">Kan ikke åbne appbutikken. Installer appen manuelt.</string>
 </resources>
