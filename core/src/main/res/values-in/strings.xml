@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~  Nextcloud Android Common Library
+  ~ 
+  ~ SPDX-FileCopyrightText: 2026 Alper Ozturk <alper.ozturk@nextcloud.com>
+  ~ SPDX-FileCopyrightText: 2025 Nextcloud GmbH and Nextcloud contributors
+  ~ SPDX-License-Identifier: MIT
+-->
+<resources>
+    <!-- relative time less than 1 minute using the term: Now -->
+    <string name="date_formatting_now">Sekarang</string>
+    <!-- relative time in minutes, less than 1 hour, i.e. 1m, 5m, 59m -->
+    <plurals name="date_formatting_relative_minutes">
+        <item quantity="other">%dm</item>
+    </plurals>
+    <!-- relative time in hours, less than 1 day, i.e. 1h, 5h, 23h -->
+    <plurals name="date_formatting_relative_hours">
+        <item quantity="other">%dj</item>
+    </plurals>
+
+    <string name="ecosystem_null_account">Akun tidak ditemukan. Tidak dapat membuka aplikasi.</string>
+    <string name="ecosystem_wrong_intent">Tidak dapat menyelesaikan tindakan: data yang diterima tidak sesuai harapan</string>
+    <string name="ecosystem_received_account_invalid">Akun yang diterima tidak valid.</string>
+    <string name="ecosystem_invalid_account">Format akun tidak valid. Harus berupa alamat email.</string>
+    <string name="ecosystem_app_not_found">Aplikasi belum terpasang. Mengalihkan ke toko aplikasi…</string>
+    <string name="ecosystem_store_open_failed">Tidak dapat membuka toko aplikasi. Silakan pasang secara manual.</string>
+</resources>
