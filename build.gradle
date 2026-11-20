@@ -10,7 +10,7 @@ buildscript {
     ext {
         daggerVersion = "2.60.1"
         kotlinVersion = "2.4.21"
-        lifecycleVersion = "2.11.0"
+        lifecycleVersion = "2.11.1"
         composeUiToolingVersion = "1.12.1"
         coilVersion = "3.6.3"
         okHttpVersion = "5.5.1"
