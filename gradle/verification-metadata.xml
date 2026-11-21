@@ -65,9 +65,11 @@
          <trusted-key id="0E225917414670F4442C250DFD533C07C264648F">
             <trusting group="androidx.annotation" name="annotation-jvm" version="1.11.0"/>
             <trusting group="androidx.appcompat"/>
+            <trusting group="androidx.collection"/>
             <trusting group="androidx.constraintlayout"/>
             <trusting group="androidx.core"/>
             <trusting group="androidx.databinding"/>
+            <trusting group="androidx.emoji2"/>
             <trusting group="androidx.lifecycle"/>
             <trusting group="^androidx[.]compose($|([.].*))" regex="true"/>
             <trusting group="^com[.]android($|([.].*))" regex="true"/>
@@ -82,7 +84,9 @@
             <trusting group="androidx.databinding"/>
             <trusting group="androidx.dynamicanimation" name="dynamicanimation" version="1.1.0"/>
             <trusting group="androidx.exifinterface" name="exifinterface" version="1.4.2"/>
+            <trusting group="androidx.graphics"/>
             <trusting group="androidx.lifecycle"/>
+            <trusting group="androidx.navigationevent"/>
             <trusting group="androidx.savedstate"/>
             <trusting group="androidx.swiperefreshlayout" name="swiperefreshlayout" version="1.2.0"/>
             <trusting group="androidx.transition"/>
