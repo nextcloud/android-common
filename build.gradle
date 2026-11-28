@@ -14,7 +14,7 @@ buildscript {
         composeUiToolingVersion = "1.12.1"
         coilVersion = "3.6.3"
         okHttpVersion = "5.5.1"
-        composeBomVersion = "2026.09.00"
+        composeBomVersion = "2026.11.01"
         kotlinxSerializationVersion = "1.13.0"
         jUnitVersion = "4.13.2"
     }
